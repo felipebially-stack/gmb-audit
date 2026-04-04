@@ -13,10 +13,10 @@ export async function POST(req: Request) {
     // Proteção extra: se a URL do site não estiver no Vercel ainda, ele usa localhost
     const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
 
-    // 2. CRIA A SESSÃO DE PAGAMENTO (Tela do cartão/Pix)
+    // 2. CRIA A SESSÃO DE PAGAMENTO (Tela do cartão)
     const session = await stripe.checkout.sessions.create({
-      // 👇 AQUI ESTÁ A MÁGICA: "pix" adicionado ao lado de "card" 👇
-      payment_method_types: ["card", "pix"], 
+      // 👇 AQUI ESTÁ O CONSERTO: Deixamos apenas "card" temporariamente 👇
+      payment_method_types: ["card"], 
       line_items: [
         {
           price_data: {
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       ],
       mode: "payment",
       
-      // 👇 LINHA ADICIONADA PARA HABILITAR OS CUPONS 👇
+      // 👇 LINHA MANTIDA PARA HABILITAR OS CUPONS 👇
       allow_promotion_codes: true, 
       
       // 3. PARA ONDE O CLIENTE VAI DEPOIS DE PAGAR
@@ -45,6 +45,4 @@ export async function POST(req: Request) {
     
   } catch (error: any) {
     console.error("Erro no Stripe:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
+    return NextResponse.json({ error: error.message }, { status: 500
