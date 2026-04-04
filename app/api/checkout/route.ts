@@ -15,7 +15,8 @@ export async function POST(req: Request) {
 
     // 2. CRIA A SESSÃO DE PAGAMENTO (Tela do cartão/Pix)
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"], // O Stripe libera Pix no seu painel depois
+      // 👇 AQUI ESTÁ A MÁGICA: "pix" adicionado ao lado de "card" 👇
+      payment_method_types: ["card", "pix"], 
       line_items: [
         {
           price_data: {
