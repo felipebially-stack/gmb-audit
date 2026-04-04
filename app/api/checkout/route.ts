@@ -15,7 +15,6 @@ export async function POST(req: Request) {
 
     // 2. CRIA A SESSÃO DE PAGAMENTO (Tela do cartão)
     const session = await stripe.checkout.sessions.create({
-      // 👇 AQUI ESTÁ O CONSERTO: Deixamos apenas "card" temporariamente 👇
       payment_method_types: ["card"], 
       line_items: [
         {
@@ -32,7 +31,7 @@ export async function POST(req: Request) {
       ],
       mode: "payment",
       
-      // 👇 LINHA MANTIDA PARA HABILITAR OS CUPONS 👇
+      // HABILITA OS CUPONS
       allow_promotion_codes: true, 
       
       // 3. PARA ONDE O CLIENTE VAI DEPOIS DE PAGAR
@@ -45,4 +44,6 @@ export async function POST(req: Request) {
     
   } catch (error: any) {
     console.error("Erro no Stripe:", error);
-    return NextResponse.json({ error: error.message }, { status: 500
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
