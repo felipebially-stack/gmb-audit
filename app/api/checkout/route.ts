@@ -1,18 +1,21 @@
-import { NextResponse } from "next/server";
-import Stripe from "stripe";
-
-// Conecta com o Stripe usando a sua chave secreta
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16" as any,
-});
+import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
 
 export async function POST(req: Request) {
   try {
+    // 1. INICIALIZA O STRIPE BLINDADO (Aqui dentro a Vercel não trava)
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+      apiVersion: "2023-10-16" as any,
+    });
+
     const { companyName } = await req.json();
 
-    // Cria a sessão de pagamento (a tela do cartão/Pix)
+    // Proteção extra: se a URL do site não estiver no Vercel ainda, ele usa localhost
+    const baseUrl = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000';
+
+    // 2. CRIA A SESSÃO DE PAGAMENTO (Tela do cartão/Pix)
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"], // No Brasil, o Stripe libera Pix no painel depois
+      payment_method_types: ["card"], // O Stripe libera Pix no seu painel depois
       line_items: [
         {
           price_data: {
@@ -27,13 +30,15 @@ export async function POST(req: Request) {
         },
       ],
       mode: "payment",
-      // Para onde o cliente vai se pagar ou se desistir
-      success_url: `${process.env.NEXT_PUBLIC_URL}/sucesso?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL}/`,
+      
+      // 3. PARA ONDE O CLIENTE VAI DEPOIS DE PAGAR
+      success_url: `${baseUrl}/sucesso?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/`,
     });
 
-    // Devolve o link da tela de pagamento para o nosso site
+    // 4. DEVOLVE O LINK DE PAGAMENTO PARA O BOTÃO DO SITE
     return NextResponse.json({ url: session.url });
+    
   } catch (error: any) {
     console.error("Erro no Stripe:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
