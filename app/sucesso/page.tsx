@@ -13,6 +13,18 @@ export default function SucessoPage() {
       const parsedData = JSON.parse(salvo);
       setDados(parsedData);
       setTimeout(() => document.title = `Consultoria_GMN_Turbo_${parsedData.companyName.replace(/\s+/g, '_')}`, 500);
+
+      // ====================================================================
+      // 🚀 GATILHO DE CONVERSÃO DO FACEBOOK (PURCHASE)
+      // ====================================================================
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'Purchase', {
+          value: 15.00,
+          currency: 'BRL',
+          content_name: `Consultoria - ${parsedData.companyName}`,
+          content_type: 'product'
+        });
+      }
     }
   }, []);
 
@@ -52,23 +64,19 @@ export default function SucessoPage() {
   // 🤖 MOTOR DE COPYWRITING INTELIGENTE (TEXTOS HUMANIZADOS)
   // ====================================================================
   
-  // 1. Limpa emojis e nomes gigantescos para usar no meio da frase
   const nomeOriginal = dados.companyName || "";
-  // Remove emojis, corta no primeiro hífen/barra e pega só as primeiras palavras para soar como apelido carinhoso/real
   let nomeConversacional = nomeOriginal
     .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '') 
     .split(/[-|]/)[0]
     .trim();
   
   if (nomeConversacional.split(' ').length > 4) {
-    nomeConversacional = nomeConversacional.split(' ').slice(0, 3).join(' '); // Limita a 3 palavras
+    nomeConversacional = nomeConversacional.split(' ').slice(0, 3).join(' ');
   }
 
-  // 2. Ajusta as palavras-chave para não soar robótico
   let keywordFoco = (termoRuim !== "seus serviços" && termoRuim !== "sua especialidade") ? termoRuim : "produtos e serviços de alta qualidade";
   let keywordSecundaria = (termoBom !== "sua especialidade" && termoBom !== "seus serviços") ? termoBom : "o melhor atendimento da região";
 
-  // 3. Escolhe um template de texto baseado no nome para variar entre clientes
   const templateIndex = nomeOriginal.length % 3;
 
   let descricaoFinal = "";
@@ -93,9 +101,8 @@ export default function SucessoPage() {
     respostaAva = `Que alegria ler o seu comentário! Toda a equipe da ${nomeConversacional} agradece de coração. Trabalhamos duro para ser a melhor opção de ${keywordFoco} em ${cidade}. Um grande abraço e até a próxima!`;
   }
 
-
   // ====================================================================
-  // MOTOR DE PRIORIZAÇÃO DINÂMICA (PLANO DE AÇÃO)
+  // MOTOR DE PRIORIZAÇÃO DINÂMICA
   // ====================================================================
   const acoesCriticas: any[] = [];
   const acoesMedias: any[] = [];
@@ -142,7 +149,6 @@ export default function SucessoPage() {
     checklistReal.push("Preencher todos os atributos (Pagamentos, Acessibilidade, etc)");
   }
 
-  // Fallbacks
   if (acoesCriticas.length === 0) {
     acoesCriticas.push({ t: "Blindagem de Descrição", d: `Sua descrição está boa, mas garanta que ela usa palavras de alta conversão. Revise com o texto do nosso Kit.`});
     acoesCriticas.push({ t: "Manutenção Visual", d: `O algoritmo adora constância. Tire mais 3 fotos da equipe ou loja em ${cidade} e poste esta semana.`});
@@ -160,86 +166,37 @@ export default function SucessoPage() {
   const prioridadesRapidas = acoesMedias.slice(0, 2);
   const checklistFinal = checklistReal.slice(0, 5);
 
-
-  // 4. MATRIZ EXATA DA AUDITORIA (PÁGINA 4)
   const auditoria10Pontos = [
-    {
-      titulo: "1. Perfil Verificado", status: statusVerificado,
-      porque: "O Google prioriza a exibição de empresas oficiais. Perfis sem propriedade assumida despencam nas buscas.",
-      impacto: statusVerificado === "Bom" ? `O perfil apresenta sinais de verificação. Foco em dominar rankings.` : `ALERTA: Reivindique a propriedade do perfil imediatamente para evitar suspensões.`
-    },
-    {
-      titulo: "2. Horários Atualizados", status: statusHorarios,
-      porque: "Um cliente que chega no local e o encontra fechado deixa 1 estrela, matando seu SEO.",
-      impacto: statusHorarios === "Bom" ? `Horários básicos estão OK. Garanta que os feriados estejam atualizados.` : `Risco de perder o selo verde de "Aberto". Atualize os horários no painel urgentemente.`
-    },
-    {
-      titulo: "3. Fotos Recentes", status: statusFotos,
-      porque: "O algoritmo lê o GPS invisível nas fotos recentes para confirmar até onde você atende.",
-      impacto: statusFotos === "Bom" ? `A frequência de imagens ajuda a sustentar seu ranking local.` : `Faltam fotos recentes! Subir fotos tiradas em ${cidade} vai expandir sua busca.`
-    },
-    {
-      titulo: "4. Descrição Completa", status: statusDescricao,
-      porque: "Os 750 caracteres são varridos pelo algoritmo em busca de intenção de compra.",
-      impacto: statusDescricao === "Bom" ? `Descrição com bom volume de texto. Monitore os termos que trazem clientes.` : `Reescreva a descrição focando na palavra "${keywordFoco}". Use nosso Kit.`
-    },
-    {
-      titulo: "5. Categoria Principal", status: statusCategorias,
-      porque: "Fator de peso máximo. Ter poucas categorias esconde sua empresa de pesquisas secundárias.",
-      impacto: statusCategorias === "Bom" ? `Categoria alinhada com o mercado. Explore opções secundárias.` : `Adicione ramificações na aba de categorias para abrir portas no Google Maps.`
-    },
-    {
-      titulo: "6. Atributos do Negócio", status: statusAtributos,
-      porque: "Filtros como 'Acessibilidade' ou 'Wi-fi' colocam você na frente em buscas exigentes.",
-      impacto: statusAtributos === "Bom" ? `Atributos preenchidos aumentam as rotas traçadas para o local.` : `Preencha os atributos para capturar leads que usam filtros de pesquisa.`
-    },
-    {
-      titulo: "7. Postagens Recentes", status: statusPostagens,
-      porque: "Perfis sem posts nos últimos 7 dias perdem o bônus de 'frescor' do algoritmo.",
-      impacto: statusPostagens === "Bom" ? `Sinal de atividade constante. O Google percebe que a empresa está viva.` : `A falta de posts paralisa seu SEO. Poste a "Oferta Semana 1" hoje mesmo.`
-    },
-    {
-      titulo: "8. Produtos e Serviços", status: statusProdutos,
-      porque: "A aba de serviços indexa termos longos que não couberam na sua descrição principal.",
-      impacto: statusProdutos === "Bom" ? `Catálogo ativo ajudando na retenção e no SEO de cauda longa.` : `Adicione produtos nomeados com as palavras onde você está invisível.`
-    },
-    {
-      titulo: "9. Perguntas Respondidas", status: statusRespostas,
-      porque: "O algoritmo pune perfis que não engajam com dúvidas de clientes.",
-      impacto: statusRespostas === "Bom" ? `Seu nível de interação transmite segurança e autoridade.` : `Sempre responda as dúvidas rapidamente usando nossa técnica.`
-    },
-    {
-      titulo: "10. Website Vinculado", status: statusWebsite,
-      porque: "O Google cruza os dados do perfil com o site oficial para dar confiança à ficha.",
-      impacto: statusWebsite === "Bom" ? `A ligação com o website transfere autoridade para sua ficha.` : `Vincule a URL de um site otimizado no perfil para blindar sua autoridade.`
-    }
+    { titulo: "1. Perfil Verificado", status: statusVerificado, porque: "O Google prioriza a exibição de empresas oficiais.", impacto: statusVerificado === "Bom" ? `Perfil verificado. Foco em dominar rankings.` : `ALERTA: Reivindique a propriedade do perfil imediatamente.` },
+    { titulo: "2. Horários Atualizados", status: statusHorarios, porque: "Horários errados geram avaliações negativas e matam o SEO.", impacto: statusHorarios === "Bom" ? `Horários OK. Garanta feriados atualizados.` : `Risco de perder selo verde. Atualize horários urgentemente.` },
+    { titulo: "3. Fotos Recentes", status: statusFotos, porque: "O algoritmo lê o GPS invisível nas fotos para confirmar sua área.", impacto: statusFotos === "Bom" ? `Frequência de mídia sustenta seu ranking.` : `Faltam fotos recentes em ${cidade}. Suba novas fotos com GPS.` },
+    { titulo: "4. Descrição Completa", status: statusDescricao, porque: "Os 750 caracteres são varridos em busca de intenção de compra.", impacto: statusDescricao === "Bom" ? `Bom volume de texto. Monitore termos de busca.` : `Reescreva a descrição focando em "${keywordFoco}".` },
+    { titulo: "5. Categoria Principal", status: statusCategorias, porque: "Fator de peso máximo no ranking local.", impacto: statusCategorias === "Bom" ? `Categoria alinhada. Explore secundárias.` : `Adicione ramificações para abrir portas no Google Maps.` },
+    { titulo: "6. Atributos do Negócio", status: statusAtributos, porque: "Filtros de busca ajudam na conversão de leads qualificados.", impacto: statusAtributos === "Bom" ? `Atributos preenchidos aumentam as rotas traçadas.` : `Preencha atributos para capturar leads de filtros específicos.` },
+    { titulo: "7. Postagens Recentes", status: statusPostagens, porque: "Sinal de frescor e atividade constante para o algoritmo.", impacto: statusPostagens === "Bom" ? `Atividade constante sinaliza que a empresa está viva.` : `Falta de posts paralisa o SEO. Use o kit hoje mesmo.` },
+    { titulo: "8. Produtos e Serviços", status: statusProdutos, porque: "Indexa termos longos que não cabem na descrição principal.", impacto: statusProdutos === "Bom" ? `Catálogo ativo ajuda na retenção e SEO longo.` : `Cadastre serviços nomeados estrategicamente.` },
+    { titulo: "9. Perguntas Respondidas", status: statusRespostas, porque: "O algoritmo pune perfis que não engajam com clientes.", impacto: statusRespostas === "Bom" ? `Interação transmite segurança e autoridade.` : `Responda dúvidas rapidamente citando "${keywordFoco}".` },
+    { titulo: "10. Website Vinculado", status: statusWebsite, porque: "Cruza dados do perfil com o site para dar confiança.", impacto: statusWebsite === "Bom" ? `Website transfere autoridade externa para a ficha.` : `Vincule a URL de um site ou WhatsApp para blindar autoridade.` }
   ];
 
   return (
     <div className="min-h-screen bg-gray-100 font-sans print:bg-white text-gray-900">
-      
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
           @page { margin: 0; size: A4; }
           body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          .card-auditoria { 
-            page-break-inside: avoid !important; 
-            break-inside: avoid !important; 
-            display: inline-block !important; 
-            width: 100%;
-          }
+          .card-auditoria { page-break-inside: avoid !important; break-inside: avoid !important; display: inline-block !important; width: 100%; }
           .quebrar-antes { page-break-before: always !important; break-before: page !important; }
         }
       `}} />
 
-      {/* TELA WEB DO CLIENTE */}
       <div className="print:hidden flex flex-col items-center py-12 px-4">
         <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-600">
           <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Zap className="w-10 h-10 text-blue-600" />
           </div>
           <h1 className="text-2xl font-black text-gray-900">Método GMN Turbo</h1>
-          <p className="text-gray-600 mt-2 mb-6 text-sm">O relatório da <strong>{nomeOriginal}</strong> foi atualizado com textos 100% humanizados.</p>
+          <p className="text-gray-600 mt-2 mb-6 text-sm">O relatório da <strong>{nomeOriginal}</strong> foi atualizado com sucesso.</p>
           <button 
             onClick={() => window.print()} 
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 mb-4 transition-transform hover:scale-[1.02]"
@@ -250,10 +207,7 @@ export default function SucessoPage() {
         </div>
       </div>
 
-      {/* === INÍCIO DO DOCUMENTO PDF (A4) === */}
       <div className="hidden print:block w-full bg-white">
-        
-        {/* PÁGINA 1: CAPA DE IMPACTO E DOR */}
         <div className="min-h-[297mm] px-12 py-10 flex flex-col">
           <div className="flex justify-between items-start border-b-4 border-gray-900 pb-4 mb-6">
             <div>
@@ -272,7 +226,7 @@ export default function SucessoPage() {
             </h2>
             <p className="text-red-900 text-base leading-relaxed">
               O Top 3 do Google Maps recebe <strong>60% de todos os cliques e ligações</strong>. 
-              Ao estar fora do ranking para buscas cruciais, estimamos que a {nomeConversacional} deixe de receber de <strong>{clientesPerdidos} a {clientesPerdidos * 2} clientes potenciais por mês</strong>.
+              Ao estar fora do ranking, estimamos que a {nomeConversacional} deixe de receber de <strong>{clientesPerdidos} a {clientesPerdidos * 2} clientes potenciais por mês</strong>.
             </p>
           </div>
 
@@ -289,16 +243,14 @@ export default function SucessoPage() {
               </div>
               <p className="mt-3 text-xs font-medium text-slate-600">Média no Top 3: <strong className="text-green-600">88/100</strong></p>
             </div>
-
             <div className="space-y-3">
               <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 card-auditoria">
                 <div className="bg-yellow-100 p-2.5 rounded-xl"><Star className="text-yellow-600 w-5 h-5"/></div>
                 <div>
                   <p className="text-[10px] font-bold text-gray-400 uppercase">Reputação Atual</p>
-                  <p className="text-xl font-black">{dados.rating} <span className="text-xs font-normal text-gray-500">em {dados.userRatingsTotal?.toLocaleString('pt-BR')} avaliações</span></p>
+                  <p className="text-xl font-black">{dados.rating} <span className="text-xs font-normal text-gray-500">em {dados.userRatingsTotal} avaliações</span></p>
                 </div>
               </div>
-              
               <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm card-auditoria">
                 <p className="text-[10px] font-bold text-gray-400 uppercase mb-2 flex items-center gap-2"><Target className="w-3 h-3"/> Rankings de Visibilidade</p>
                 <div className="space-y-1.5">
@@ -314,7 +266,6 @@ export default function SucessoPage() {
               </div>
             </div>
           </div>
-
           <div className="mt-auto bg-blue-900 text-white p-6 rounded-2xl flex items-center justify-between card-auditoria">
              <div>
                <h3 className="text-lg font-bold text-blue-300 flex items-center gap-2"><TrendingUp className="w-5 h-5"/> Previsão de Resultados</h3>
@@ -327,113 +278,84 @@ export default function SucessoPage() {
           </div>
         </div>
 
-        {/* PÁGINA 2: O KIT "DONE-FOR-YOU" COM COPYWRITING HUMANO */}
         <div className="quebrar-antes min-h-[297mm] px-12 py-16">
           <div className="mb-10 card-auditoria">
             <h2 className="text-3xl font-black text-gray-900 flex items-center gap-3"><FileText className="w-8 h-8 text-blue-600"/> Kit de Implementação Pronto</h2>
-            <p className="text-gray-500 mt-2">Nossa Inteligência Artificial criou textos persuasivos e exclusivos para a {nomeConversacional}. Apenas copie e cole no perfil.</p>
+            <p className="text-gray-500 mt-2">Copiando e colando esses textos exclusivos você já começa a subir nos rankings de {cidade}.</p>
           </div>
-
-          <div>
-            <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden card-auditoria mb-8">
-              <div className="bg-gray-200/50 px-6 py-3 border-b border-gray-200 flex justify-between items-center">
-                <span className="font-bold text-gray-700 text-sm uppercase tracking-widest">1. Nova Descrição Oficial</span>
-                <Copy className="w-4 h-4 text-gray-400"/>
-              </div>
-              <div className="p-6">
-                <div className="bg-white p-4 border border-blue-100 rounded-lg text-gray-800 text-sm leading-relaxed shadow-sm">
-                  "{descricaoFinal}"
-                </div>
+          <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden card-auditoria mb-8">
+            <div className="bg-gray-200/50 px-6 py-3 border-b border-gray-200 flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-widest">
+              <span>1. Nova Descrição Oficial</span>
+              <Copy className="w-4 h-4 text-gray-400"/>
+            </div>
+            <div className="p-6">
+              <div className="bg-white p-4 border border-blue-100 rounded-lg text-gray-800 text-sm leading-relaxed shadow-sm">
+                "{descricaoFinal}"
               </div>
             </div>
-
-            <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden card-auditoria mb-8">
-              <div className="bg-gray-200/50 px-6 py-3 border-b border-gray-200 flex justify-between items-center">
-                <span className="font-bold text-gray-700 text-sm uppercase tracking-widest">2. Postagens (Copiar e Colar)</span>
-                <Copy className="w-4 h-4 text-gray-400"/>
+          </div>
+          <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden card-auditoria mb-8">
+            <div className="bg-gray-200/50 px-6 py-3 border-b border-gray-200 flex justify-between items-center text-sm font-bold text-gray-700 uppercase tracking-widest">
+              <span>2. Postagens Otimizadas</span>
+              <Copy className="w-4 h-4 text-gray-400"/>
+            </div>
+            <div className="p-6 grid grid-cols-2 gap-4">
+              <div className="bg-white p-4 border border-blue-100 rounded-lg shadow-sm">
+                <span className="text-xs bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded mb-2 inline-block uppercase">Post 1</span>
+                <p className="text-gray-800 text-sm leading-relaxed">"{post1}"</p>
               </div>
-              <div className="p-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white p-4 border border-blue-100 rounded-lg shadow-sm card-auditoria">
-                    <span className="text-xs bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded mb-2 inline-block">Post Semana 1</span>
-                    <p className="text-gray-800 text-sm leading-relaxed">
-                      "{post1}"
-                    </p>
-                  </div>
-                  <div className="bg-white p-4 border border-blue-100 rounded-lg shadow-sm card-auditoria">
-                    <span className="text-xs bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded mb-2 inline-block">Post Semana 2</span>
-                    <p className="text-gray-800 text-sm leading-relaxed">
-                      "{post2}"
-                    </p>
-                  </div>
-                </div>
+              <div className="bg-white p-4 border border-blue-100 rounded-lg shadow-sm">
+                <span className="text-xs bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded mb-2 inline-block uppercase">Post 2</span>
+                <p className="text-gray-800 text-sm leading-relaxed">"{post2}"</p>
               </div>
             </div>
-            
-            <div className="grid grid-cols-2 gap-8">
-              <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden card-auditoria">
-                <div className="bg-gray-200/50 px-6 py-3 border-b border-gray-200">
-                  <span className="font-bold text-gray-700 text-sm uppercase tracking-widest">3. Resposta de Avaliação</span>
-                </div>
-                <div className="p-6 bg-white h-full">
-                  <p className="text-gray-800 text-sm italic border-l-4 border-yellow-400 pl-3">
-                    "{respostaAva}"
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden card-auditoria">
-                <div className="bg-gray-200/50 px-6 py-3 border-b border-gray-200">
-                  <span className="font-bold text-gray-700 text-sm uppercase tracking-widest">4. Serviços Complementares</span>
-                </div>
-                <div className="p-6 bg-white h-full">
-                  <ul className="list-disc pl-4 space-y-1 text-sm text-gray-800 font-bold">
-                    <li>{keywordFoco} Premium</li>
-                    <li>Especialista em {keywordSecundaria}</li>
-                    <li>Atendimento na região de {cidade}</li>
-                  </ul>
-                </div>
+          </div>
+          <div className="grid grid-cols-2 gap-8 card-auditoria">
+            <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden">
+              <div className="bg-gray-200/50 px-6 py-3 border-b border-gray-200 font-bold text-gray-700 text-sm uppercase tracking-widest">3. Resposta de Avaliação</div>
+              <div className="p-6 bg-white h-full italic text-sm text-gray-800 border-l-4 border-yellow-400">"{respostaAva}"</div>
+            </div>
+            <div className="bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden">
+              <div className="bg-gray-200/50 px-6 py-3 border-b border-gray-200 font-bold text-gray-700 text-sm uppercase tracking-widest">4. Serviços Complementares</div>
+              <div className="p-6 bg-white h-full text-sm text-gray-800 font-bold">
+                <ul className="list-disc pl-4 space-y-1">
+                  <li>{keywordFoco} Premium</li>
+                  <li>Especialista em {keywordSecundaria}</li>
+                  <li>Atendimento em {cidade}</li>
+                </ul>
               </div>
             </div>
           </div>
         </div>
 
-        {/* PÁGINA 3: PLANO DE AÇÃO E CHECKLIST PERSONALIZADOS */}
         <div className="quebrar-antes min-h-[297mm] px-12 py-16">
           <div className="mb-10 card-auditoria">
             <h2 className="text-3xl font-black text-gray-900 flex items-center gap-3"><Zap className="w-8 h-8 text-yellow-500 fill-yellow-500"/> Plano de Ação Personalizado</h2>
-            <p className="text-gray-500 mt-2">Nossa inteligência filtrou os erros reais do seu perfil para focar apenas no que te dá mais resultado.</p>
+            <p className="text-gray-500 mt-2">Ações práticas baseadas no diagnóstico real da {nomeConversacional}.</p>
           </div>
-
-          <div className="grid grid-cols-2 gap-8 mb-10">
-            <div className="bg-red-50 border border-red-100 rounded-xl p-6 card-auditoria">
+          <div className="grid grid-cols-2 gap-8 mb-10 card-auditoria">
+            <div className="bg-red-50 border border-red-100 rounded-xl p-6">
               <h3 className="text-lg font-black text-red-600 mb-4 uppercase flex items-center gap-2"><AlertTriangle className="w-4 h-4"/> Urgente (48h)</h3>
-              <div className="space-y-4 text-sm">
+              <div className="space-y-4 text-sm text-red-900">
                 {prioridadesUrgentes.map((acao, i) => (
-                  <div key={i}>
-                    <strong className="text-red-900">{i+1}. {acao.t}:</strong> <span className="text-red-800">{acao.d}</span>
-                  </div>
+                  <div key={i}><strong>{i+1}. {acao.t}:</strong> <span>{acao.d}</span></div>
                 ))}
               </div>
             </div>
-
-            <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-6 card-auditoria">
+            <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-6">
               <h3 className="text-lg font-black text-yellow-600 mb-4 uppercase flex items-center gap-2"><Zap className="w-4 h-4"/> Rápido (7 Dias)</h3>
-              <div className="space-y-4 text-sm">
+              <div className="space-y-4 text-sm text-yellow-900">
                 {prioridadesRapidas.map((acao, i) => (
-                  <div key={i}>
-                    <strong className="text-yellow-900">{i+3}. {acao.t}:</strong> <span className="text-yellow-800">{acao.d}</span>
-                  </div>
+                  <div key={i}><strong>{i+3}. {acao.t}:</strong> <span>{acao.d}</span></div>
                 ))}
               </div>
             </div>
           </div>
-
           <div className="bg-white border-2 border-slate-900 rounded-2xl p-8 card-auditoria">
-            <h3 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-2"><CheckSquare className="w-6 h-6"/> Checklist Específico da Empresa</h3>
+            <h3 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-2"><CheckSquare className="w-6 h-6"/> Checklist de Implementação</h3>
             <div className="space-y-4">
               {checklistFinal.map((item, i) => (
-                <div key={i} className="flex items-center gap-4 border-b border-gray-100 pb-3 card-auditoria">
+                <div key={i} className="flex items-center gap-4 border-b border-gray-100 pb-3">
                   <div className="w-6 h-6 rounded border-2 border-slate-300 shrink-0"></div>
                   <p className="text-gray-700 font-medium text-sm">{item}</p>
                 </div>
@@ -442,48 +364,35 @@ export default function SucessoPage() {
           </div>
         </div>
 
-        {/* PÁGINA 4: A AUDITORIA TÉCNICA DINÂMICA */}
         <div className="quebrar-antes min-h-[297mm] px-12 py-16">
           <div className="mb-10 card-auditoria">
             <p className="text-blue-600 font-black tracking-widest uppercase text-sm mb-1">Diagnóstico Específico da {nomeConversacional}</p>
-            <h2 className="text-3xl font-black text-gray-900 flex items-center gap-3"><ShieldAlert className="w-8 h-8 text-blue-900"/> Os 10 Pilares GMN</h2>
-            <p className="text-gray-500 mt-2">Esta análise técnica detalha os erros e acertos que basearam seu plano de ação.</p>
+            <h2 className="text-3xl font-black text-gray-900 flex items-center gap-3"><ShieldAlert className="w-8 h-8 text-blue-900"/> Os 10 Pilares Técnicos GMN</h2>
           </div>
-
-          <div>
+          <div className="space-y-6">
             {auditoria10Pontos.map((item, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-5 bg-gray-50/50 shadow-sm mb-6 card-auditoria">
-                
+              <div key={index} className="border border-gray-200 rounded-lg p-5 bg-gray-50/50 shadow-sm card-auditoria">
                 <div className="flex justify-between items-start mb-3 border-b border-gray-200 pb-2">
-                  <h3 className="font-black text-gray-900 text-sm uppercase max-w-[80%]">{item.titulo}</h3>
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border whitespace-nowrap ml-2
-                    ${item.status === 'Bom' ? 'bg-green-100 text-green-800 border-green-300' : 
-                      item.status === 'Razoável' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : 
-                      'bg-red-100 text-red-800 border-red-300'}`}
-                  >
+                  <h3 className="font-black text-gray-900 text-sm uppercase">{item.titulo}</h3>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${item.status === 'Bom' ? 'bg-green-100 text-green-800 border-green-300' : item.status === 'Razoável' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : 'bg-red-100 text-red-800 border-red-300'}`}>
                     {item.status}
                   </span>
                 </div>
-                
                 <div className="mb-3 pl-2 border-l-2 border-gray-300">
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Por que isso importa?</p>
                   <p className="text-gray-600 text-xs leading-relaxed">{item.porque}</p>
                 </div>
-
                 <div className="bg-white p-3 rounded border border-blue-100">
                   <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1 flex items-center gap-1"><TrendingUp className="w-3 h-3"/> Situação da Empresa</p>
                   <p className="text-gray-900 text-sm font-medium">{item.impacto}</p>
                 </div>
-
               </div>
             ))}
           </div>
-
           <div className="text-center text-xs text-gray-400 mt-6 pb-8 border-t border-gray-100 pt-4 card-auditoria">
-            Auditoria Técnica Algorítmica gerada exclusivamente para {nomeOriginal}. Método GMN Turbo © {new Date().getFullYear()}.
+            Auditoria Técnica Algorítmica exclusiva para {nomeOriginal}. Método GMN Turbo © {new Date().getFullYear()}.
           </div>
         </div>
-
       </div>
     </div>
   );
