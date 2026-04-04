@@ -31,6 +31,9 @@ export async function POST(req: Request) {
       ],
       mode: "payment",
       
+      // 👇 LINHA ADICIONADA PARA HABILITAR OS CUPONS 👇
+      allow_promotion_codes: true, 
+      
       // 3. PARA ONDE O CLIENTE VAI DEPOIS DE PAGAR
       success_url: `${baseUrl}/sucesso?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/`,
