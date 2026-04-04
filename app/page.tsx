@@ -41,6 +41,77 @@ export default function AuditDashboard() {
   const keywordRankings = useMemo(() => {
     const fromApi = result?.rankings
     if (!Array.isArray(fromApi)) return []
+
+    // 🤖 FILTRO TRADUTOR AUTOMÁTICO DO GOOGLE PLACES
+    const traduzirTermo = (termo: string) => {
+      let t = termo.toLowerCase();
+      const dicionario: Record<string, string> = {
+        "building materials store": "loja de materiais de construção",
+        "hardware store": "loja de ferragens",
+        "home goods store": "loja de utilidades domésticas",
+        "clothing store": "loja de roupas",
+        "shoe store": "loja de calçados",
+        "furniture store": "loja de móveis",
+        "electronics store": "loja de eletrônicos",
+        "department store": "loja de departamentos",
+        "jewelry store": "joalheria",
+        "pet store": "pet shop",
+        "convenience store": "loja de conveniência",
+        "grocery store": "mercearia",
+        "liquor store": "distribuidora de bebidas",
+        "book store": "livraria",
+        "bicycle store": "loja de bicicletas",
+        "store": "loja",
+        "farm": "viveiro de plantas",
+        "bakery": "padaria",
+        "cafe": "cafeteria",
+        "coffee shop": "cafeteria",
+        "restaurant": "restaurante",
+        "bar": "bar",
+        "supermarket": "supermercado",
+        "shopping mall": "shopping center",
+        "veterinary care": "clínica veterinária",
+        "hospital": "hospital",
+        "pharmacy": "farmácia",
+        "drugstore": "farmácia",
+        "doctor": "médico",
+        "dentist": "dentista",
+        "gym": "academia",
+        "spa": "clínica de estética",
+        "beauty salon": "salão de beleza",
+        "hair care": "cabeleireiro",
+        "car repair": "oficina mecânica",
+        "car wash": "lava rápido",
+        "car dealer": "concessionária",
+        "gas station": "posto de gasolina",
+        "parking": "estacionamento",
+        "real estate agency": "imobiliária",
+        "travel agency": "agência de viagens",
+        "lawyer": "escritório de advocacia",
+        "accounting": "escritório de contabilidade",
+        "florist": "floricultura",
+        "plumber": "encanador",
+        "electrician": "eletricista",
+        "moving company": "empresa de mudanças",
+        "locksmith": "chaveiro",
+        "painter": "pintor",
+        "roofing contractor": "empreiteira"
+      };
+
+      // Substitui os termos em inglês pelos correspondentes em português
+      for (const [eng, pt] of Object.entries(dicionario)) {
+        if (t.includes(eng)) {
+          t = t.replace(eng, pt);
+        }
+      }
+      
+      // Capitaliza a primeira letra de cada palavra (exceto preposições curtas) para ficar bonito na tabela
+      return t.split(' ').map(word => {
+        if (["de", "da", "do", "das", "dos", "e", "em"].includes(word)) return word;
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }).join(' ');
+    }
+
     return fromApi.map((row) => {
       const toNum = (v: unknown): number | null => {
         if (v === null || v === undefined) return null
@@ -48,7 +119,8 @@ export default function AuditDashboard() {
         return Number.isFinite(n) ? n : null
       }
       return {
-        keyword: String(row.keyword ?? ""),
+        // Aplica a tradução exatamente aqui, antes de ir para a tabela e para o PDF!
+        keyword: traduzirTermo(String(row.keyword ?? "")),
         searchVolume: String(row.searchVolume ?? ""),
         position: toNum(row.position),
         previousPosition: toNum(row.previousPosition),
@@ -73,6 +145,7 @@ export default function AuditDashboard() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ query: companyName }),
+        cache: "no-store", 
       })
 
       const data = (await response.json()) as PlaceAuditData & { error?: string }
@@ -122,12 +195,12 @@ export default function AuditDashboard() {
           )}
 
           <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
-            {/* Health Score - Full width on mobile, 1 column on desktop */}
+            {/* Health Score */}
             <div className="lg:col-span-1">
               <HealthScore score={isLoading ? 0 : healthScore} />
             </div>
 
-            {/* Metrics Cards - Full width on mobile, 2 columns on desktop */}
+            {/* Metrics Cards */}
             <div className="lg:col-span-2">
               <MetricsCards
                 rating={result?.rating ?? null}
@@ -140,7 +213,7 @@ export default function AuditDashboard() {
 
           {/* SEO Checklist */}
           <div className="mt-6 sm:mt-8">
-            <SeoChecklist />
+            <SeoChecklist data={result} healthScore={healthScore} />
           </div>
 
           {/* Keyword Rankings */}
@@ -161,6 +234,8 @@ export default function AuditDashboard() {
                 rating={result.rating}
                 userRatingsTotal={result.userRatingsTotal || 0}
                 rankings={keywordRankings || []}
+                healthScore={healthScore}
+                checklistData={result} 
               />
             ) : null}
           </div>
