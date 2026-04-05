@@ -1,6 +1,6 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
+import { TrendingUp, AlertTriangle } from "lucide-react"
 
 interface HealthScoreProps {
   score: number
@@ -31,13 +31,26 @@ export function HealthScore({ score, maxScore = 100 }: HealthScoreProps) {
     return "stroke-destructive"
   }
 
+  // 👇 NOVA FUNÇÃO: Mensagem dinâmica focada em conversão (CRO) 👇
+  const getComparisonText = () => {
+    if (percentage >= 85) {
+      return `Seu perfil domina ${Math.floor(percentage - 5)}% da região, mas há dinheiro na mesa.`;
+    }
+    if (percentage >= 60) {
+      return "Você está a perder vendas diárias para os líderes da sua região.";
+    }
+    if (percentage >= 40) {
+      return `Alerta: Você está abaixo de ${Math.floor(80 - percentage)}% dos concorrentes locais.`;
+    }
+    return "Crítico: A sua empresa está praticamente invisível no Google Maps.";
+  }
+
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
       <h2 className="text-center text-lg font-semibold text-foreground sm:text-xl">
         Nota Geral de Saúde do Perfil
       </h2>
       
-      {/* 👇 NOVO TEXTO EXPLICATIVO (Gatilho da Perda) 👇 */}
       <p className="mt-2 mb-6 text-center text-sm text-muted-foreground">
         Notas abaixo de 80 indicam que os seus concorrentes estão roubando os seus clientes diários.
       </p>
@@ -77,14 +90,19 @@ export function HealthScore({ score, maxScore = 100 }: HealthScoreProps) {
       </div>
 
       <div className="mt-4 flex items-center gap-2">
-        <TrendingUp className={`h-4 w-4 ${getScoreColor()}`} />
+        {percentage >= 60 ? (
+          <TrendingUp className={`h-4 w-4 ${getScoreColor()}`} />
+        ) : (
+          <AlertTriangle className={`h-4 w-4 ${getScoreColor()}`} />
+        )}
         <span className={`text-sm font-medium ${getScoreColor()}`}>
           {getScoreLabel()}
         </span>
       </div>
 
-      <p className="mt-2 text-center text-xs text-muted-foreground sm:text-sm">
-        Seu perfil está acima de 72% dos concorrentes na região
+      {/* 👇 FRASE DINÂMICA RENDERIZADA AQUI 👇 */}
+      <p className={`mt-2 text-center text-xs sm:text-sm font-medium ${percentage < 60 ? 'text-destructive/80' : 'text-muted-foreground'}`}>
+        {getComparisonText()}
       </p>
     </div>
   )
