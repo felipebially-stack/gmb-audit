@@ -33,10 +33,45 @@ export default function AuditDashboard() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [result, setResult] = useState<PlaceAuditData | null>(null)
 
+  // 👇 ALGORITMO RIGOROSO DE SAÚDE APLICADO AQUI 👇
   const healthScore = useMemo(() => {
-    if (!result?.rating) return 0
-    return Math.round((result.rating / 5) * 100)
-  }, [result?.rating])
+    if (!result) return 0;
+
+    // 1. REPUTAÇÃO (Nota de Estrelas - Máximo de 40 pontos)
+    const rating = result.rating || 0;
+    const reputationScore = (rating / 5) * 40;
+
+    // 2. AUTORIDADE (Volume de Avaliações - Máximo de 30 pontos)
+    // O Google exige volume para dar destaque. Menos de 250 avaliações = perde pontos.
+    const reviews = result.userRatingsTotal || 0;
+    const authorityScore = Math.min((reviews / 250) * 30, 30);
+
+    // 3. DESTAQUE (Ranking de Palavras-chave - Máximo de 30 pontos)
+    // Penaliza severamente se a empresa estiver invisível nas buscas (Posição > 10).
+    let rankingScore = 0;
+    const rankings = result.rankings || [];
+    
+    if (rankings.length > 0) {
+      let top3Count = 0;
+      let top10Count = 0;
+
+      rankings.forEach(r => {
+        if (r.position && r.position <= 3) top3Count++;
+        else if (r.position && r.position <= 10) top10Count++;
+      });
+
+      // 10 pontos por cada palavra no Top 3, 5 pontos por Top 10.
+      rankingScore = Math.min((top3Count * 10) + (top10Count * 5), 30);
+    }
+
+    // Calcula a nota final somando os 3 pilares do Google
+    const finalScore = Math.round(reputationScore + authorityScore + rankingScore);
+
+    // Garante que a nota fique entre 10 e 100 (nunca 0 para não parecer erro do site)
+    return Math.max(10, Math.min(finalScore, 100));
+    
+  }, [result]);
+  // 👆 FIM DO ALGORITMO RIGOROSO 👆
 
   const keywordRankings = useMemo(() => {
     const fromApi = result?.rankings
