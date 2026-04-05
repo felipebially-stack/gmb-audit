@@ -87,6 +87,11 @@ export function SeoChecklist({ data, healthScore }: { data?: any, healthScore?: 
 
   const scoreTotal = itens.filter(i => i.status === "bom").length;
 
+  // 👇 Função para rolar até o botão de pagamento 👇
+  const scrollToCTA = () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
   return (
     <div className="rounded-xl border bg-card p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
@@ -133,18 +138,23 @@ export function SeoChecklist({ data, healthScore }: { data?: any, healthScore?: 
                   {item.textoBom}
                 </p>
               ) : (
-                <div className="relative mt-1">
-                  {/* Texto Fake Embaçado para não poder ser copiado */}
-                  <p className="text-xs text-gray-400 blur-[4px] select-none pointer-events-none opacity-60">
+                // 👇 BOTÃO CLICÁVEL COM ROLAGEM AQUI 👇
+                <button 
+                  onClick={scrollToCTA}
+                  className="relative mt-1 w-full text-left cursor-pointer group focus:outline-none"
+                  type="button"
+                >
+                  {/* Texto Fake Embaçado */}
+                  <p className="text-xs text-gray-400 blur-[4px] select-none opacity-60 transition-opacity group-hover:opacity-40">
                     O diagnóstico detalhado revela o motivo deste alerta e o passo a passo para correção.
                   </p>
                   {/* Botão de Desbloqueio por cima */}
-                  <div className="absolute inset-0 flex items-center justify-start pointer-events-none">
-                    <span className="text-[10px] font-bold text-blue-700 bg-blue-50/90 border border-blue-200 px-2 py-0.5 rounded shadow-sm flex items-center gap-1 backdrop-blur-sm">
+                  <div className="absolute inset-0 flex items-center justify-start">
+                    <span className="text-[10px] font-bold text-blue-700 bg-blue-50/90 border border-blue-200 px-2 py-0.5 rounded shadow-sm flex items-center gap-1 backdrop-blur-sm transition-transform group-hover:scale-105 group-hover:bg-blue-100">
                        Desbloquear no PDF
                     </span>
                   </div>
-                </div>
+                </button>
               )}
             </div>
           </div>
