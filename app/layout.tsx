@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'GMB Audit - Auditoria de Google Meu Negócio',
+  title: 'Auditoria Google Meu Negócio | R$ 15,00',
   description: 'Ferramenta profissional de auditoria para Google Meu Negócio. Analise seu perfil, melhore seu SEO local e aumente sua visibilidade.',
   generator: 'v0.app',
   icons: {
