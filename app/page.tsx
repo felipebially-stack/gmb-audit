@@ -42,7 +42,6 @@ export default function AuditDashboard() {
     const fromApi = result?.rankings
     if (!Array.isArray(fromApi)) return []
 
-    // 🤖 FILTRO TRADUTOR AUTOMÁTICO DO GOOGLE PLACES
     const traduzirTermo = (termo: string) => {
       let t = termo.toLowerCase();
       const dicionario: Record<string, string> = {
@@ -98,14 +97,12 @@ export default function AuditDashboard() {
         "roofing contractor": "empreiteira"
       };
 
-      // Substitui os termos em inglês pelos correspondentes em português
       for (const [eng, pt] of Object.entries(dicionario)) {
         if (t.includes(eng)) {
           t = t.replace(eng, pt);
         }
       }
       
-      // Capitaliza a primeira letra de cada palavra (exceto preposições curtas) para ficar bonito na tabela
       return t.split(' ').map(word => {
         if (["de", "da", "do", "das", "dos", "e", "em"].includes(word)) return word;
         return word.charAt(0).toUpperCase() + word.slice(1);
@@ -119,7 +116,6 @@ export default function AuditDashboard() {
         return Number.isFinite(n) ? n : null
       }
       return {
-        // Aplica a tradução exatamente aqui, antes de ir para a tabela e para o PDF!
         keyword: traduzirTermo(String(row.keyword ?? "")),
         searchVolume: String(row.searchVolume ?? ""),
         position: toNum(row.position),
@@ -178,6 +174,10 @@ export default function AuditDashboard() {
               <h2 className="text-xl font-bold text-foreground sm:text-2xl">
                 Resultados da Auditoria
               </h2>
+              {/* NOVO SUBTÍTULO AQUI */}
+              <p className="mt-2 text-md text-muted-foreground font-medium text-blue-600">
+                Descubra o que está travando as suas vendas no mapa e como superar a concorrência.
+              </p>
               <p className="mt-1 text-sm text-muted-foreground">
                 {isLoading ? "Buscando dados..." : result?.companyName ? `${result.companyName} - ${result.address}` : "Pesquise uma empresa para ver os dados reais"}
               </p>
@@ -240,6 +240,28 @@ export default function AuditDashboard() {
             ) : null}
           </div>
 
+          {/* 🌟 NOVA SEÇÃO: PROVAS SOCIAIS (DEPOIMENTOS) 🌟 */}
+          <div className="mt-16 bg-slate-50 py-12 px-6 rounded-2xl border border-slate-200">
+            <h2 className="text-2xl font-bold text-center mb-8 text-slate-800">Donos de negócios que já aplicaram o Plano de Ação:</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <div className="flex text-yellow-400 mb-3">★★★★★</div>
+                <p className="italic text-slate-600 text-sm">"Paguei R$ 15 nesse diagnóstico e descobri exatamente o erro que estava travando as vendas da minha loja."</p>
+                <div className="mt-4 font-bold text-sm text-slate-900">- Maria S., Dona de Loja</div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <div className="flex text-yellow-400 mb-3">★★★★★</div>
+                <p className="italic text-slate-600 text-sm">"Eu não entendia por que o meu concorrente vendia mais. O plano de ação me deu tudo mastigado. Recomendo muito!"</p>
+                <div className="mt-4 font-bold text-sm text-slate-900">- Roberto A., Auto Center</div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                <div className="flex text-yellow-400 mb-3">★★★★★</div>
+                <p className="italic text-slate-600 text-sm">"Muito fácil. Copiei e colei as instruções no meu perfil do Google e na mesma semana já vi diferença."</p>
+                <div className="mt-4 font-bold text-sm text-slate-900">- Fernando P., Padaria</div>
+              </div>
+            </div>
+          </div>
+
           {/* CTA Section */}
           <div className="mt-8 sm:mt-12">
             <CtaSection />
@@ -261,7 +283,8 @@ export default function AuditDashboard() {
               <a href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                 Privacidade
               </a>
-              <a href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+              {/* 👇 LINK DE SUPORTE ATUALIZADO AQUI 👇 */}
+              <a href="mailto:felipebially@gmail.com" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
                 Suporte
               </a>
             </div>

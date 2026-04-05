@@ -33,9 +33,14 @@ export function HealthScore({ score, maxScore = 100 }: HealthScoreProps) {
 
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
-      <h2 className="mb-6 text-center text-lg font-semibold text-foreground sm:text-xl">
+      <h2 className="text-center text-lg font-semibold text-foreground sm:text-xl">
         Nota Geral de Saúde do Perfil
       </h2>
+      
+      {/* 👇 NOVO TEXTO EXPLICATIVO (Gatilho da Perda) 👇 */}
+      <p className="mt-2 mb-6 text-center text-sm text-muted-foreground">
+        Notas abaixo de 80 indicam que os seus concorrentes estão roubando os seus clientes diários.
+      </p>
       
       <div className="relative flex h-40 w-40 items-center justify-center sm:h-48 sm:w-48">
         <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 100 100">

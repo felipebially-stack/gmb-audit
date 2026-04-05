@@ -25,13 +25,16 @@ export function SearchSection({ onSearch, isLoading = false }: SearchSectionProp
         <h1 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
           Auditoria de Google Meu Negócio
         </h1>
+        
+        {/* 👇 NOVO SUBTÍTULO FOCADO EM CONVERSÃO 👇 */}
         <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg">
-          Digite o nome da empresa ou cole o link do Google Maps para buscar dados reais e receber uma análise para melhorar seu ranking local.
+          Descubra o que está travando as suas vendas no mapa e receba um plano de ação prático para dominar as buscas na sua região!
         </p>
 
         <form onSubmit={handleSubmit} className="mt-8 sm:mt-10">
-          <div className="relative mx-auto max-w-2xl">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-4">
+          {/* Ajustado para flex-col no mobile e bloco no desktop para caber o novo botão */}
+          <div className="relative mx-auto max-w-2xl flex flex-col sm:block">
+            <div className="absolute inset-y-0 left-0 hidden sm:flex items-center pl-4">
               <Link2 className="h-5 w-5 text-muted-foreground" />
             </div>
             <input
@@ -39,11 +42,13 @@ export function SearchSection({ onSearch, isLoading = false }: SearchSectionProp
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Digite o nome da empresa ou cole o link"
-              className="h-14 w-full rounded-xl border border-border bg-background pl-12 pr-32 text-base text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-16 sm:text-lg"
+              /* Padding ajustado (sm:pr-[250px]) para o texto não sobrepor o botão grande */
+              className="h-14 w-full rounded-xl border border-border bg-background pl-4 sm:pl-12 pr-4 sm:pr-[250px] text-base text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:h-16 sm:text-lg mb-3 sm:mb-0"
             />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2">
-              <Button type="submit" size="lg" className="h-10 px-4 sm:h-12 sm:px-6" disabled={isLoading}>
-                {isLoading ? "Buscando dados..." : "Analisar"}
+            <div className="sm:absolute sm:inset-y-0 sm:right-0 flex items-center sm:pr-2">
+              {/* 👇 NOVO BOTÃO DE AÇÃO (CTA) 👇 */}
+              <Button type="submit" size="lg" className="w-full sm:w-auto h-12 sm:h-12 px-6" disabled={isLoading}>
+                {isLoading ? "Buscando dados..." : "Comece sua Auditoria Agora!"}
               </Button>
             </div>
           </div>
