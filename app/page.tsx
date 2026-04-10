@@ -265,6 +265,3 @@ export default function AuditDashboard() {
     </div>
   )
 }
-    </div>
-  )
-}
