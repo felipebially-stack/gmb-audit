@@ -32,8 +32,8 @@ export function ExitPopup({ reportData }: { reportData?: any }) {
     if (reportData && reportData.result) {
       localStorage.setItem('@gmbAudit:reportData', JSON.stringify(reportData));
     }
-    // 👇 ATENÇÃO: COLOQUE AQUI O SEU LINK DA KIWIFY COM O PREÇO DE R$ 6,90 👇
-    window.location.href = "https://pay.kiwify.com.br/SEU_LINK_COM_DESCONTO"; 
+    // 👇 ATENÇÃO: COLOQUE AQUI O SEU LINK DA KIWIFY COM O PREÇO DE R$ 9,97 👇
+    window.location.href = "https://pay.kiwify.com.br/SEU_LINK_AQUI"; 
   }
 
   return (
@@ -53,28 +53,27 @@ export function ExitPopup({ reportData }: { reportData?: any }) {
           <AlertTriangle className="h-10 w-10 text-red-600" />
         </div>
 
-        {/* 👇 NOVA HEADLINE MAIS AGRESSIVA 👇 */}
+        {/* 👇 HEADLINE AGRESSIVA FOCADA NA PERDA 👇 */}
         <h2 className="mb-3 text-3xl font-extrabold text-slate-900">
-          Você tem certeza que vai perder essa oferta?
+          Tem certeza que vai perder essa chance?
         </h2>
         
         <p className="mb-6 text-lg text-slate-600 font-medium">
-          Essa é literalmente a sua <strong className="text-red-600">última chance</strong> de levar o Plano de Ação completo antes que essa página expire e o valor volte ao normal.
+          Você está prestes a fechar a página. Se você sair agora, o seu diagnóstico será <strong className="text-red-600">apagado</strong> e o valor voltará para R$ 197,00.
         </p>
 
         {/* Caixa de Preço */}
         <div className="mb-8 rounded-2xl bg-slate-50 p-6 border border-slate-200">
-          <p className="text-sm font-bold text-slate-400 line-through mb-1">Preço normal: R$ 197,00</p>
-          <p className="text-sm font-bold text-slate-500 line-through mb-2">Preço de hoje: R$ 9,97</p>
-          <p className="text-4xl font-extrabold text-green-600 animate-pulse">Por apenas R$ 6,90</p>
+          <p className="text-sm font-bold text-slate-400 line-through mb-2">Preço normal: R$ 197,00</p>
+          <p className="text-4xl font-extrabold text-orange-500 animate-pulse">Por apenas R$ 9,97</p>
         </div>
 
-        {/* Botão de Compra com Desconto */}
+        {/* Botão de Compra - Mantendo as cores do site */}
         <Button
           onClick={handleCheckout}
-          className="h-16 w-full bg-green-500 text-xl font-extrabold uppercase tracking-wide text-white shadow-[0_0_30px_rgba(34,197,94,0.4)] transition-all hover:scale-105 hover:bg-green-600 rounded-2xl"
+          className="h-16 w-full bg-orange-500 text-xl font-extrabold uppercase tracking-wide text-white shadow-[0_0_30px_rgba(249,115,22,0.4)] transition-all hover:scale-105 hover:bg-orange-600 rounded-2xl"
         >
-          Quero minha Última Chance
+          Quero Minha Última Chance
           <ArrowRight className="ml-2 h-6 w-6" />
         </Button>
         
