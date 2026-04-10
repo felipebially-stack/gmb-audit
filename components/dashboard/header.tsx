@@ -7,13 +7,26 @@ import { useState } from "react"
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Função inteligente que rola a página em vez de abrir outros links
-  const scrollToSection = (position: 'top' | 'bottom') => {
-    setMobileMenuOpen(false)
-    if (position === 'top') {
+  // 👇 Função atualizada para encontrar qualquer parte da página 👇
+  const scrollToSection = (targetId: string) => {
+    setMobileMenuOpen(false) // Fecha o menu mobile se estiver aberto
+    
+    if (targetId === 'top') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
-    } else {
+      return;
+    }
+    
+    if (targetId === 'bottom') {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+      return;
+    }
+
+    // Se ele recebeu um ID (ex: 'como-funciona'), ele procura o elemento e rola até ele
+    const element = document.getElementById(targetId)
+    if (element) {
+      // O '- 100' é para compensar a altura do cabeçalho que fica grudado no topo
+      const y = element.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
   }
 
@@ -21,18 +34,16 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 shadow-sm transition-all">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         
-        {/* 👇 NOVA LOGO DESENHADA EM CÓDIGO (SVG) 👇 */}
+        {/* Logo */}
         <div 
           className="flex items-center gap-3 cursor-pointer group" 
           onClick={() => scrollToSection('top')}
         >
           <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 shadow-lg transition-transform group-hover:scale-105">
-            {/* Ícone de Mapa em vetor puro (ultra rápido) */}
             <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            {/* Bolinha verde "online" */}
             <div className="absolute -right-1 -top-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-green-500 shadow-sm animate-pulse"></div>
           </div>
           <span className="text-2xl font-extrabold tracking-tight text-slate-900">
@@ -40,12 +51,13 @@ export function Header() {
           </span>
         </div>
 
-        {/* 👇 MENUS ÂNCORA (DESKTOP) 👇 */}
+        {/* Menus Desktop */}
         <nav className="hidden items-center gap-8 md:flex">
           <button onClick={() => scrollToSection('top')} className="text-sm font-bold text-slate-600 transition-colors hover:text-blue-600">
             Início
           </button>
-          <button onClick={() => scrollToSection('top')} className="text-sm font-bold text-slate-600 transition-colors hover:text-blue-600">
+          {/* 👇 Botão atualizado para buscar o ID 'como-funciona' 👇 */}
+          <button onClick={() => scrollToSection('como-funciona')} className="text-sm font-bold text-slate-600 transition-colors hover:text-blue-600">
             Como Funciona
           </button>
           <button onClick={() => scrollToSection('bottom')} className="text-sm font-bold text-slate-600 transition-colors hover:text-blue-600">
@@ -62,7 +74,7 @@ export function Header() {
           </Button>
         </div>
 
-        {/* Menu Hamburguer Mobile */}
+        {/* Menu Mobile */}
         <Button
           variant="ghost"
           size="icon"
@@ -73,14 +85,15 @@ export function Header() {
         </Button>
       </div>
 
-      {/* Dropdown Menu Mobile */}
+      {/* Dropdown Mobile */}
       {mobileMenuOpen && (
         <div className="border-t border-slate-200 bg-white px-4 py-6 md:hidden shadow-xl absolute w-full">
           <nav className="flex flex-col gap-4">
             <button onClick={() => scrollToSection('top')} className="text-left text-base font-bold text-slate-600 hover:text-blue-600">
               Início
             </button>
-            <button onClick={() => scrollToSection('top')} className="text-left text-base font-bold text-slate-600 hover:text-blue-600">
+            {/* 👇 Botão mobile atualizado também 👇 */}
+            <button onClick={() => scrollToSection('como-funciona')} className="text-left text-base font-bold text-slate-600 hover:text-blue-600">
               Como Funciona
             </button>
             <button onClick={() => scrollToSection('bottom')} className="text-left text-base font-bold text-slate-600 hover:text-blue-600">

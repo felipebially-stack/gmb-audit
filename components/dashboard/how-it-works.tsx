@@ -4,7 +4,8 @@ import { Search, MapPin, Flame, CheckCircle2, Link2 } from "lucide-react"
 
 export function HowItWorks() {
   return (
-    <section className="bg-white py-16 sm:py-24 border-b border-slate-100">
+    // 👇 ADICIONEI O ID "como-funciona" AQUI NESTA LINHA 👇
+    <section id="como-funciona" className="bg-white py-16 sm:py-24 border-b border-slate-100">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         <div className="text-center max-w-3xl mx-auto mb-16">
