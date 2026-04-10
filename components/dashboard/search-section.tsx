@@ -58,7 +58,7 @@ export function SearchSection({ onSearch, isLoading = false }: { onSearch?: (q: 
                   />
                 </div>
                 <Button type="submit" className="h-16 w-full bg-orange-500 hover:bg-orange-600 text-white text-xl font-extrabold rounded-2xl shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all uppercase tracking-wide hover:scale-[1.02]">
-                  {isLoading ? "Buscando empresa..." : "Pagar R$ 9,97 e Receber Agora"}
+                  {isLoading ? "Buscando empresa..." : "Analise agora mesmo o seu perfil"}
                 </Button>
               </div>
               <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-4 text-xs font-bold text-slate-400">
