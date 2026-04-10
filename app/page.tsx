@@ -9,7 +9,7 @@ import { SeoChecklist } from "@/components/dashboard/seo-checklist"
 import { KeywordRankings } from "@/components/dashboard/keyword-rankings"
 import { FaqSection } from "@/components/dashboard/faq-section" 
 import { CtaSection } from "@/components/dashboard/cta-section"
-
+import { ExitPopup } from "@/components/dashboard/exit-popup"
 import { useMemo, useState } from "react"
 
 interface PlaceAuditData {
@@ -247,6 +247,24 @@ export default function AuditDashboard() {
           </div>
         </div>
       </footer>
+      <footer className="border-t border-slate-200 bg-white mt-12">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm font-bold text-slate-500">
+            © 2026 GMB Audit. Todos os direitos reservados.
+          </p>
+          <div className="flex gap-6 text-sm font-bold text-slate-500">
+            <a href="#" className="hover:text-blue-600">Termos de Uso</a>
+            <a href="#" className="hover:text-blue-600">Privacidade</a>
+            <a href="mailto:felipebially@gmail.com" className="hover:text-blue-600">Suporte</a>
+          </div>
+        </div>
+      </footer>
+
+      {/* 👇 NOSSO POPUP INVISÍVEL FICA AQUI ESPERANDO 👇 */}
+      <ExitPopup reportData={{ result, healthScore, keywordRankings }} />
+    </div>
+  )
+}
     </div>
   )
 }
