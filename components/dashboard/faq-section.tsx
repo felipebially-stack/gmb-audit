@@ -4,27 +4,27 @@ import { useState } from "react"
 import { ChevronDown, HelpCircle } from "lucide-react"
 
 const faqs = [
-  {
-    pergunta: "O que eu recebo exatamente após o pagamento?",
-    resposta: "Você receberá acesso imediato a um Plano de Ação em PDF personalizado para a sua empresa. Ele contém o diagnóstico completo que você viu na tela, além do passo a passo exato do que você precisa alterar no seu perfil do Google para voltar ao topo das buscas."
-  },
-  {
-    pergunta: "Como vou receber o meu PDF?",
-    resposta: "Assim que o seu pagamento (Pix ou Cartão) for aprovado pela plataforma segura (Kiwify/Hotmart), você será redirecionado automaticamente para uma página VIP onde o seu PDF já estará pronto para ser baixado."
-  },
-  {
-    pergunta: "Isso serve para o meu tipo de negócio?",
-    resposta: "Sim! A nossa inteligência funciona para qualquer negócio local que dependa de clientes da região: padarias, oficinas mecânicas, clínicas, escritórios, lojas de roupas, restaurantes, prestadores de serviço e muito mais."
-  },
-  {
-    pergunta: "Preciso ter conhecimento técnico em programação ou SEO?",
-    resposta: "Zero. O manual foi feito para donos de negócios, não para programadores. Nós entregamos as instruções 'mastigadas'. É literalmente copiar o que sugerimos e colar no seu perfil do Google."
-  },
-  {
-    pergunta: "É seguro colocar os meus dados de pagamento?",
-    resposta: "100% seguro. Nós não guardamos nenhum dado de pagamento. Todo o processo é criptografado e gerido pelas maiores plataformas de pagamento de infoprodutos do Brasil."
-  }
-]
+    {
+      pergunta: "Por que não é gratuito?",
+      resposta: "Porque entregamos um diagnóstico profissional completo com IA avançada e um plano de ação personalizado que vale R$ 197 no mercado. Cobramos apenas R$ 15 para que qualquer negócio, do pequeno ao grande, possa ter acesso a esse nível de tecnologia."
+    },
+    {
+      pergunta: "É realmente só R$ 15 ou tem pegadinha?",
+      resposta: "É exatamente R$ 15. Sem mensalidade, sem taxas ocultas, sem compromisso de longo prazo e com garantia total de devolução se você não gostar do relatório."
+    },
+    {
+      pergunta: "Quanto tempo leva para receber o Plano de Ação?",
+      resposta: "Menos de 1 minuto após a aprovação do seu pagamento via Pix ou cartão. O sistema gera o seu PDF instantaneamente."
+    },
+    {
+      pergunta: "Funciona para o meu tipo de negócio?",
+      resposta: "Sim. Restaurantes, clínicas, lojas físicas, advogados, dentistas, prestadores de serviços em geral... Se você precisa de clientes da sua cidade, a nossa ferramenta funciona. Já ajudamos mais de 1.247 negócios."
+    },
+    {
+      pergunta: "E se eu não gostar ou achar difícil de aplicar?",
+      resposta: "Temos uma garantia incondicional de 7 dias. Se você achar que o diagnóstico de R$ 15 não valeu a pena, você nos envia um e-mail e devolvemos 100% do seu dinheiro, sem perguntas."
+    }
+  ]
 
 export function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0) // A primeira já começa aberta

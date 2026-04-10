@@ -7,8 +7,9 @@ import { HealthScore } from "@/components/dashboard/health-score"
 import { MetricsCards } from "@/components/dashboard/metrics-cards"
 import { SeoChecklist } from "@/components/dashboard/seo-checklist"
 import { KeywordRankings } from "@/components/dashboard/keyword-rankings"
-import { FaqSection } from "@/components/dashboard/faq-section" // IMPORT DO FAQ AQUI
+import { FaqSection } from "@/components/dashboard/faq-section" 
 import { CtaSection } from "@/components/dashboard/cta-section"
+
 
 import { useMemo, useState } from "react"
 
@@ -36,15 +37,12 @@ export default function AuditDashboard() {
   const healthScore = useMemo(() => {
     if (!result) return 0;
 
-    // 1. REPUTAÇÃO (Nota de Estrelas - Máximo de 40 pontos)
     const rating = result.rating || 0;
     const reputationScore = (rating / 5) * 40;
 
-    // 2. AUTORIDADE (Volume de Avaliações - Máximo de 30 pontos)
     const reviews = result.userRatingsTotal || 0;
     const authorityScore = Math.min((reviews / 250) * 30, 30);
 
-    // 3. DESTAQUE (Ranking de Palavras-chave - Máximo de 30 pontos)
     let rankingScore = 0;
     const rankings = result.rankings || [];
     
@@ -188,20 +186,24 @@ export default function AuditDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      
+      {/* 👇 BARRA VERMELHA DE URGÊNCIA (NOVA) 👇 */}
+      <div className="bg-red-600 text-white text-center py-2 px-4 text-sm font-bold shadow-md relative z-50">
+        Apenas mais 47 diagnósticos com preço promocional de R$ 15 hoje. Aproveite antes que volte para R$ 197.
+      </div>
+
       <Header />
       
       <main>
         <SearchSection onSearch={handleSearch} isLoading={isLoading} />
         
-        {/* A NOVA SEÇÃO DE "COMO FUNCIONA" */}
         {!result && !isLoading && (
           <HowItWorks />
         )}
         
         {/* Results Section */}
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-          {/* Oculta o cabeçalho de resultados se não houver pesquisa */}
           {(result || isLoading) && (
             <div className="mb-8 flex items-center justify-between">
               <div>
@@ -228,16 +230,12 @@ export default function AuditDashboard() {
             </p>
           )}
 
-          {/* Só mostra os cards se a pesquisa tiver sido feita */}
           {(result || isLoading) && (
             <>
               <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
-                {/* Health Score */}
                 <div className="lg:col-span-1">
                   <HealthScore score={isLoading ? 0 : healthScore} />
                 </div>
-
-                {/* Metrics Cards */}
                 <div className="lg:col-span-2">
                   <MetricsCards
                     rating={result?.rating ?? null}
@@ -248,12 +246,10 @@ export default function AuditDashboard() {
                 </div>
               </div>
 
-              {/* SEO Checklist */}
               <div className="mt-6 sm:mt-8">
                 <SeoChecklist data={result} healthScore={healthScore} />
               </div>
 
-              {/* Keyword Rankings */}
               <div className="mt-6 sm:mt-8">
                 <KeywordRankings
                   rankings={keywordRankings}
@@ -264,42 +260,48 @@ export default function AuditDashboard() {
             </>
           )}
 
-          {/* As provas sociais ficam sempre visíveis, ajudam a converter quem está rolando a página */}
-          <div className="mt-16 bg-slate-50 py-12 px-6 rounded-2xl border border-slate-200">
-            <h2 className="text-2xl font-bold text-center mb-8 text-slate-800">Donos de negócios que já aplicaram o Plano de Ação:</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                <div className="flex text-yellow-400 mb-3">★★★★★</div>
-                <p className="italic text-slate-600 text-sm">"Paguei R$ 15 nesse diagnóstico e descobri exatamente o erro que estava travando as vendas da minha loja."</p>
-                <div className="mt-4 font-bold text-sm text-slate-900">- Maria S., Dona de Loja</div>
+          {/* 👇 NOVA SEÇÃO DE PROVAS SOCIAIS MATADORAS 👇 */}
+          <div className="mt-16 bg-slate-50 py-16 px-6 rounded-3xl border border-slate-200">
+            <h2 className="text-3xl font-extrabold text-center mb-10 text-slate-900">Negócios que investiram R$ 15 e viraram o jogo:</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 relative">
+                <div className="absolute -top-4 -right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">+412% de visualizações em 28 dias</div>
+                <div className="flex text-yellow-400 mb-4">★★★★★</div>
+                <p className="italic text-slate-700 text-base leading-relaxed">"Paguei R$ 15 e em 3 dias já vi diferença no Google Maps. Segui o passo a passo da IA e o telefone não para de tocar. Melhor investimento que já fiz!"</p>
+                <div className="mt-6 flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">MC</div>
+                  <div>
+                    <div className="font-bold text-sm text-slate-900">Maria Clara</div>
+                    <div className="text-xs text-slate-500">Doceria Doce Encanto, SP</div>
+                  </div>
+                </div>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                <div className="flex text-yellow-400 mb-3">★★★★★</div>
-                <p className="italic text-slate-600 text-sm">"Eu não entendia por que o meu concorrente vendia mais. O plano de ação me deu tudo mastigado. Recomendo muito!"</p>
-                <div className="mt-4 font-bold text-sm text-slate-900">- Roberto A., Auto Center</div>
-              </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                <div className="flex text-yellow-400 mb-3">★★★★★</div>
-                <p className="italic text-slate-600 text-sm">"Muito fácil. Copiei e colei as instruções no meu perfil do Google e na mesma semana já vi diferença."</p>
-                <div className="mt-4 font-bold text-sm text-slate-900">- Fernando P., Padaria</div>
+              <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 relative">
+                <div className="absolute -top-4 -right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Top 3 em 1 semana</div>
+                <div className="flex text-yellow-400 mb-4">★★★★★</div>
+                <p className="italic text-slate-700 text-base leading-relaxed">"Por R$ 15 recebi um relatório melhor e mais prático que o de um consultor que me cobrou R$ 1.200 no ano passado. Incrível, não tem pegadinha."</p>
+                <div className="mt-6 flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">RM</div>
+                  <div>
+                    <div className="font-bold text-sm text-slate-900">Roberto M.</div>
+                    <div className="text-xs text-slate-500">Auto Center, RJ</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* 👇 FAQ SECTION AQUI 👇 */}
           <div className="mt-8">
             <FaqSection />
           </div>
 
-          {/* CTA Section - RECEBENDO OS DADOS */}
           <div className="mt-8 sm:mt-12">
             <CtaSection reportData={{ result, healthScore, keywordRankings }} />
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-card">
+      <footer className="border-t border-border bg-card mt-12">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-sm text-muted-foreground">

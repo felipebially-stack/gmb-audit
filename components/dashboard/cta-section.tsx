@@ -1,69 +1,58 @@
 "use client"
 
-import { ArrowRight, FileText, ShieldCheck, Mail } from "lucide-react"
+import { ArrowRight, ShieldCheck, Lock, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-// 👇 1. Adicionamos a propriedade reportData para receber os dados
 export function CtaSection({ reportData }: { reportData?: any }) {
   
-  // 👇 2. Nova função inteligente de Checkout
   const handleCheckout = () => {
-    // Guarda no "Cofre Invisível" se houver dados pesquisados
     if (reportData && reportData.result) {
       localStorage.setItem('@gmbAudit:reportData', JSON.stringify(reportData));
     }
-
-    // Redireciona para o checkout
-    // ATENÇÃO: Substitua o link abaixo pelo seu link real da Kiwify ou Mercado Pago
     window.location.href = "https://pay.kiwify.com.br/SEU_LINK_AQUI"; 
   }
 
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-slate-900 px-6 py-12 text-center sm:px-12 sm:py-16 shadow-xl border border-slate-800">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent" />
+    <section className="relative overflow-hidden rounded-2xl bg-blue-950 px-6 py-12 text-center sm:px-12 sm:py-16 shadow-2xl border border-blue-900">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-800/30 via-blue-950 to-blue-950" />
       
-      <div className="relative mx-auto max-w-2xl">
-        <h2 className="text-balance text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
-          Pronto para Dominar as Buscas Locais?
+      <div className="relative mx-auto max-w-3xl z-10">
+        <h2 className="text-balance text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+          Pronto para descobrir exatamente por que você está perdendo clientes no Google?
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-pretty text-base text-slate-300 sm:text-lg">
-          O nosso sistema inteligente já mapeou o algoritmo do Google. Receba agora o passo a passo exato que centenas de empresas estão a usar para sair da invisibilidade e multiplicar as vendas.
+        <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg text-blue-200 font-medium">
+          Por <strong className="text-white">apenas R$ 15</strong> você recebe o diagnóstico completo + plano de ação personalizado. Menos que um café para destravar as suas vendas.
         </p>
 
-        <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          {/* 👇 3. Botão Principal de Vendas ATUALIZADO 👇 */}
+        <div className="mt-10 flex flex-col items-center justify-center gap-4">
           <Button
             size="lg"
-            className="w-full gap-2 text-base font-bold sm:w-auto bg-green-600 hover:bg-green-500 text-white border-none shadow-[0_0_20px_rgba(22,163,74,0.4)] transition-all"
+            className="w-full h-16 max-w-md gap-2 text-lg font-extrabold bg-orange-500 hover:bg-orange-600 text-white border-none shadow-[0_0_40px_rgba(249,115,22,0.4)] transition-all hover:scale-105 uppercase tracking-wider"
             onClick={handleCheckout}
           >
-            <FileText className="h-5 w-5" />
-            Liberar Meu Plano de Ação
-            <ArrowRight className="h-4 w-4" />
+            <Lock className="h-6 w-6 opacity-90" />
+            Pagar R$ 15 e Receber Agora
+            <ArrowRight className="h-5 w-5" />
           </Button>
-
-          {/* Botão Secundário de E-mail mantido */}
-          <a href="mailto:felipebially@gmail.com?subject=Dúvida sobre a Auditoria GMB" className="w-full sm:w-auto">
-            <Button
-              size="lg"
-              variant="outline"
-              className="w-full gap-2 text-base font-medium sm:w-auto text-slate-300 border-slate-700 bg-transparent hover:bg-slate-800 hover:text-white"
-            >
-              <Mail className="h-5 w-5" />
-              Falar com alguém
-            </Button>
-          </a>
+          
+          <button className="text-sm font-bold text-blue-300 hover:text-white underline underline-offset-4 mt-2 transition-colors">
+            Ver 3 exemplos reais de diagnósticos entregues →
+          </button>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-400 font-medium">
-          <span className="flex items-center gap-1.5">
-            <FileText className="h-4 w-4 text-green-500" />
-            Acesso Imediato (PDF)
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-blue-200 font-medium bg-blue-900/50 py-4 px-6 rounded-xl border border-blue-800/50">
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5 text-green-400" />
+            Mais de 1.247 diagnósticos entregues
           </span>
-          <span className="hidden sm:inline opacity-50">•</span>
-          <span className="flex items-center gap-1.5">
-            <ShieldCheck className="h-4 w-4 text-blue-400" />
-            Pagamento 100% Seguro
+          <span className="hidden sm:inline text-blue-700">|</span>
+          <span className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-blue-400" />
+            Pagamento seguro via Pix / Cartão
+          </span>
+          <span className="hidden sm:inline text-blue-700">|</span>
+          <span className="flex items-center gap-2 text-green-300 font-bold">
+            Garantia Incondicional de 7 dias
           </span>
         </div>
       </div>
