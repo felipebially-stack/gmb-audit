@@ -3,7 +3,21 @@
 import { ArrowRight, FileText, ShieldCheck, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export function CtaSection() {
+// 👇 1. Adicionamos a propriedade reportData para receber os dados
+export function CtaSection({ reportData }: { reportData?: any }) {
+  
+  // 👇 2. Nova função inteligente de Checkout
+  const handleCheckout = () => {
+    // Guarda no "Cofre Invisível" se houver dados pesquisados
+    if (reportData && reportData.result) {
+      localStorage.setItem('@gmbAudit:reportData', JSON.stringify(reportData));
+    }
+
+    // Redireciona para o checkout
+    // ATENÇÃO: Substitua o link abaixo pelo seu link real da Kiwify ou Mercado Pago
+    window.location.href = "https://pay.kiwify.com.br/SEU_LINK_AQUI"; 
+  }
+
   return (
     <section className="relative overflow-hidden rounded-2xl bg-slate-900 px-6 py-12 text-center sm:px-12 sm:py-16 shadow-xl border border-slate-800">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent" />
@@ -17,18 +31,18 @@ export function CtaSection() {
         </p>
 
         <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          {/* Botão Principal de Vendas */}
+          {/* 👇 3. Botão Principal de Vendas ATUALIZADO 👇 */}
           <Button
             size="lg"
             className="w-full gap-2 text-base font-bold sm:w-auto bg-green-600 hover:bg-green-500 text-white border-none shadow-[0_0_20px_rgba(22,163,74,0.4)] transition-all"
-            onClick={() => window.scrollTo({ top: document.body.scrollHeight / 2, behavior: 'smooth' })}
+            onClick={handleCheckout}
           >
             <FileText className="h-5 w-5" />
             Liberar Meu Plano de Ação
             <ArrowRight className="h-4 w-4" />
           </Button>
 
-          {/* Botão Secundário de E-mail */}
+          {/* Botão Secundário de E-mail mantido */}
           <a href="mailto:felipebially@gmail.com?subject=Dúvida sobre a Auditoria GMB" className="w-full sm:w-auto">
             <Button
               size="lg"

@@ -2,15 +2,14 @@
 import dynamic from "next/dynamic";
 import { Header } from "@/components/dashboard/header"
 import { SearchSection } from "@/components/dashboard/search-section"
-import { HowItWorks } from "@/components/dashboard/how-it-works" // NOVO IMPORTE
+import { HowItWorks } from "@/components/dashboard/how-it-works" 
 import { HealthScore } from "@/components/dashboard/health-score"
 import { MetricsCards } from "@/components/dashboard/metrics-cards"
 import { SeoChecklist } from "@/components/dashboard/seo-checklist"
 import { KeywordRankings } from "@/components/dashboard/keyword-rankings"
+import { FaqSection } from "@/components/dashboard/faq-section" // IMPORT DO FAQ AQUI
 import { CtaSection } from "@/components/dashboard/cta-section"
-const ReportGenerator = dynamic(() => import("@/components/dashboard/ReportGenerator"), {
-  ssr: false,
-});
+
 import { useMemo, useState } from "react"
 
 interface PlaceAuditData {
@@ -195,7 +194,7 @@ export default function AuditDashboard() {
       <main>
         <SearchSection onSearch={handleSearch} isLoading={isLoading} />
         
-        {/* 👇 A NOVA SEÇÃO DE "COMO FUNCIONA" 👇 */}
+        {/* A NOVA SEÇÃO DE "COMO FUNCIONA" */}
         {!result && !isLoading && (
           <HowItWorks />
         )}
@@ -262,21 +261,6 @@ export default function AuditDashboard() {
                   serpStatus={result?.serpStatus}
                 />
               </div>
-
-             {/* Report generator */}
-             <div className="mt-6">
-                {result && result.rating ? (
-                  <ReportGenerator
-                    companyName={result.companyName || ""}
-                    address={result.address || ""}
-                    rating={result.rating}
-                    userRatingsTotal={result.userRatingsTotal || 0}
-                    rankings={keywordRankings || []}
-                    healthScore={healthScore}
-                    checklistData={result} 
-                  />
-                ) : null}
-              </div>
             </>
           )}
 
@@ -302,9 +286,14 @@ export default function AuditDashboard() {
             </div>
           </div>
 
-          {/* CTA Section */}
+          {/* 👇 FAQ SECTION AQUI 👇 */}
+          <div className="mt-8">
+            <FaqSection />
+          </div>
+
+          {/* CTA Section - RECEBENDO OS DADOS */}
           <div className="mt-8 sm:mt-12">
-            <CtaSection />
+            <CtaSection reportData={{ result, healthScore, keywordRankings }} />
           </div>
         </section>
       </main>
