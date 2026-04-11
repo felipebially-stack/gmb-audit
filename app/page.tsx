@@ -11,6 +11,7 @@ import { FaqSection } from "@/components/dashboard/faq-section"
 import { CtaSection } from "@/components/dashboard/cta-section"
 import { ExitPopup } from "@/components/dashboard/exit-popup"
 import { useMemo, useState } from "react"
+import { Button } from "@/components/ui/button"
 
 interface PlaceAuditData {
   companyName: string
@@ -122,6 +123,17 @@ export default function AuditDashboard() {
     }
   }
 
+  // 👇 FUNÇÃO MESTRE QUE SERÁ CHAMADA PELOS CADEADOS E PELO NOVO BOTÃO 👇
+  const handleCheckoutDirect = () => {
+    if (result || isLoading) {
+      const reportData = { result, healthScore, keywordRankings };
+      localStorage.setItem('@gmbAudit:reportData', JSON.stringify(reportData));
+    }
+    
+    // 👇 COLE O SEU LINK DA KIWIFY DE R$ 9,97 AQUI NESTA LINHA ABAIXO 👇
+    window.location.href = "https://pay.kiwify.com.br/SEU_LINK_AQUI"; 
+  }
+
   return (
     <div className="min-h-screen bg-slate-900 relative">
       
@@ -142,7 +154,7 @@ export default function AuditDashboard() {
         {/* Results Section */}
         <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
           {(result || isLoading) && (
-            <div className="mb-8 flex flex-col gap-2">
+            <div className="mb-8 flex flex-col gap-2 bg-slate-50 rounded-t-3xl p-6 sm:p-10 shadow-2xl">
               <h2 className="text-2xl font-extrabold text-slate-900">
                 Resultados da Avaliação
               </h2>
@@ -159,7 +171,7 @@ export default function AuditDashboard() {
           )}
 
           {(result || isLoading) && (
-            <>
+            <div className="bg-slate-50 rounded-b-3xl p-6 sm:p-10 shadow-2xl mb-12 -mt-8 pt-0">
               <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
                 <div className="lg:col-span-1">
                   <HealthScore score={isLoading ? 0 : healthScore} />
@@ -175,17 +187,29 @@ export default function AuditDashboard() {
               </div>
 
               <div className="mt-6 sm:mt-8">
-                <SeoChecklist data={result} healthScore={healthScore} />
+                {/* Aqui passamos a função para os cadeados do Checklist */}
+                <SeoChecklist data={result} healthScore={healthScore} onCheckout={handleCheckoutDirect} />
               </div>
 
-              <div className="mt-6 sm:mt-8">
+              {/* 👇 NOVO BOTÃO DE CHECKOUT ENTRE AS SEÇÕES 👇 */}
+              <div className="mt-12 mb-6 flex justify-center">
+                <Button 
+                  onClick={handleCheckoutDirect}
+                  className="h-16 w-full max-w-xl bg-orange-500 hover:bg-orange-600 text-white text-lg sm:text-xl font-extrabold rounded-2xl shadow-[0_0_40px_rgba(249,115,22,0.4)] transition-all uppercase tracking-wide hover:scale-105 animate-bounce"
+                  style={{ animationDuration: '3s' }}
+                >
+                  Desbloquear Meu Plano por R$ 9,97
+                </Button>
+              </div>
+
+              <div className="mt-6 sm:mt-8 border-t border-slate-200 pt-8">
                 <KeywordRankings
                   rankings={keywordRankings}
                   isLoading={isLoading}
                   serpStatus={result?.serpStatus}
                 />
               </div>
-            </>
+            </div>
           )}
 
           {/* 👇 SUPER DESTAQUE NOS DEPOIMENTOS (FUNDO AZUL MARINHO GIGANTE) 👇 */}
@@ -235,18 +259,6 @@ export default function AuditDashboard() {
         </section>
       </main>
 
-      <footer className="border-t border-slate-200 bg-white mt-12">
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm font-bold text-slate-500">
-            © 2026 GMB Audit. Todos os direitos reservados.
-          </p>
-          <div className="flex gap-6 text-sm font-bold text-slate-500">
-            <a href="#" className="hover:text-blue-600">Termos de Uso</a>
-            <a href="#" className="hover:text-blue-600">Privacidade</a>
-            <a href="mailto:felipebially@gmail.com" className="hover:text-blue-600">Suporte</a>
-          </div>
-        </div>
-      </footer>
       <footer className="border-t border-slate-200 bg-white mt-12">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm font-bold text-slate-500">
