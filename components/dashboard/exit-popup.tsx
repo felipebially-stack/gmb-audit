@@ -33,7 +33,7 @@ export function ExitPopup({ reportData }: { reportData?: any }) {
       localStorage.setItem('@gmbAudit:reportData', JSON.stringify(reportData));
     }
     // 👇 ATENÇÃO: COLOQUE AQUI O SEU LINK DA KIWIFY COM O PREÇO DE R$ 9,97 👇
-    window.location.href = "https://pay.kiwify.com.br/SEU_LINK_AQUI"; 
+    window.location.href = "https://pay.kiwify.com.br/yM2aUy9"; 
   }
 
   return (

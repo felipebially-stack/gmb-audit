@@ -8,7 +8,7 @@ export function CtaSection({ reportData }: { reportData?: any }) {
     if (reportData && reportData.result) {
       localStorage.setItem('@gmbAudit:reportData', JSON.stringify(reportData));
     }
-    window.location.href = "https://pay.kiwify.com.br/SEU_LINK_AQUI"; 
+    window.location.href = "https://pay.kiwify.com.br/yM2aUy9"; 
   }
 
   return (
