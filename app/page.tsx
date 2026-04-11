@@ -131,7 +131,7 @@ export default function AuditDashboard() {
     }
     
     // 👇 COLE O SEU LINK DA KIWIFY DE R$ 9,97 AQUI NESTA LINHA ABAIXO 👇
-    window.location.href = "https://pay.kiwify.com.br/SEU_LINK_AQUI"; 
+    window.location.href = "https://pay.kiwify.com.br/yM2aUy9"; 
   }
 
   return (
