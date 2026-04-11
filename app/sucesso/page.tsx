@@ -8,27 +8,42 @@ export default function SucessoPage() {
   const [dados, setDados] = useState<any>(null);
 
   useEffect(() => {
-    const salvo = localStorage.getItem("ultimo_relatorio");
+    // 👇 CHAVE CORRETA DO COFRE 👇
+    const salvo = localStorage.getItem("@gmbAudit:reportData");
+    
     if (salvo) {
-      const parsedData = JSON.parse(salvo);
+      const parsedDataRaw = JSON.parse(salvo);
+      
+      // Normalizando a estrutura de dados vinda da página inicial para o formato do PDF
+      const parsedData = parsedDataRaw.result ? {
+        ...parsedDataRaw.result,
+        healthScore: parsedDataRaw.healthScore,
+        rankings: parsedDataRaw.keywordRankings || parsedDataRaw.result?.rankings
+      } : parsedDataRaw;
+
       setDados(parsedData);
-      setTimeout(() => document.title = `Consultoria_GMN_Turbo_${parsedData.companyName.replace(/\s+/g, '_')}`, 500);
+      
+      setTimeout(() => {
+        if (parsedData.companyName) {
+          document.title = `Consultoria_GMN_Turbo_${parsedData.companyName.replace(/\s+/g, '_')}`;
+        }
+      }, 500);
 
       // ====================================================================
       // 🚀 GATILHO DE CONVERSÃO DO FACEBOOK (PURCHASE)
       // ====================================================================
       if (typeof window !== 'undefined' && (window as any).fbq) {
         (window as any).fbq('track', 'Purchase', {
-          value: 15.00,
+          value: 9.97, // 👇 Atualizado para o novo preço 👇
           currency: 'BRL',
-          content_name: `Consultoria - ${parsedData.companyName}`,
+          content_name: `Consultoria - ${parsedData.companyName || 'Empresa'}`,
           content_type: 'product'
         });
       }
     }
   }, []);
 
-  if (!dados) return <div className="p-10 text-center font-sans">Gerando Consultoria Dinâmica...</div>;
+  if (!dados) return <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white font-sans text-xl">Gerando Consultoria Dinâmica...</div>;
 
   // 1. EXTRAÇÃO DE TERMOS E CIDADE
   const safeRankings = dados.rankings || [];
@@ -64,7 +79,7 @@ export default function SucessoPage() {
   // 🤖 MOTOR DE COPYWRITING INTELIGENTE (TEXTOS HUMANIZADOS)
   // ====================================================================
   
-  const nomeOriginal = dados.companyName || "";
+  const nomeOriginal = dados.companyName || "Sua Empresa";
   let nomeConversacional = nomeOriginal
     .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '') 
     .split(/[-|]/)[0]
@@ -180,30 +195,31 @@ export default function SucessoPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans print:bg-white text-gray-900">
+    <div className="min-h-screen bg-slate-900 font-sans print:bg-white text-gray-900">
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
           @page { margin: 0; size: A4; }
-          body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: white !important; }
           .card-auditoria { page-break-inside: avoid !important; break-inside: avoid !important; display: inline-block !important; width: 100%; }
           .quebrar-antes { page-break-before: always !important; break-before: page !important; }
+          .print\\:hidden { display: none !important; }
         }
       `}} />
 
       <div className="print:hidden flex flex-col items-center py-12 px-4">
         <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-600">
           <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Zap className="w-10 h-10 text-blue-600" />
+            <CheckCircle2 className="w-10 h-10 text-green-500" />
           </div>
-          <h1 className="text-2xl font-black text-gray-900">Método GMN Turbo</h1>
-          <p className="text-gray-600 mt-2 mb-6 text-sm">O relatório da <strong>{nomeOriginal}</strong> foi atualizado com sucesso.</p>
+          <h1 className="text-2xl font-black text-gray-900">Pagamento Aprovado!</h1>
+          <p className="text-gray-600 mt-2 mb-6 text-sm">O relatório da <strong>{nomeOriginal}</strong> foi liberado e está pronto para download.</p>
           <button 
             onClick={() => window.print()} 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 mb-4 transition-transform hover:scale-[1.02]"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-xl shadow-lg flex justify-center items-center gap-2 mb-4 transition-transform hover:scale-[1.02] uppercase tracking-wide"
           >
-            <Download className="w-5 h-5" /> Baixar Consultoria Personalizada
+            <Download className="w-5 h-5" /> Baixar Consultoria em PDF
           </button>
-          <Link href="/" className="text-gray-400 text-sm hover:text-gray-600 underline">Fazer nova auditoria</Link>
+          <Link href="/" className="text-gray-400 text-sm hover:text-gray-600 underline">Voltar para a página inicial</Link>
         </div>
       </div>
 
@@ -248,20 +264,22 @@ export default function SucessoPage() {
                 <div className="bg-yellow-100 p-2.5 rounded-xl"><Star className="text-yellow-600 w-5 h-5"/></div>
                 <div>
                   <p className="text-[10px] font-bold text-gray-400 uppercase">Reputação Atual</p>
-                  <p className="text-xl font-black">{dados.rating} <span className="text-xs font-normal text-gray-500">em {dados.userRatingsTotal} avaliações</span></p>
+                  <p className="text-xl font-black">{dados.rating || 'N/A'} <span className="text-xs font-normal text-gray-500">em {dados.userRatingsTotal || 0} avaliações</span></p>
                 </div>
               </div>
               <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm card-auditoria">
                 <p className="text-[10px] font-bold text-gray-400 uppercase mb-2 flex items-center gap-2"><Target className="w-3 h-3"/> Rankings de Visibilidade</p>
                 <div className="space-y-1.5">
-                  {safeRankings.slice(0, 3).map((r: any, i: number) => (
+                  {safeRankings.length > 0 ? safeRankings.slice(0, 3).map((r: any, i: number) => (
                     <div key={i} className="flex justify-between items-center text-xs">
                       <span className="truncate w-44 text-gray-700">{r.keyword}</span>
                       <span className={`font-black ${r.position && r.position <= 3 ? 'text-green-600' : 'text-red-500 bg-red-50 px-1.5 py-0.5 rounded'}`}>
                         {r.position ? `${r.position}º Lugar` : 'Invisível (>20)'}
                       </span>
                     </div>
-                  ))}
+                  )) : (
+                    <p className="text-xs text-gray-500">Nenhum dado de ranking encontrado.</p>
+                  )}
                 </div>
               </div>
             </div>
