@@ -1,17 +1,18 @@
 "use client"
+
 import dynamic from "next/dynamic";
 import { Header } from "@/components/dashboard/header"
 import { SearchSection } from "@/components/dashboard/search-section"
 import { HowItWorks } from "@/components/dashboard/how-it-works" 
 import { HealthScore } from "@/components/dashboard/health-score"
-import { MetricsCards } from "@/components/dashboard/metrics-cards"
-import { SeoChecklist } from "@/components/dashboard/seo-checklist"
-import { KeywordRankings } from "@/components/dashboard/keyword-rankings"
 import { FaqSection } from "@/components/dashboard/faq-section" 
-import { CtaSection } from "@/components/dashboard/cta-section"
 import { ExitPopup } from "@/components/dashboard/exit-popup"
+import { AlertTriangle, MapPin, TrendingDown } from "lucide-react"
 import { useMemo, useState } from "react"
-import { Button } from "@/components/ui/button"
+
+const ReportGenerator = dynamic(() => import("@/components/dashboard/ReportGenerator"), {
+  ssr: false,
+});
 
 interface PlaceAuditData {
   companyName: string
@@ -19,6 +20,7 @@ interface PlaceAuditData {
   userRatingsTotal: number | null
   address: string | null
   rankings: KeywordRanking[]
+  checklistData?: any
   serpStatus?: "ok" | "api_unavailable" | "not_configured"
 }
 
@@ -123,140 +125,151 @@ export default function AuditDashboard() {
     }
   }
 
-  // 👇 FUNÇÃO MESTRE QUE SERÁ CHAMADA PELOS CADEADOS E PELO NOVO BOTÃO 👇
-  const handleCheckoutDirect = () => {
-    if (result || isLoading) {
-      const reportData = { result, healthScore, keywordRankings };
-      localStorage.setItem('@gmbAudit:reportData', JSON.stringify(reportData));
-    }
-    
-    // 👇 COLE O SEU LINK DA KIWIFY DE R$ 9,97 AQUI NESTA LINHA ABAIXO 👇
-    window.location.href = "https://pay.kiwify.com.br/yM2aUy9"; 
-  }
-
   return (
-    <div className="min-h-screen bg-slate-900 relative">
+    <div className="min-h-screen bg-slate-50 relative">
       
-      {/* 👇 BARRA VERMELHA DE URGÊNCIA (NOVO PREÇO) 👇 */}
+      {/* BARRA VERMELHA DE URGÊNCIA (NOVO PREÇO E COPY) */}
       <div className="bg-red-600 text-white text-center py-2 px-4 text-sm font-bold shadow-md relative z-50">
-        Apenas mais 47 diagnósticos com preço promocional de R$ 9,97 hoje. Aproveite antes que volte para R$ 197.
+        Aviso: O Google Maps atualizou suas diretrizes de ranqueamento local. Descubra agora por que a sua ficha perdeu posições.
       </div>
 
       <Header />
       
       <main>
-        <SearchSection onSearch={handleSearch} isLoading={isLoading} />
+        {/* BUSCA: Só aparece se não tiver resultado */}
+        {!result && (
+          <SearchSection onSearch={handleSearch} isLoading={isLoading} />
+        )}
         
+        {/* COMO FUNCIONA: Só aparece se não tiver resultado */}
         {!result && !isLoading && (
           <HowItWorks />
         )}
-        
-        {/* Results Section */}
-        <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-          {(result || isLoading) && (
-            <div className="mb-8 flex flex-col gap-2 bg-slate-50 rounded-t-3xl p-6 sm:p-10 shadow-2xl">
-              <h2 className="text-2xl font-extrabold text-slate-900">
-                Resultados da Avaliação
-              </h2>
-              <p className="text-lg text-blue-600 font-bold">
-                {isLoading ? "Buscando dados..." : result?.companyName ? `${result.companyName} - ${result.address}` : ""}
-              </p>
-            </div>
-          )}
 
-          {errorMessage && (
+        {errorMessage && (
+          <div className="max-w-4xl mx-auto mt-8 px-4">
             <p className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 font-bold">
               {errorMessage}
             </p>
-          )}
+          </div>
+        )}
+        
+        {/* 👇 A CARTA DE VENDAS (SÓ APARECE APÓS A PESQUISA) 👇 */}
+        {result && result.rating && (
+          <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+            <div className="mb-10 text-center">
+              <h2 className="text-3xl font-extrabold text-slate-900 flex items-center justify-center gap-2 mb-2">
+                <MapPin className="text-blue-600" /> {result.companyName}
+              </h2>
+              <p className="text-slate-500">{result.address}</p>
+            </div>
 
-          {(result || isLoading) && (
-            <div className="bg-slate-50 rounded-b-3xl p-6 sm:p-10 shadow-2xl mb-12 -mt-8 pt-0">
-              <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
-                <div className="lg:col-span-1">
+            <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
+              
+              {/* O CHOQUE (Health Score Grande) */}
+              <div className="bg-slate-900 p-10 text-center flex flex-col items-center">
+                <p className="text-blue-400 font-bold tracking-widest uppercase text-sm mb-6">Diagnóstico Concluído</p>
+                
+                <div className="w-48 h-48 mb-6">
                   <HealthScore score={isLoading ? 0 : healthScore} />
                 </div>
-                <div className="lg:col-span-2">
-                  <MetricsCards
-                    rating={result?.rating ?? null}
-                    userRatingsTotal={result?.userRatingsTotal ?? null}
-                    address={result?.address ?? null}
-                    isLoading={isLoading}
-                  />
+                
+                <h3 className="text-3xl font-black text-white mt-4 flex items-center gap-3">
+                  <AlertTriangle className="text-yellow-500 w-8 h-8" />
+                  Sua empresa tirou a nota {healthScore}/100.
+                </h3>
+                <p className="text-xl text-slate-300 mt-3 font-medium max-w-2xl">
+                  Você está praticamente invisível para mais da metade dos clientes da sua região.
+                </p>
+              </div>
+
+              {/* O TEXTO PERSUASIVO */}
+              <div className="p-10 sm:p-14 space-y-8 text-lg text-slate-700 leading-relaxed font-medium">
+                
+                <p>Sabe por que o seu telefone parou de tocar? <strong className="text-slate-900">Não é culpa da economia ou do seu preço.</strong> É porque o algoritmo do Google Meu Negócio mudou, e os seus concorrentes aprenderam a jogar o jogo.</p>
+                
+                <p>Pense no seu cliente ideal. Seja você dono de uma empresa de serviços de pintura ou de um escritório focado em defesa patrimonial. Quando o seu cliente pega o celular precisando urgente do seu serviço, o Google mostra <strong>apenas 3 empresas no mapa</strong>.</p>
+                
+                <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl">
+                  <p className="flex items-start gap-3 text-red-900">
+                    <TrendingDown className="w-6 h-6 shrink-0 mt-1" />
+                    <span>Essas 3 empresas levam <strong>60% de todos os cliques e ligações da cidade</strong>.</span>
+                  </p>
                 </div>
-              </div>
 
-              <div className="mt-6 sm:mt-8">
-                {/* Aqui passamos a função para os cadeados do Checklist */}
-                <SeoChecklist data={result} healthScore={healthScore} onCheckout={handleCheckoutDirect} />
-              </div>
+                <p>Se a sua ficha apresenta a pontuação que você acabou de ver acima, <strong>você nunca será uma dessas 3 opções.</strong> Pior: você está entregando dinheiro de mão beijada para a concorrência todos os dias.</p>
+                
+                <h4 className="text-2xl font-black text-slate-900 pt-6">A Solução Rápida</h4>
+                
+                <p>Nossa Inteligência Artificial cruzou os dados da sua ficha com as diretrizes oficiais do Google e encontrou exatamente o que está travando o seu perfil. Nós agrupamos as falhas e a solução em um <strong>Plano de Domínio Local (PDF)</strong> mastigado para você.</p>
+                
+                <ul className="space-y-4 bg-slate-50 p-6 rounded-xl border border-slate-200 text-base">
+                  <li className="flex gap-3"><span className="text-green-500 font-black">✓</span> <strong>A Auditoria:</strong> Descubra para quais palavras-chave você simplesmente não existe.</li>
+                  <li className="flex gap-3"><span className="text-green-500 font-black">✓</span> <strong>O Kit Copie e Cole:</strong> A IA já escreveu a sua nova descrição e o roteiro das suas postagens. É só copiar.</li>
+                  <li className="flex gap-3"><span className="text-green-500 font-black">✓</span> <strong>O Checklist de 7 Dias:</strong> As tarefas urgentes para fazer o algoritmo devolver as suas ligações em 72 horas.</li>
+                </ul>
 
-              {/* 👇 NOVO BOTÃO DE CHECKOUT ENTRE AS SEÇÕES 👇 */}
-              <div className="mt-12 mb-6 flex justify-center">
-                <Button 
-                  onClick={handleCheckoutDirect}
-                  className="h-16 w-full max-w-xl bg-orange-500 hover:bg-orange-600 text-white text-lg sm:text-xl font-extrabold rounded-2xl shadow-[0_0_40px_rgba(249,115,22,0.4)] transition-all uppercase tracking-wide hover:scale-105 animate-bounce"
-                  style={{ animationDuration: '3s' }}
-                >
-                  Desbloquear Meu Plano por R$ 9,97
-                </Button>
-              </div>
+                <p className="pt-4">Você pode tentar adivinhar o que está errado e perder semanas testando, ou pode receber o plano exato do que alterar hoje para o telefone voltar a tocar.</p>
+                
+                <p>Uma consultoria de SEO Local não sairia por menos de R$ 1.000,00 no mercado. Por isso, liberar o seu Relatório Executivo e o Plano de Ação completo custa <strong>apenas R$ 9,97</strong>.</p>
+                
+                <p className="text-center font-bold text-slate-900 text-xl py-4">Menos de dez reais para destravar as vendas da sua empresa.</p>
 
-              <div className="mt-6 sm:mt-8 border-t border-slate-200 pt-8">
-                <KeywordRankings
-                  rankings={keywordRankings}
-                  isLoading={isLoading}
-                  serpStatus={result?.serpStatus}
+                {/* 👇 O BOTÃO DE VENDAS QUE SUBSTITUI TODO O RESTO 👇 */}
+                <ReportGenerator
+                  companyName={result.companyName || ""}
+                  address={result.address || ""}
+                  rating={result.rating}
+                  userRatingsTotal={result.userRatingsTotal || 0}
+                  rankings={keywordRankings || []}
+                  healthScore={healthScore}
+                  checklistData={result.checklistData}
                 />
               </div>
             </div>
-          )}
+          </section>
+        )}
 
-          {/* 👇 SUPER DESTAQUE NOS DEPOIMENTOS (FUNDO AZUL MARINHO GIGANTE) 👇 */}
-          <div className="mt-20 bg-blue-950 py-20 px-6 rounded-[3rem] shadow-2xl relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-800/30 via-transparent to-transparent" />
-            <div className="relative z-10">
-              <h2 className="text-4xl font-extrabold text-center mb-16 text-white">Negócios que investiram R$ 9,97 e viraram o jogo:</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                
-                <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
-                  <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">+412% de visualizações</div>
-                  <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
-                  <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Paguei R$ 9,97 e em 3 dias já vi diferença. Segui o passo a passo da IA e o telefone não para de tocar. Melhor investimento que já fiz!"</p>
-                  <div className="mt-8 flex items-center gap-4">
-                    <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xl">MC</div>
-                    <div>
-                      <div className="font-extrabold text-lg text-slate-900">Maria Clara</div>
-                      <div className="text-sm font-medium text-slate-500">Doceria Doce Encanto, SP</div>
-                    </div>
+        {/* DEPOIMENTOS GIGANTES */}
+        <div className="mt-20 bg-blue-950 py-20 px-6 rounded-[3rem] shadow-2xl relative overflow-hidden max-w-7xl mx-auto">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-800/30 via-transparent to-transparent" />
+          <div className="relative z-10">
+            <h2 className="text-4xl font-extrabold text-center mb-16 text-white">Negócios que investiram R$ 9,97 e viraram o jogo:</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              
+              <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
+                <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">+412% de visualizações</div>
+                <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
+                <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Eu achava que o problema era preço, mas o diagnóstico me mostrou que eu estava invisível no mapa. Paguei R$ 9,97, apliquei o PDF e meu telefone não para de tocar."</p>
+                <div className="mt-8 flex items-center gap-4">
+                  <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xl">MC</div>
+                  <div>
+                    <div className="font-extrabold text-lg text-slate-900">Maria Clara</div>
+                    <div className="text-sm font-medium text-slate-500">Doceria Doce Encanto, SP</div>
                   </div>
                 </div>
-
-                <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
-                  <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">Top 3 em 1 semana</div>
-                  <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
-                  <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Por R$ 9,97 recebi um relatório mais prático que o de um consultor que me cobrou R$ 1.200. Incrível, não tem pegadinha."</p>
-                  <div className="mt-8 flex items-center gap-4">
-                    <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xl">RM</div>
-                    <div>
-                      <div className="font-extrabold text-lg text-slate-900">Roberto M.</div>
-                      <div className="text-sm font-medium text-slate-500">Auto Center, RJ</div>
-                    </div>
-                  </div>
-                </div>
-
               </div>
+
+              <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
+                <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">Top 3 em 1 semana</div>
+                <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
+                <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Por R$ 9,97 recebi um relatório prático que me disse exatamente o que fazer. Hoje os orçamentos chegam sozinhos no WhatsApp. Incrível."</p>
+                <div className="mt-8 flex items-center gap-4">
+                  <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xl">RM</div>
+                  <div>
+                    <div className="font-extrabold text-lg text-slate-900">Roberto M.</div>
+                    <div className="text-sm font-medium text-slate-500">Auto Center, RJ</div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
+        </div>
 
-          <div className="mt-20">
-            <FaqSection />
-          </div>
-
-          <div className="mt-16 mb-10" id="planos">
-            <CtaSection reportData={{ result, healthScore, keywordRankings }} />
-          </div>
-        </section>
+        <div className="mt-20">
+          <FaqSection />
+        </div>
       </main>
 
       <footer className="border-t border-slate-200 bg-white mt-12">
@@ -272,7 +285,6 @@ export default function AuditDashboard() {
         </div>
       </footer>
 
-      {/* 👇 NOSSO POPUP INVISÍVEL FICA AQUI ESPERANDO 👇 */}
       <ExitPopup reportData={{ result, healthScore, keywordRankings }} />
     </div>
   )

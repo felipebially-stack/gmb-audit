@@ -21,10 +21,10 @@ export async function POST(req: Request) {
           price_data: {
             currency: "brl",
             product_data: {
-              name: `Plano de Ação de SEO - ${companyName || 'Empresa'}`,
-              description: "Auditoria Completa e Plano de Otimização do Google Meu Negócio",
+              name: `Plano de Domínio Local - ${companyName || 'Empresa'}`,
+              description: "Relatório Executivo e Plano de Ação Prático",
             },
-            unit_amount: 1500, // R$ 15,00 (O Stripe lê o valor em centavos)
+            unit_amount: 997, // R$ 9,97 (O Stripe lê o valor em centavos)
           },
           quantity: 1,
         },
