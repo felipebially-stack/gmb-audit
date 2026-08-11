@@ -1,16 +1,13 @@
-"use client";
-
 import { Search, Zap, FileText } from "lucide-react";
 
 export function HowItWorks() {
   return (
-    // 👇 FUNDO GRAFITE 👇
     <section id="como-funciona" className="bg-slate-800 py-20 border-b border-slate-700">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            Por apenas R$ 19,90, nós mapeamos os erros exatos <span className="text-blue-400 block mt-2">que estão desviando seus clientes para a concorrência</span>
+            Por apenas R$ 9,97, nós mapeamos os erros exatos <span className="text-blue-400 block mt-2">que estão desviando seus clientes para a concorrência</span>
           </h2>
         </div>
 
@@ -50,10 +47,11 @@ export function HowItWorks() {
               Nada de relatórios técnicos impossíveis de ler. Você recebe um PDF mastigado mostrando exatamente onde clicar e o que mudar hoje para o telefone voltar a tocar.
             </p>
             <div className="w-full mt-auto bg-green-500/10 rounded-xl p-3 border border-green-500/20">
-               <p className="text-sm font-extrabold text-green-400 uppercase">Seu PDF liberado na hora</p>
+              <p className="text-sm font-extrabold text-green-400 uppercase">Seu PDF liberado na hora</p>
             </div>
           </div>
         </div>
+
       </div>
     </section>
   );
