@@ -9,8 +9,8 @@ const faqs = [
       resposta: "Porque entregamos um diagnóstico profissional completo com IA avançada e um plano de ação personalizado que vale R$ 197 no mercado. Cobramos apenas R$ 15 para que qualquer negócio, do pequeno ao grande, possa ter acesso a esse nível de tecnologia."
     },
     {
-      pergunta: "É realmente só R$ 15 ou tem pegadinha?",
-      resposta: "É exatamente R$ 15. Sem mensalidade, sem taxas ocultas, sem compromisso de longo prazo e com garantia total de devolução se você não gostar do relatório."
+      pergunta: "É realmente só R$ 9,97 ou tem pegadinha?",
+      resposta: "É exatamente R$ 9,97. Sem mensalidade, sem taxas ocultas, sem compromisso de longo prazo e com garantia total de devolução se você não gostar do relatório."
     },
     {
       pergunta: "Quanto tempo leva para receber o Plano de Ação?",
