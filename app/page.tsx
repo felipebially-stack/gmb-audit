@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import { Header } from "@/components/dashboard/header"
 import { SearchSection } from "@/components/dashboard/search-section"
 import { HowItWorks } from "@/components/dashboard/how-it-works" 
-import { HealthScore } from "@/components/dashboard/health-score"
 import { FaqSection } from "@/components/dashboard/faq-section" 
 import { ExitPopup } from "@/components/dashboard/exit-popup"
 import { AlertTriangle, MapPin, TrendingDown } from "lucide-react"
@@ -166,25 +165,33 @@ export default function AuditDashboard() {
 
             <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
               
-              {/* O CHOQUE (Health Score Grande) */}
-              <div className="bg-slate-900 p-10 text-center flex flex-col items-center">
+              {/* O CHOQUE (Health Score com Gráfico Nativo Consertado) */}
+              <div className="bg-slate-900 p-8 sm:p-14 text-center flex flex-col items-center">
                 <p className="text-blue-400 font-bold tracking-widest uppercase text-sm mb-6">Diagnóstico Concluído</p>
                 
-                <div className="w-48 h-48 mb-6">
-                  <HealthScore score={isLoading ? 0 : healthScore} />
+                {/* GRÁFICO CIRCULAR NATIVO (Sem vazar layout) */}
+                <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-8 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <path className="text-slate-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="100, 100" />
+                    <path className={healthScore > 75 ? "text-green-500" : healthScore > 50 ? "text-yellow-500" : "text-red-500"} strokeDasharray={`${healthScore}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                  <div className="absolute flex flex-col items-center justify-center">
+                    <span className="text-5xl sm:text-6xl font-black text-white">{healthScore}</span>
+                    <span className="text-slate-400 text-sm font-bold">/100</span>
+                  </div>
                 </div>
                 
-                <h3 className="text-3xl font-black text-white mt-4 flex items-center gap-3">
-                  <AlertTriangle className="text-yellow-500 w-8 h-8" />
-                  Sua empresa tirou a nota {healthScore}/100.
+                <h3 className="text-2xl sm:text-3xl font-black text-white mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+                  <AlertTriangle className="text-yellow-500 w-8 h-8 shrink-0" />
+                  <span>Sua empresa tirou a nota {healthScore}/100.</span>
                 </h3>
-                <p className="text-xl text-slate-300 mt-3 font-medium max-w-2xl">
+                <p className="text-lg sm:text-xl text-slate-300 mt-4 font-medium max-w-2xl">
                   Você está praticamente invisível para mais da metade dos clientes da sua região.
                 </p>
               </div>
 
               {/* O TEXTO PERSUASIVO */}
-              <div className="p-10 sm:p-14 space-y-8 text-lg text-slate-700 leading-relaxed font-medium">
+              <div className="p-8 sm:p-14 space-y-8 text-lg text-slate-700 leading-relaxed font-medium">
                 
                 <p>Sabe por que o seu telefone parou de tocar? <strong className="text-slate-900">Não é culpa da economia ou do seu preço.</strong> É porque o algoritmo do Google Meu Negócio mudou, e os seus concorrentes aprenderam a jogar o jogo.</p>
                 
@@ -215,7 +222,7 @@ export default function AuditDashboard() {
                 
                 <p className="text-center font-bold text-slate-900 text-xl py-4">Menos de dez reais para destravar as vendas da sua empresa.</p>
 
-                {/* 👇 O BOTÃO DE VENDAS QUE SUBSTITUI TODO O RESTO 👇 */}
+                {/* BOTÃO DE VENDAS */}
                 <ReportGenerator
                   companyName={result.companyName || ""}
                   address={result.address || ""}
