@@ -1,6 +1,6 @@
 "use client"
 
-import { Link2, ShieldCheck, AlertCircle, CheckCircle2 } from "lucide-react"
+import { ShieldCheck, AlertCircle, CheckCircle2, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 
@@ -25,48 +25,48 @@ export function SearchSection({ onSearch, isLoading = false }: { onSearch?: (q: 
           
           <div className={`transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <div className="flex flex-wrap gap-3 mb-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1.5 text-sm font-bold text-red-400 border border-red-500/20 shadow-sm">
-                <span className="flex h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse"></span>
-                De R$ 197 por apenas R$ 9,97
-              </div>
+              
+              {/* 👇 A Isca Curiosa (Sem preço) 👇 */}
               <div className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-3 py-1.5 text-sm font-bold text-slate-300 border border-slate-700 shadow-sm">
-                🔥 237 diagnósticos hoje
+                🔥 +1.200 empresas analisadas esta semana
               </div>
             </div>
             
-            {/* Textos em branco para destacar no fundo escuro */}
+            {/* 👇 Nova Headline Focada na Dor do Cliente 👇 */}
             <h1 className="text-balance text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Seu negócio está perdendo clientes no Google? <span className="text-blue-400 block mt-2">Por apenas R$ 9,97 você descobre o porquê.</span>
+              Pare de perder clientes para o <span className="text-blue-400 block mt-2">concorrente da rua de trás.</span>
             </h1>
             
             <p className="mt-6 max-w-2xl text-pretty text-lg text-slate-300 font-medium">
-              Diagnóstico completo do seu Google Meu Negócio feito por IA + Plano de Ação. <br/><span className="text-white font-bold">Leva 47 segundos • Resultado instantâneo • Garantia de devolução.</span>
+              Descubra os erros ocultos que estão escondendo a sua empresa de quem pesquisa pelos seus serviços na sua região. <br/><span className="text-white font-bold">Faça um raio-x 100% gratuito em 47 segundos.</span>
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8 relative max-w-xl">
               <div className="flex flex-col gap-3">
                 <div className="relative flex-1">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-4">
-                    <Link2 className="h-6 w-6 text-slate-500" />
+                    <Search className="h-6 w-6 text-slate-500" />
                   </div>
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Digite o nome da empresa..."
+                    placeholder="Ex: Defesa Patrimonial, AGV Painting, Odontologia..."
                     className="h-16 w-full rounded-2xl border-2 border-slate-700 bg-slate-800 text-white pl-12 pr-4 text-lg shadow-sm placeholder:text-slate-500 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20"
                   />
                 </div>
-                <Button type="submit" className="h-16 w-full bg-orange-500 hover:bg-orange-600 text-white text-xl font-extrabold rounded-2xl shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all uppercase tracking-wide hover:scale-[1.02]">
-                  {isLoading ? "Buscando empresa..." : "Analise agora mesmo o seu perfil"}
+                <Button disabled={isLoading} type="submit" className="h-16 w-full bg-orange-500 hover:bg-orange-600 text-white text-xl font-extrabold rounded-2xl shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all uppercase tracking-wide hover:scale-[1.02]">
+                  {isLoading ? "Analisando o mapa..." : "Descobrir Minha Nota Gratuita"}
                 </Button>
               </div>
+              
+              {/* 👇 Gatilhos de ausência de atrito 👇 */}
               <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-4 text-xs font-bold text-slate-400">
-                <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-green-400"/> Pagamento seguro</span>
+                <span className="flex items-center gap-1"><ShieldCheck className="h-4 w-4 text-green-400"/> 100% Gratuito</span>
                 <span>•</span>
-                <span>Acesso imediato</span>
+                <span>Sem Cadastro</span>
                 <span>•</span>
-                <span>100% confidencial</span>
+                <span>Resultado Imediato</span>
               </div>
             </form>
           </div>
