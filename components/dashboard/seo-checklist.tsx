@@ -9,7 +9,6 @@ interface SeoChecklistProps {
 }
 
 export function SeoChecklist({ data, onCheckout }: SeoChecklistProps) {
-  // Simulando o estado das análises (se for falso é erro grave, senão é aviso)
   const api = data?.checklistData || {};
 
   const items = [
@@ -46,7 +45,6 @@ export function SeoChecklist({ data, onCheckout }: SeoChecklistProps) {
             <Lock className="h-5 w-5 text-blue-300 group-hover:text-blue-600 transition-colors" />
           </div>
           
-          {/* Efeito visual de texto censurado/borrado */}
           <div className="mt-5 blur-[4px] select-none opacity-40">
             <div className="h-2 w-full bg-slate-400 rounded mb-2"></div>
             <div className="h-2 w-4/5 bg-slate-400 rounded mb-2"></div>
