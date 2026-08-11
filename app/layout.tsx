@@ -2,14 +2,14 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
-import Script from "next/script" // 👈 Adicionamos esta linha
+import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Auditoria Google Meu Negócio | R$ 15,00',
-  description: 'Ferramenta profissional de auditoria para Google Meu Negócio. Analise seu perfil, melhore seu SEO local e aumente sua visibilidade.',
+  title: 'Diagnóstico de Posicionamento Local | Descubra seus erros',
+  description: 'Pare de perder clientes para o concorrente da rua de trás. Faça o raio-x da sua ficha do Google Meu Negócio e receba seu plano de domínio local.',
   generator: 'v0.app',
   icons: {
     icon: [
