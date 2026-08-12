@@ -8,42 +8,59 @@ export default function SucessoPage() {
   const [dados, setDados] = useState<any>(null);
 
   useEffect(() => {
-    // 👇 CHAVE CORRETA DO COFRE 👇
-    const salvo = localStorage.getItem("@gmbAudit:reportData");
+    // Busca os dados deixados pelo ReportGenerator
+    const salvo = localStorage.getItem("ultimo_relatorio");
     
     if (salvo) {
-      const parsedDataRaw = JSON.parse(salvo);
-      
-      // Normalizando a estrutura de dados vinda da página inicial para o formato do PDF
-      const parsedData = parsedDataRaw.result ? {
-        ...parsedDataRaw.result,
-        healthScore: parsedDataRaw.healthScore,
-        rankings: parsedDataRaw.keywordRankings || parsedDataRaw.result?.rankings
-      } : parsedDataRaw;
+      try {
+        const parsedData = JSON.parse(salvo);
+        setDados(parsedData);
+        
+        // Ajusta o título da aba para ficar elegante ao baixar o PDF
+        setTimeout(() => {
+          if (parsedData.companyName) {
+            document.title = `Consultoria_GMN_Turbo_${parsedData.companyName.replace(/\s+/g, '_')}`;
+          }
+        }, 500);
 
-      setDados(parsedData);
-      
-      setTimeout(() => {
-        if (parsedData.companyName) {
-          document.title = `Consultoria_GMN_Turbo_${parsedData.companyName.replace(/\s+/g, '_')}`;
+        // Dispara o evento de Purchase do FB (Opcional, mas mantive por segurança)
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+          (window as any).fbq('track', 'Purchase', {
+            value: 9.97,
+            currency: 'BRL',
+            content_name: `Consultoria - ${parsedData.companyName || 'Empresa'}`,
+            content_type: 'product'
+          });
         }
-      }, 500);
-
-      // ====================================================================
-      // 🚀 GATILHO DE CONVERSÃO DO FACEBOOK (PURCHASE)
-      // ====================================================================
-      if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq('track', 'Purchase', {
-          value: 9.97, // 👇 Atualizado para o novo preço 👇
-          currency: 'BRL',
-          content_name: `Consultoria - ${parsedData.companyName || 'Empresa'}`,
-          content_type: 'product'
-        });
+      } catch (e) {
+        console.error("Erro ao ler dados do relatório", e);
+      }
+    } else {
+      // Se por algum motivo entrar direto sem dados, tenta buscar o backup antigo
+      const backup = localStorage.getItem("@gmbAudit:reportData");
+      if (backup) {
+         try {
+           const parsedBackup = JSON.parse(backup);
+           const fallbackData = parsedBackup.result ? {
+             ...parsedBackup.result,
+             healthScore: parsedBackup.healthScore,
+             rankings: parsedBackup.keywordRankings || parsedBackup.result?.rankings
+           } : parsedBackup;
+           setDados(fallbackData);
+         } catch(e) {}
       }
     }
   }, []);
 
-  if (!dados) return <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white font-sans text-xl">Gerando Consultoria Dinâmica...</div>;
+  if (!dados) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 text-white font-sans text-xl gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <p>Gerando Consultoria Dinâmica...</p>
+        <Link href="/" className="text-sm text-blue-400 mt-4 underline">Voltar ao Início</Link>
+      </div>
+    );
+  }
 
   // 1. EXTRAÇÃO DE TERMOS E CIDADE
   const safeRankings = dados.rankings || [];
