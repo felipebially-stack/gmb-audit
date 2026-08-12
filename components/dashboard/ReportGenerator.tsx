@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Lock, ArrowRight, Beaker } from "lucide-react";
 
 interface ReportProps {
   companyName: string;
@@ -8,7 +9,6 @@ interface ReportProps {
   userRatingsTotal: number | null;
   address: string;
   rankings: any[];
-  // 👇 AS DUAS LINHAS NOVAS MÁGICAS AQUI:
   healthScore?: number;
   checklistData?: any;
 }
@@ -19,18 +19,26 @@ export default function ReportGenerator({ companyName, rating, userRatingsTotal,
   const irParaPagamento = async () => {
     setIsRedirecting(true);
 
-    // 👇 AGORA ELE SALVA A NOTA REAL E OS DADOS REAIS DO PAINEL
+    // Salva os dados na memória do navegador para gerar o PDF dinâmico depois
     const dadosRelatorio = {
       companyName,
       rating,
       userRatingsTotal,
       address,
       rankings,
-      healthScore, // Vai salvar o seu "86"
-      checklistData // Vai salvar os "Vs" verdes e "Xs" vermelhos da sua tela
+      healthScore,
+      checklistData
     };
+
     localStorage.setItem("ultimo_relatorio", JSON.stringify(dadosRelatorio));
 
+    // 🚧 INÍCIO DO BYPASS DE TESTE 🚧
+    // Em vez de chamar o Stripe, simulamos um pequeno delay e vamos direto para o PDF
+    setTimeout(() => {
+      window.location.href = "/sucesso";
+    }, 800);
+
+    /* 👇 CÓDIGO ORIGINAL DO STRIPE (COMENTADO PARA TESTES) 👇
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
@@ -39,6 +47,7 @@ export default function ReportGenerator({ companyName, rating, userRatingsTotal,
       });
 
       const data = await response.json();
+
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -49,6 +58,7 @@ export default function ReportGenerator({ companyName, rating, userRatingsTotal,
       console.error(error);
       setIsRedirecting(false);
     }
+    👆 FIM DO CÓDIGO ORIGINAL DO STRIPE 👆 */
   };
 
   return (
@@ -56,16 +66,19 @@ export default function ReportGenerator({ companyName, rating, userRatingsTotal,
       <button
         onClick={irParaPagamento}
         disabled={isRedirecting || !rating}
-        className="w-full max-w-md bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-xl shadow-lg transition-all disabled:opacity-50 text-lg flex flex-col items-center"
+        className="w-full max-w-xl bg-green-600 hover:bg-green-700 text-white font-extrabold py-5 px-8 rounded-2xl shadow-[0_0_30px_rgba(22,163,74,0.3)] transition-all hover:scale-105 disabled:opacity-50 text-xl flex justify-center items-center gap-3 uppercase tracking-wide"
       >
-        {isRedirecting ? "Processando..." : (
+        {isRedirecting ? "Gerando PDF..." : (
           <>
-            <span>Liberar Plano de Ação Completo</span>
-            <span className="text-sm font-normal opacity-90">Análise de 10 pontos + PDF Executivo (R$ 15,00)</span>
+            <Beaker className="w-6 h-6" />
+            [MODO TESTE] GERAR PDF GRÁTIS
+            <ArrowRight className="w-6 h-6" />
           </>
         )}
       </button>
-      <p className="text-sm text-gray-500 mt-3 flex items-center gap-1">🔒 Pagamento Seguro via Stripe</p>
+      <p className="text-sm text-green-600 mt-4 font-bold flex items-center gap-2">
+        🚧 Bypass Ativado: O checkout via Stripe foi pulado.
+      </p>
     </div>
   );
 }
