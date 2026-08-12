@@ -6,7 +6,7 @@ import { ChevronDown, HelpCircle } from "lucide-react"
 const faqs = [
     {
       pergunta: "Por que não é gratuito?",
-      resposta: "Porque entregamos um diagnóstico profissional completo com IA avançada e um plano de ação personalizado que vale R$ 197 no mercado. Cobramos apenas R$ 15 para que qualquer negócio, do pequeno ao grande, possa ter acesso a esse nível de tecnologia."
+      resposta: "Porque entregamos um diagnóstico profissional completo com IA avançada e um plano de ação personalizado que vale R$ 197 no mercado. Cobramos apenas R$ 9,97 para que qualquer negócio, do pequeno ao grande, possa ter acesso a esse nível de tecnologia."
     },
     {
       pergunta: "É realmente só R$ 9,97 ou tem pegadinha?",
@@ -22,7 +22,7 @@ const faqs = [
     },
     {
       pergunta: "E se eu não gostar ou achar difícil de aplicar?",
-      resposta: "Temos uma garantia incondicional de 7 dias. Se você achar que o diagnóstico de R$ 15 não valeu a pena, você nos envia um e-mail e devolvemos 100% do seu dinheiro, sem perguntas."
+      resposta: "Temos uma garantia incondicional de 7 dias. Se você achar que o diagnóstico de R$ 9,97 não valeu a pena, você nos envia um e-mail e devolvemos 100% do seu dinheiro, sem perguntas."
     }
   ]
 
