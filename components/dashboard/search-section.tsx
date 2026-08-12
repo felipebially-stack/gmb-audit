@@ -47,7 +47,7 @@ export function SearchSection({ onSearch, isLoading = false }: { onSearch?: (q: 
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Ex: Defesa Patrimonial, AGV Painting, Odontologia..."
+                    placeholder="Coloque aqui o nome da sua empresa e região!"
                     className="h-16 w-full rounded-2xl border-2 border-slate-700 bg-slate-800 text-white pl-12 pr-4 text-lg shadow-sm placeholder:text-slate-500 focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20"
                   />
                 </div>
