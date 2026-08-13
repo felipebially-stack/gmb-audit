@@ -308,8 +308,8 @@ export default function AuditDashboard() {
           </section>
         )}
 
-        {/* DEPOIMENTOS GIGANTES */}
-        <div className="mt-20 bg-blue-950 py-20 px-6 rounded-[3rem] shadow-2xl relative overflow-hidden max-w-7xl mx-auto">
+    {/* DEPOIMENTOS GIGANTES */}
+    <div className="mt-20 bg-blue-950 py-20 px-6 rounded-[3rem] shadow-2xl relative overflow-hidden max-w-7xl mx-auto">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-800/30 via-transparent to-transparent" />
           <div className="relative z-10">
             <h2 className="text-4xl font-extrabold text-center mb-16 text-white">Negócios que investiram R$ 9,97 e viraram o jogo:</h2>
@@ -320,7 +320,8 @@ export default function AuditDashboard() {
                 <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
                 <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Eu achava que o problema era preço, mas o diagnóstico me mostrou que eu estava invisível no mapa. Paguei R$ 9,97, apliquei o PDF e meu telefone não para de tocar."</p>
                 <div className="mt-8 flex items-center gap-4">
-                  <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xl">MC</div>
+                  {/* FOTO REAL: Empreendedora */}
+                  <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&h=150&q=80" alt="Maria Clara" className="h-14 w-14 rounded-full object-cover border-2 border-slate-100 shadow-sm" />
                   <div>
                     <div className="font-extrabold text-lg text-slate-900">Maria Clara</div>
                     <div className="text-sm font-medium text-slate-500">Doceria Doce Encanto, SP</div>
@@ -333,7 +334,8 @@ export default function AuditDashboard() {
                 <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
                 <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Por R$ 9,97 recebi um relatório prático que me disse exatamente o que fazer. Hoje os orçamentos chegam sozinhos no WhatsApp. Incrível."</p>
                 <div className="mt-8 flex items-center gap-4">
-                  <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xl">RM</div>
+                  {/* FOTO REAL: Homem/Oficina */}
+                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80" alt="Roberto M." className="h-14 w-14 rounded-full object-cover border-2 border-slate-100 shadow-sm" />
                   <div>
                     <div className="font-extrabold text-lg text-slate-900">Roberto M.</div>
                     <div className="text-sm font-medium text-slate-500">Auto Center, RJ</div>
