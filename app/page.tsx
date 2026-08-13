@@ -126,7 +126,6 @@ export default function AuditDashboard() {
     }
   }
 
-  // ✅ AQUI ESTÁ A TRAVA QUE RESOLVE O PROBLEMA DO RECARREGAMENTO
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault(); 
     handleSearch(query);
@@ -171,7 +170,6 @@ export default function AuditDashboard() {
                       </p>
                     </div>
                     
-                    {/* ✅ O FORMULÁRIO AGORA INTERCEPTA O SUBMIT */}
                     <form onSubmit={handleSubmit} className="mt-8 relative max-w-xl">
                       <input
                         type="text"
@@ -215,7 +213,9 @@ export default function AuditDashboard() {
 
         {/* COMO FUNCIONA: Só aparece se não tiver resultado */}
         {!result && !isLoading && (
-          <HowItWorks />
+          <div id="como-funciona">
+            <HowItWorks />
+          </div>
         )}
 
         {errorMessage && (
@@ -348,7 +348,7 @@ export default function AuditDashboard() {
           </div>
         </div>
 
-        <div className="mt-20">
+        <div id="faq" className="mt-20">
           <FaqSection />
         </div>
       </main>
@@ -359,10 +359,10 @@ export default function AuditDashboard() {
             © 2026 GMB Audit. Todos os direitos reservados.
           </p>
           <div className="flex gap-6 text-sm font-bold text-slate-500">
-  <a href="/termos" className="hover:text-blue-600">Termos de Uso</a>
-  <a href="/privacidade" className="hover:text-blue-600">Privacidade</a>
-  <a href="mailto:felipebially@gmail.com" className="hover:text-blue-600">Suporte</a>
-</div>
+            <a href="/termos" className="hover:text-blue-600">Termos de Uso</a>
+            <a href="/privacidade" className="hover:text-blue-600">Privacidade</a>
+            <a href="mailto:felipebially@gmail.com" className="hover:text-blue-600">Suporte</a>
+          </div>
         </div>
       </footer>
 
