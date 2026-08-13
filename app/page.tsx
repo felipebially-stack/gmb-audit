@@ -356,10 +356,10 @@ export default function AuditDashboard() {
             © 2026 GMB Audit. Todos os direitos reservados.
           </p>
           <div className="flex gap-6 text-sm font-bold text-slate-500">
-            <a href="#" className="hover:text-blue-600">Termos de Uso</a>
-            <a href="#" className="hover:text-blue-600">Privacidade</a>
-            <a href="mailto:felipebially@gmail.com" className="hover:text-blue-600">Suporte</a>
-          </div>
+  <a href="/termos" className="hover:text-blue-600">Termos de Uso</a>
+  <a href="/privacidade" className="hover:text-blue-600">Privacidade</a>
+  <a href="mailto:felipebially@gmail.com" className="hover:text-blue-600">Suporte</a>
+</div>
         </div>
       </footer>
 
