@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { Header } from "@/components/dashboard/header"
-import { SearchSection } from "@/components/dashboard/search-section"
 import { HowItWorks } from "@/components/dashboard/how-it-works" 
 import { FaqSection } from "@/components/dashboard/faq-section" 
 import { ExitPopup } from "@/components/dashboard/exit-popup"
-import { AlertTriangle, MapPin, TrendingDown } from "lucide-react"
+import { AlertTriangle, MapPin, TrendingDown, XCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { useMemo, useState } from "react"
 
 const ReportGenerator = dynamic(() => import("@/components/dashboard/ReportGenerator"), {
@@ -31,6 +31,7 @@ interface KeywordRanking {
 }
 
 export default function AuditDashboard() {
+  const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [result, setResult] = useState<PlaceAuditData | null>(null)
@@ -90,8 +91,8 @@ export default function AuditDashboard() {
     })
   }, [result?.rankings])
 
-  const handleSearch = async (query: string) => {
-    const companyName = query.trim()
+  const handleSearch = async (searchQuery: string) => {
+    const companyName = searchQuery.trim()
     if (!companyName) {
       setErrorMessage("Digite o nome de uma empresa para pesquisar.")
       return
@@ -124,10 +125,16 @@ export default function AuditDashboard() {
     }
   }
 
+  // ✅ AQUI ESTÁ A TRAVA QUE RESOLVE O PROBLEMA DO RECARREGAMENTO
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); 
+    handleSearch(query);
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 relative">
       
-      {/* BARRA VERMELHA DE URGÊNCIA (NOVO PREÇO E COPY) */}
+      {/* BARRA VERMELHA DE URGÊNCIA */}
       <div className="bg-red-600 text-white text-center py-2 px-4 text-sm font-bold shadow-md relative z-50">
         Aviso: O Google Maps atualizou suas diretrizes de ranqueamento local. Descubra agora por que a sua ficha perdeu posições.
       </div>
@@ -135,11 +142,76 @@ export default function AuditDashboard() {
       <Header />
       
       <main>
-        {/* BUSCA: Só aparece se não tiver resultado */}
+        {/* NOVA ESTRUTURA DO HERO + FECHAMENTO EMOCIONAL (SÓ APARECE SE NÃO TIVER RESULTADO) */}
         {!result && (
-          <SearchSection onSearch={handleSearch} isLoading={isLoading} />
+          <>
+            <section className="relative overflow-hidden bg-slate-900 py-16 sm:py-24 border-b border-slate-800">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent" />
+              
+              <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div className="grid gap-12 lg:grid-cols-2 items-center">
+                  
+                  {/* Lado Esquerdo: Headline + História + Busca */}
+                  <div>
+                    <div className="flex flex-wrap gap-3 mb-6">
+                      <div className="inline-flex items-center gap-2 rounded-full bg-orange-500/10 px-3 py-1.5 text-sm font-bold text-orange-400 border border-orange-500/20">
+                        ⏳ Oferta de Lançamento: Vagas limitadas para hoje
+                      </div>
+                    </div>
+                    
+                    <h1 className="text-balance text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
+                      Pare de perder clientes para o <span className="text-blue-400 block mt-2">concorrente da rua de trás.</span>
+                    </h1>
+
+                    {/* História de Origem */}
+                    <div className="mt-8 p-6 bg-slate-800/50 rounded-2xl border border-slate-700">
+                      <p className="text-slate-300 italic font-medium leading-relaxed">
+                        "Gerencio o Google Meu Negócio de empresas há anos e cansei de ver negócios brilhantes fecharem as portas por erros de SEO que ninguém explicava. Criei o GMB Audit para que você não precise de uma agência cara para dominar o mapa da sua região." <span className="text-white font-bold not-italic">— Felipe Bially</span>
+                      </p>
+                    </div>
+                    
+                    {/* ✅ O FORMULÁRIO AGORA INTERCEPTA O SUBMIT */}
+                    <form onSubmit={handleSubmit} className="mt-8 relative max-w-xl">
+                      <input
+                        type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Digite o nome da empresa..."
+                        className="h-16 w-full rounded-2xl border-2 border-slate-700 bg-slate-800 text-white pl-6 pr-4 text-lg mb-3 shadow-sm focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20"
+                      />
+                      <Button disabled={isLoading} type="submit" className="h-16 w-full bg-orange-500 hover:bg-orange-600 text-white text-xl font-extrabold rounded-2xl shadow-[0_0_30px_rgba(249,115,22,0.3)] hover:scale-[1.02] transition-all">
+                        {isLoading ? "Buscando..." : "Analisar Meu Perfil Grátis"}
+                      </Button>
+                    </form>
+                  </div>
+
+                  {/* Lado Direito: Ilustração de dor */}
+                  <div className="hidden lg:block">
+                    <div className="rounded-2xl bg-white shadow-2xl p-8 border-4 border-orange-500">
+                      <h3 className="text-xl font-black text-slate-900 mb-6">Seu perfil está neste estado?</h3>
+                      <div className="space-y-4">
+                         <div className="flex items-center gap-3 text-red-600 font-bold"><XCircle className="w-6 h-6"/> Invisível no Local Pack</div>
+                         <div className="flex items-center gap-3 text-red-600 font-bold"><XCircle className="w-6 h-6"/> Fotos sem geotag</div>
+                         <div className="flex items-center gap-3 text-orange-600 font-bold"><AlertTriangle className="w-6 h-6"/> Sem palavras-chave locais</div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </section>
+
+            {/* Bloco de Fechamento Emocional (O Fantasma do Passado) */}
+            <section className="bg-slate-50 py-16 text-center border-b border-slate-200">
+              <div className="max-w-3xl mx-auto px-4">
+                <p className="text-2xl font-black text-slate-900 leading-tight">
+                  "Se você fechar essa página agora, amanhã seu concorrente vai continuar aparecendo na frente do seu cliente. Você vai continuar perdendo as chamadas que deveriam ser suas."
+                </p>
+              </div>
+            </section>
+          </>
         )}
-        
+
         {/* COMO FUNCIONA: Só aparece se não tiver resultado */}
         {!result && !isLoading && (
           <HowItWorks />
@@ -165,11 +237,10 @@ export default function AuditDashboard() {
 
             <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
               
-              {/* O CHOQUE (Health Score com Gráfico Nativo Consertado) */}
+              {/* O CHOQUE */}
               <div className="bg-slate-900 p-8 sm:p-14 text-center flex flex-col items-center">
                 <p className="text-blue-400 font-bold tracking-widest uppercase text-sm mb-6">Diagnóstico Concluído</p>
                 
-                {/* GRÁFICO CIRCULAR NATIVO (Sem vazar layout) */}
                 <div className="relative w-40 h-40 sm:w-48 sm:h-48 mb-8 flex items-center justify-center">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                     <path className="text-slate-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="100, 100" />
@@ -195,7 +266,7 @@ export default function AuditDashboard() {
                 
                 <p>Sabe por que o seu telefone parou de tocar? <strong className="text-slate-900">Não é culpa da economia ou do seu preço.</strong> É porque o algoritmo do Google Meu Negócio mudou, e os seus concorrentes aprenderam a jogar o jogo.</p>
                 
-                <p>Pense no seu cliente ideal. Seja você dono de uma empresa de serviços de pintura ou de um escritório focado em defesa patrimonial. Quando o seu cliente pega o celular precisando urgente do seu serviço, o Google mostra <strong>apenas 3 empresas no mapa</strong>.</p>
+                <p>Pense no seu cliente ideal. Quando ele pega o celular precisando urgente do seu serviço, o Google mostra <strong>apenas 3 empresas no mapa</strong>.</p>
                 
                 <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl">
                   <p className="flex items-start gap-3 text-red-900">
@@ -218,7 +289,7 @@ export default function AuditDashboard() {
 
                 <p className="pt-4">Você pode tentar adivinhar o que está errado e perder semanas testando, ou pode receber o plano exato do que alterar hoje para o telefone voltar a tocar.</p>
                 
-                <p>Uma consultoria de SEO Local não sairia por menos de R$ 1.000,00 no mercado. Por isso, liberar o seu Relatório Executivo e o Plano de Ação completo custa <strong>apenas R$ 9,97</strong>.</p>
+                <p>Uma consultoria de SEO Local não sairia por menos de R$ 197,00 no mercado. Mas hoje, liberar o seu Relatório Executivo e o Plano de Ação completo custa <strong>apenas R$ 9,97</strong>.</p>
                 
                 <p className="text-center font-bold text-slate-900 text-xl py-4">Menos de dez reais para destravar as vendas da sua empresa.</p>
 
