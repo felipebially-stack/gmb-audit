@@ -22,6 +22,7 @@ interface PlaceAuditData {
   rankings: KeywordRanking[]
   checklistData?: any
   serpStatus?: "ok" | "api_unavailable" | "not_configured"
+  photoUrl?: string // AQUI ESTÁ A CHAVE: O sistema agora sabe que a foto existe
 }
 
 interface KeywordRanking {
@@ -116,6 +117,8 @@ export default function AuditDashboard() {
         setErrorMessage(data.error ?? "Não foi possível buscar os dados da empresa.")
         return
       }
+      
+      console.log("Dados retornados da API:", data); // Ajudará a ver se a foto chegou aqui
 
       setResult(data)
     } catch {
@@ -133,8 +136,6 @@ export default function AuditDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 relative">
-      
-      {/* BARRA VERMELHA DE URGÊNCIA */}
       <div className="bg-red-600 text-white text-center py-2 px-4 text-sm font-bold shadow-md relative z-50">
         Aviso: O Google Maps atualizou suas diretrizes de ranqueamento local. Descubra agora por que a sua ficha perdeu posições.
       </div>
@@ -142,7 +143,6 @@ export default function AuditDashboard() {
       <Header />
       
       <main>
-        {/* NOVA ESTRUTURA DO HERO + FECHAMENTO EMOCIONAL (SÓ APARECE SE NÃO TIVER RESULTADO) */}
         {!result && (
           <>
             <section className="relative overflow-hidden bg-slate-900 py-16 sm:py-24 border-b border-slate-800">
@@ -150,8 +150,6 @@ export default function AuditDashboard() {
               
               <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid gap-12 lg:grid-cols-2 items-center">
-                  
-                  {/* Lado Esquerdo: Headline + Busca Destacada */}
                   <div>
                     <div className="flex flex-wrap gap-3 mb-6">
                       <div className="inline-flex items-center gap-2 rounded-full bg-orange-500/10 px-3 py-1.5 text-sm font-bold text-orange-400 border border-orange-500/20">
@@ -164,7 +162,6 @@ export default function AuditDashboard() {
                     </h1>
                     
                     <form onSubmit={handleSubmit} className="mt-10 relative max-w-xl">
-                      {/* Campo de busca com cor clara/branca para GRITAR na tela */}
                       <input
                         type="text"
                         value={query}
@@ -176,20 +173,14 @@ export default function AuditDashboard() {
                         {isLoading ? "Buscando..." : "Analisar Meu Perfil Grátis"}
                       </Button>
                       
-                      {/* Microcopy de alívio de tensão */}
                       <p className="text-sm text-slate-400 mt-4 text-center font-medium">
                         ⚡ Receba sua nota de SEO Local gratuitamente em menos de 60 segundos.
                       </p>
                     </form>
                   </div>
 
-                  {/* Lado Direito: Ficha Fake + História de Origem */}
                   <div className="hidden lg:block space-y-6">
-                    
-                    {/* Ficha Fake do Google */}
                     <div className="relative rounded-2xl bg-white shadow-2xl overflow-hidden border border-slate-200">
-                      
-                      {/* Top Header estilo Google Maps */}
                       <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Store className="w-5 h-5 text-slate-400" />
@@ -204,13 +195,11 @@ export default function AuditDashboard() {
                             <h3 className="text-2xl font-black text-slate-900 leading-none">Sua Empresa</h3>
                             <p className="text-slate-500 text-sm mt-2 flex items-center gap-1"><MapPin className="w-3 h-3"/> Sua Cidade, Região</p>
                           </div>
-                          {/* Símbolo "G" para remeter ao Google sem usar imagens externas */}
                           <div className="bg-slate-50 p-2 rounded-lg flex items-center justify-center w-10 h-10 border border-slate-200 shrink-0">
                             <span className="font-black text-xl text-blue-600">G</span>
                           </div>
                         </div>
 
-                        {/* Avaliações Ruins (Gatilho de Autoridade) */}
                         <div className="flex items-center gap-1 text-orange-500 mb-6">
                           <span className="text-xl font-bold text-slate-700 mr-1">2.1</span>
                           <Star className="w-5 h-5 fill-current" />
@@ -221,7 +210,6 @@ export default function AuditDashboard() {
                           <span className="text-sm text-slate-400 ml-2">(7)</span>
                         </div>
 
-                        {/* Alerta de Visibilidade */}
                         <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
                           <h4 className="text-red-700 font-bold flex items-center gap-2 mb-1">
                             <EyeOff className="w-5 h-5" /> Invisível nas Buscas
@@ -231,7 +219,6 @@ export default function AuditDashboard() {
                           </p>
                         </div>
 
-                        {/* Checklist de erros */}
                         <div className="space-y-3">
                            <div className="flex items-center gap-3 text-sm text-slate-700 font-bold">
                               <XCircle className="w-5 h-5 text-red-500 shrink-0"/> Fora do Top 3 (Local Pack)
@@ -246,20 +233,16 @@ export default function AuditDashboard() {
                       </div>
                     </div>
 
-                    {/* História de Origem (Movida para baixo do card) */}
                     <div className="p-6 bg-slate-800/60 rounded-2xl border border-slate-700 shadow-xl backdrop-blur-sm">
                       <p className="text-slate-300 italic font-medium leading-relaxed text-sm">
                         "Gerencio o Google Meu Negócio de empresas há anos e cansei de ver negócios brilhantes fecharem as portas por erros de SEO que ninguém explicava. Criei o GMB Audit para que você não precise de uma agência cara para dominar o mapa da sua região." <span className="text-white font-bold not-italic">— Felipe Bially</span>
                       </p>
                     </div>
-
                   </div>
-
                 </div>
               </div>
             </section>
 
-            {/* Bloco de Fechamento Emocional (O Fantasma do Passado) */}
             <section className="bg-slate-50 py-16 text-center border-b border-slate-200">
               <div className="max-w-3xl mx-auto px-4">
                 <p className="text-2xl font-black text-slate-900 leading-tight">
@@ -270,7 +253,6 @@ export default function AuditDashboard() {
           </>
         )}
 
-        {/* COMO FUNCIONA: Só aparece se não tiver resultado */}
         {!result && !isLoading && (
           <div id="como-funciona">
             <HowItWorks />
@@ -285,7 +267,6 @@ export default function AuditDashboard() {
           </div>
         )}
         
-        {/* 👇 A CARTA DE VENDAS (SÓ APARECE APÓS A PESQUISA) 👇 */}
         {result && result.rating && (
           <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
             <div className="mb-10 text-center">
@@ -296,8 +277,6 @@ export default function AuditDashboard() {
             </div>
 
             <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
-              
-              {/* O CHOQUE */}
               <div className="bg-slate-900 p-8 sm:p-14 text-center flex flex-col items-center">
                 <p className="text-blue-400 font-bold tracking-widest uppercase text-sm mb-6">Diagnóstico Concluído</p>
                 
@@ -321,39 +300,28 @@ export default function AuditDashboard() {
                 </p>
               </div>
 
-              {/* O TEXTO PERSUASIVO */}
               <div className="p-8 sm:p-14 space-y-8 text-lg text-slate-700 leading-relaxed font-medium">
-                
                 <p>Sabe por que o seu telefone parou de tocar? <strong className="text-slate-900">Não é culpa da economia ou do seu preço.</strong> É porque o algoritmo do Google Meu Negócio mudou, e os seus concorrentes aprenderam a jogar o jogo.</p>
-                
                 <p>Pense no seu cliente ideal. Quando ele pega o celular precisando urgente do seu serviço, o Google mostra <strong>apenas 3 empresas no mapa</strong>.</p>
-                
                 <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl">
                   <p className="flex items-start gap-3 text-red-900">
                     <TrendingDown className="w-6 h-6 shrink-0 mt-1" />
                     <span>Essas 3 empresas levam <strong>60% de todos os cliques e ligações da cidade</strong>.</span>
                   </p>
                 </div>
-
                 <p>Se a sua ficha apresenta a pontuação que você acabou de ver acima, <strong>você nunca será uma dessas 3 opções.</strong> Pior: você está entregando dinheiro de mão beijada para a concorrência todos os dias.</p>
-                
                 <h4 className="text-2xl font-black text-slate-900 pt-6">A Solução Rápida</h4>
-                
                 <p>Nossa Inteligência Artificial cruzou os dados da sua ficha com as diretrizes oficiais do Google e encontrou exatamente o que está travando o seu perfil. Nós agrupamos as falhas e a solução em um <strong>Plano de Domínio Local (PDF)</strong> mastigado para você.</p>
-                
                 <ul className="space-y-4 bg-slate-50 p-6 rounded-xl border border-slate-200 text-base">
                   <li className="flex gap-3"><span className="text-green-500 font-black">✓</span> <strong>A Auditoria:</strong> Descubra para quais palavras-chave você simplesmente não existe.</li>
                   <li className="flex gap-3"><span className="text-green-500 font-black">✓</span> <strong>O Kit Copie e Cole:</strong> A IA já escreveu a sua nova descrição e o roteiro das suas postagens. É só copiar.</li>
                   <li className="flex gap-3"><span className="text-green-500 font-black">✓</span> <strong>O Checklist de 7 Dias:</strong> As tarefas urgentes para fazer o algoritmo devolver as suas ligações em 72 horas.</li>
                 </ul>
-
                 <p className="pt-4">Você pode tentar adivinhar o que está errado e perder semanas testando, ou pode receber o plano exato do que alterar hoje para o telefone voltar a tocar.</p>
-                
                 <p>Uma consultoria de SEO Local não sairia por menos de R$ 197,00 no mercado. Mas hoje, liberar o seu Relatório Executivo e o Plano de Ação completo custa <strong>apenas R$ 9,97</strong>.</p>
-                
                 <p className="text-center font-bold text-slate-900 text-xl py-4">Menos de dez reais para destravar as vendas da sua empresa.</p>
 
-                {/* BOTÃO DE VENDAS */}
+                {/* BOTÃO DE VENDAS (AQUI A FOTO ESTÁ SENDO PASSADA COM SEGURANÇA) */}
                 <ReportGenerator
                   companyName={result.companyName || ""}
                   address={result.address || ""}
@@ -362,25 +330,23 @@ export default function AuditDashboard() {
                   rankings={keywordRankings || []}
                   healthScore={healthScore}
                   checklistData={result.checklistData}
+                  photoUrl={result.photoUrl} 
                 />
               </div>
             </div>
           </section>
         )}
 
-        {/* DEPOIMENTOS GIGANTES */}
         <div className="mt-20 bg-blue-950 py-20 px-6 rounded-[3rem] shadow-2xl relative overflow-hidden max-w-7xl mx-auto">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-800/30 via-transparent to-transparent" />
           <div className="relative z-10">
             <h2 className="text-4xl font-extrabold text-center mb-16 text-white">Negócios que investiram R$ 9,97 e viraram o jogo:</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              
               <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
                 <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">+412% de visualizações</div>
                 <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
                 <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Eu achava que o problema era preço, mas o diagnóstico me mostrou que eu estava invisível no mapa. Paguei R$ 9,97, apliquei o PDF e meu telefone não para de tocar."</p>
                 <div className="mt-8 flex items-center gap-4">
-                  {/* Ícone Estilo Google Maps: Doceria */}
                   <div className="h-14 w-14 rounded-full bg-orange-100 flex items-center justify-center border-2 border-orange-500 shadow-sm shrink-0">
                     <Store className="text-orange-600 w-7 h-7" />
                   </div>
@@ -390,13 +356,11 @@ export default function AuditDashboard() {
                   </div>
                 </div>
               </div>
-
               <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
                 <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">Top 3 em 1 semana</div>
                 <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
                 <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Por R$ 9,97 recebi um relatório prático que me disse exatamente o que fazer. Hoje os orçamentos chegam sozinhos no WhatsApp. Incrível."</p>
                 <div className="mt-8 flex items-center gap-4">
-                  {/* Ícone Estilo Google Maps: Oficina */}
                   <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center border-2 border-blue-500 shadow-sm shrink-0">
                     <Wrench className="text-blue-600 w-7 h-7" />
                   </div>
@@ -406,7 +370,6 @@ export default function AuditDashboard() {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
