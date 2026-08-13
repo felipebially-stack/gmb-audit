@@ -563,13 +563,18 @@ export async function POST(request: Request) {
     const serpApiKey = process.env.SERPAPI_API_KEY
     const dynamicSeeds = buildDynamicSerpKeywords(place, city)
 
-    // CRIANDO A URL DA FOTO PARA MANDAR PARA O FRONT
-    let photoUrl: string | null = null; 
-    if (place.photos && place.photos.length > 0) {
-       // Pega o "name" da foto que vem da API e formata o link
-       const photoName = place.photos[0].name;
-       photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxHeightPx=800&maxWidthPx=1200&key=${apiKey}`;
-    }
+  // CRIANDO A URL DA FOTO PARA MANDAR PARA O FRONT
+  let photoUrl: string | null = null;
+    
+  if (place.photos && place.photos.length > 0) {
+     // Tentativa 1: Foto real de dentro/fachada via Google Places
+     const photoName = place.photos[0].name;
+     photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxHeightPx=800&maxWidthPx=1200&key=${apiKey}`;
+  } else {
+     // Tentativa 2 (O Fallback Imbatível): Se o Places falhar, pegamos a foto da rua (Street View) pelo endereço!
+     const queryParaFoto = place.formattedAddress ? place.formattedAddress : `${companyName} ${city || ""}`;
+     photoUrl = `https://maps.googleapis.com/maps/api/streetview?size=800x400&location=${encodeURIComponent(queryParaFoto)}&key=${apiKey}`;
+  }
 
     let serpStatus: SerpStatus = "not_configured"
     let rankings: KeywordRanking[] = dynamicSeeds.map((item) => ({
