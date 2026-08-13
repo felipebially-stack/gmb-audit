@@ -11,9 +11,10 @@ interface ReportProps {
   rankings: any[];
   healthScore?: number;
   checklistData?: any;
+  photoUrl?: string; // ✅ AQUI: Ensinamos o componente a aceitar a foto
 }
 
-export default function ReportGenerator({ companyName, rating, userRatingsTotal, address, rankings, healthScore, checklistData }: ReportProps) {
+export default function ReportGenerator({ companyName, rating, userRatingsTotal, address, rankings, healthScore, checklistData, photoUrl }: ReportProps) {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   const irParaPagamento = async () => {
@@ -27,7 +28,8 @@ export default function ReportGenerator({ companyName, rating, userRatingsTotal,
       address,
       rankings,
       healthScore,
-      checklistData
+      checklistData,
+      photoUrl // ✅ AQUI: Guardamos a foto na mala para a página de sucesso
     };
 
     localStorage.setItem("ultimo_relatorio", JSON.stringify(dadosRelatorio));
