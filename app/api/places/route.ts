@@ -564,7 +564,7 @@ export async function POST(request: Request) {
     const dynamicSeeds = buildDynamicSerpKeywords(place, city)
 
     // CRIANDO A URL DA FOTO PARA MANDAR PARA O FRONT
-    let photoUrl = null;
+    let photoUrl: string | null = null; 
     if (place.photos && place.photos.length > 0) {
        // Pega o "name" da foto que vem da API e formata o link
        const photoName = place.photos[0].name;
