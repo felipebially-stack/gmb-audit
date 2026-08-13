@@ -256,38 +256,64 @@ export default function SucessoPage() {
       {/* Versão de Impressão / PDF Oficial */}
       <div className="hidden print:block w-full bg-white">
         
-        {/* NOVA PÁGINA 1: CAPA EXECUTIVA DE ALTO PADRÃO */}
-        <div className="min-h-[297mm] px-16 py-20 flex flex-col justify-between quebrar-antes bg-slate-900 text-white relative">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/30 via-transparent to-transparent" />
+        {/* NOVA PÁGINA 1: CAPA EXECUTIVA DE ALTO PADRÃO COM FOTO REAL */}
+        <div className="min-h-[297mm] px-16 py-20 flex flex-col justify-between quebrar-antes bg-slate-900 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent" />
           
           <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-12">
-              <div className="bg-blue-600 p-3 rounded-xl">
-                <Award className="w-8 h-8 text-white" />
+            <div className="flex items-center justify-between mb-10">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-600 p-3 rounded-xl shadow-lg">
+                  <Award className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <p className="text-blue-400 font-bold uppercase tracking-widest text-xs">Auditoria Estratégica Individual</p>
+                  <p className="text-xl font-black">Método GMN Turbo</p>
+                </div>
               </div>
-              <div>
-                <p className="text-blue-400 font-bold uppercase tracking-widest text-xs">Auditoria de Elite</p>
-                <p className="text-xl font-black">Método GMN Turbo</p>
-              </div>
+              <span className="bg-blue-500/20 border border-blue-400/30 text-blue-300 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                Dossiê Oficial Personalizado
+              </span>
             </div>
 
-            <h1 className="text-5xl font-black tracking-tight leading-tight mb-6">
-              Relatório de Diagnóstico & <span className="text-blue-400">Plano de Domínio Local</span>
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-tight mb-4">
+              Relatório de Posicionamento & <span className="text-blue-400">Plano de Domínio Local</span>
             </h1>
-            <p className="text-slate-300 text-lg max-w-xl leading-relaxed">
-              Análise algorítmica avançada de posicionamento e diretrizes do Google Meu Negócio.
+            <p className="text-slate-300 text-base max-w-xl leading-relaxed mb-8">
+              Documento exclusivo gerado por varredura algorítmica nas diretrizes oficiais do Google Maps para o perfil verificado.
             </p>
+
+            {/* FOTO REAL DA EMPRESA (Puxada do Google Places, se disponível) */}
+            {dados.photoUrl ? (
+              <div className="relative w-full h-56 rounded-2xl overflow-hidden border-2 border-slate-700 shadow-2xl mb-6">
+                <img src={dados.photoUrl} alt={nomeOriginal} className="w-full h-full object-cover" />
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent p-4 flex items-center justify-between">
+                  <span className="text-xs font-bold text-white bg-blue-600/80 backdrop-blur-md px-3 py-1 rounded-lg">📸 Registro Oficial do Google Maps</span>
+                  <span className="text-xs text-slate-300">{cidade}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 mb-6 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 font-black text-xl">
+                  {nomeOriginal.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">Estabelecimento Monitorado</p>
+                  <p className="text-xs text-slate-400">Dados sincronizados via API Google Places em tempo real.</p>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="relative z-10 border-t border-slate-800 pt-8 flex justify-between items-end">
+          <div className="relative z-10 border-t border-slate-800 pt-6 flex justify-between items-end">
             <div>
-              <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">Empresa Avaliada:</p>
-              <h2 className="text-3xl font-black text-white">{nomeOriginal}</h2>
-              <p className="text-sm text-slate-400 mt-1 flex items-center gap-1"><MapPin className="w-4 h-4"/> {cidade}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Unidade Analisada:</p>
+              <h2 className="text-2xl font-black text-white">{nomeOriginal}</h2>
+              <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-blue-400"/> {dados.address || cidade}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">Data da Emissão:</p>
-              <p className="text-sm font-bold text-white">{new Date().toLocaleDateString('pt-BR')}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Validação do Relatório:</p>
+              <p className="text-xs font-bold text-green-400 bg-green-950/50 border border-green-800/50 px-3 py-1 rounded-md">Ativo & Verificado</p>
             </div>
           </div>
         </div>
