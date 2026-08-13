@@ -165,7 +165,7 @@ function tryExtractNameFromHtml(content: string) {
     const cleaned = ogMatch[1].replace(/\s*-\s*Google(?:\s+Maps)?\s*$/i, "").trim()
     if (cleaned && !isUnusableListingHtmlTitle(cleaned)) return cleaned
   }
-  const titleMatch = content.match(/<title>(.*?)<\/title>/is)
+  const titleMatch = content.match(/<title>([\s\S]*?)<\/title>/i)
   if (!titleMatch?.[1]) return null
   const cleanedTitle = titleMatch[1]
     .replace(/\s*-\s*Google(?:\s+Maps)?\s*$/i, "")
