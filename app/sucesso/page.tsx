@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Download, Star, MapPin, AlertTriangle, TrendingDown, TrendingUp, Zap, FileText, CheckSquare, Copy, Target, ShieldAlert } from "lucide-react";
+import { CheckCircle2, Download, Star, MapPin, AlertTriangle, TrendingDown, TrendingUp, Zap, FileText, CheckSquare, Copy, Target, ShieldAlert, Award } from "lucide-react";
 import Link from "next/link";
 
 export default function SucessoPage() {
@@ -23,7 +23,6 @@ export default function SucessoPage() {
           }
         }, 500);
 
-        // Dispara o evento de Purchase do FB (Opcional, mas mantive por segurança)
         if (typeof window !== 'undefined' && (window as any).fbq) {
           (window as any).fbq('track', 'Purchase', {
             value: 9.97,
@@ -36,7 +35,6 @@ export default function SucessoPage() {
         console.error("Erro ao ler dados do relatório", e);
       }
     } else {
-      // Se por algum motivo entrar direto sem dados, tenta buscar o backup antigo
       const backup = localStorage.getItem("@gmbAudit:reportData");
       if (backup) {
          try {
@@ -223,8 +221,9 @@ export default function SucessoPage() {
         }
       `}} />
 
+      {/* Tela de Sucesso (Visível apenas na Web) */}
       <div className="print:hidden flex flex-col items-center py-12 px-4">
-        <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-600">
+        <div className="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-600 mb-6">
           <div className="bg-blue-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="w-10 h-10 text-green-500" />
           </div>
@@ -238,10 +237,63 @@ export default function SucessoPage() {
           </button>
           <Link href="/" className="text-gray-400 text-sm hover:text-gray-600 underline">Voltar para a página inicial</Link>
         </div>
+
+        {/* BLOCO DE UPSELL / PRÓXIMO PASSO (Exclusivo na Web) */}
+        <div className="bg-gradient-to-r from-blue-900 to-indigo-900 p-8 rounded-3xl shadow-2xl max-w-md w-full text-white border border-blue-700 text-center">
+          <h3 className="text-lg font-black mb-2 text-blue-200 uppercase tracking-wider">Serviço de Implementação VIP</h3>
+          <p className="text-sm text-slate-300 mb-6">Prefere que nossa equipe aplique todas as otimizações deste relatório diretamente na sua ficha do Google?</p>
+          <a 
+            href={`https://wa.me/5541999999999?text=Olá,%20acabei%20de%20comprar%20o%20relatório%20da%20minha%20empresa%20(${encodeURIComponent(nomeOriginal)})%20e%20gostaria%20de%20saber%20sobre%20a%20implementação%20VIP.`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-black py-3 px-6 rounded-xl shadow-lg w-full transition-transform hover:scale-[1.02]"
+          >
+            Falar com Especialista no WhatsApp
+          </a>
+        </div>
       </div>
 
+      {/* Versão de Impressão / PDF Oficial */}
       <div className="hidden print:block w-full bg-white">
-        <div className="min-h-[297mm] px-12 py-10 flex flex-col">
+        
+        {/* NOVA PÁGINA 1: CAPA EXECUTIVA DE ALTO PADRÃO */}
+        <div className="min-h-[297mm] px-16 py-20 flex flex-col justify-between quebrar-antes bg-slate-900 text-white relative">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/30 via-transparent to-transparent" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-12">
+              <div className="bg-blue-600 p-3 rounded-xl">
+                <Award className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <p className="text-blue-400 font-bold uppercase tracking-widest text-xs">Auditoria de Elite</p>
+                <p className="text-xl font-black">Método GMN Turbo</p>
+              </div>
+            </div>
+
+            <h1 className="text-5xl font-black tracking-tight leading-tight mb-6">
+              Relatório de Diagnóstico & <span className="text-blue-400">Plano de Domínio Local</span>
+            </h1>
+            <p className="text-slate-300 text-lg max-w-xl leading-relaxed">
+              Análise algorítmica avançada de posicionamento e diretrizes do Google Meu Negócio.
+            </p>
+          </div>
+
+          <div className="relative z-10 border-t border-slate-800 pt-8 flex justify-between items-end">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">Empresa Avaliada:</p>
+              <h2 className="text-3xl font-black text-white">{nomeOriginal}</h2>
+              <p className="text-sm text-slate-400 mt-1 flex items-center gap-1"><MapPin className="w-4 h-4"/> {cidade}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">Data da Emissão:</p>
+              <p className="text-sm font-bold text-white">{new Date().toLocaleDateString('pt-BR')}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* PÁGINA 2: O DIAGNÓSTICO */}
+        <div className="min-h-[297mm] px-12 py-10 flex flex-col quebrar-antes">
           <div className="flex justify-between items-start border-b-4 border-gray-900 pb-4 mb-6">
             <div>
               <p className="text-blue-600 font-black tracking-widest uppercase text-sm mb-1">Diagnóstico Executivo</p>
@@ -313,6 +365,7 @@ export default function SucessoPage() {
           </div>
         </div>
 
+        {/* PÁGINA 3: KIT DE IMPLEMENTAÇÃO */}
         <div className="quebrar-antes min-h-[297mm] px-12 py-16">
           <div className="mb-10 card-auditoria">
             <h2 className="text-3xl font-black text-gray-900 flex items-center gap-3"><FileText className="w-8 h-8 text-blue-600"/> Kit de Implementação Pronto</h2>
@@ -363,6 +416,7 @@ export default function SucessoPage() {
           </div>
         </div>
 
+        {/* PÁGINA 4: PLANO DE AÇÃO */}
         <div className="quebrar-antes min-h-[297mm] px-12 py-16">
           <div className="mb-10 card-auditoria">
             <h2 className="text-3xl font-black text-gray-900 flex items-center gap-3"><Zap className="w-8 h-8 text-yellow-500 fill-yellow-500"/> Plano de Ação Personalizado</h2>
@@ -399,6 +453,7 @@ export default function SucessoPage() {
           </div>
         </div>
 
+        {/* PÁGINA 5: OS 10 PILARES TÉCNICOS */}
         <div className="quebrar-antes min-h-[297mm] px-12 py-16">
           <div className="mb-10 card-auditoria">
             <p className="text-blue-600 font-black tracking-widest uppercase text-sm mb-1">Diagnóstico Específico da {nomeConversacional}</p>
@@ -428,6 +483,7 @@ export default function SucessoPage() {
             Auditoria Técnica Algorítmica exclusiva para {nomeOriginal}. Método GMN Turbo © {new Date().getFullYear()}.
           </div>
         </div>
+
       </div>
     </div>
   );
