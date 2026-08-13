@@ -6,9 +6,9 @@ import { Header } from "@/components/dashboard/header"
 import { HowItWorks } from "@/components/dashboard/how-it-works" 
 import { FaqSection } from "@/components/dashboard/faq-section" 
 import { ExitPopup } from "@/components/dashboard/exit-popup"
-import { AlertTriangle, MapPin, TrendingDown, XCircle, Store, Wrench, Star, EyeOff } from "lucide-react"
+import { AlertTriangle, MapPin, TrendingDown, XCircle, Store, Wrench, Star, EyeOff, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 
 const ReportGenerator = dynamic(() => import("@/components/dashboard/ReportGenerator"), {
   ssr: false,
@@ -22,7 +22,7 @@ interface PlaceAuditData {
   rankings: KeywordRanking[]
   checklistData?: any
   serpStatus?: "ok" | "api_unavailable" | "not_configured"
-  photoUrl?: string // AQUI ESTÁ A CHAVE: O sistema agora sabe que a foto existe
+  photoUrl?: string 
 }
 
 interface KeywordRanking {
@@ -35,8 +35,18 @@ interface KeywordRanking {
 export default function AuditDashboard() {
   const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isSimulating, setIsSimulating] = useState(false)
+  const [simulationStep, setSimulationStep] = useState(0)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [result, setResult] = useState<PlaceAuditData | null>(null)
+
+  const simulationSteps = [
+    "Conectando aos servidores do Google Maps...",
+    "Mapeando presença local e concorrência...",
+    "Analisando densidade de palavras-chave...",
+    "Avaliando reputação e força do perfil...",
+    "Calculando GMN Score e gerando Dossiê..."
+  ];
 
   const healthScore = useMemo(() => {
     if (!result) return 0;
@@ -102,6 +112,9 @@ export default function AuditDashboard() {
 
     setIsLoading(true)
     setErrorMessage(null)
+    setIsSimulating(true)
+    setSimulationStep(0)
+    setResult(null)
 
     try {
       const response = await fetch("/api/places", {
@@ -115,17 +128,30 @@ export default function AuditDashboard() {
       if (!response.ok) {
         setResult(null)
         setErrorMessage(data.error ?? "Não foi possível buscar os dados da empresa.")
+        setIsLoading(false)
+        setIsSimulating(false)
         return
       }
       
-      console.log("Dados retornados da API:", data); // Ajudará a ver se a foto chegou aqui
+      // Simulação de Auditoria (Ilusão do Trabalho)
+      let currentStep = 0;
+      const interval = setInterval(() => {
+        currentStep++;
+        if (currentStep >= simulationSteps.length) {
+          clearInterval(interval);
+          setResult(data);
+          setIsSimulating(false);
+          setIsLoading(false);
+        } else {
+          setSimulationStep(currentStep);
+        }
+      }, 1600); // 1.6 segundos por cada passo (Totalizando 8s de suspense)
 
-      setResult(data)
     } catch {
       setResult(null)
       setErrorMessage("Falha de conexão ao buscar dados.")
-    } finally {
       setIsLoading(false)
+      setIsSimulating(false)
     }
   }
 
@@ -143,7 +169,38 @@ export default function AuditDashboard() {
       <Header />
       
       <main>
-        {!result && (
+        {/* TELA DE SIMULAÇÃO (SUSPENSE) */}
+        {isSimulating && (
+          <section className="relative overflow-hidden bg-slate-900 py-24 min-h-[70vh] flex items-center justify-center">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent animate-pulse" />
+            <div className="relative z-10 w-full max-w-2xl px-4 flex flex-col items-center text-center">
+              <div className="relative w-32 h-32 mb-10">
+                <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Search className="w-10 h-10 text-blue-400 animate-pulse" />
+                </div>
+              </div>
+              <h2 className="text-3xl font-black text-white mb-4 tracking-tight">Auditando Perfil Oficial...</h2>
+              <p className="text-blue-400 font-bold text-xl h-8 transition-opacity duration-300">
+                {simulationSteps[simulationStep]}
+              </p>
+              
+              <div className="w-full bg-slate-800 rounded-full h-3 mt-12 overflow-hidden shadow-inner border border-slate-700">
+                <div
+                  className="bg-gradient-to-r from-blue-600 to-blue-400 h-full transition-all duration-700 ease-out relative"
+                  style={{ width: `${((simulationStep + 1) / simulationSteps.length) * 100}%` }}
+                >
+                  <div className="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite]"></div>
+                </div>
+              </div>
+              <p className="text-slate-500 mt-4 text-sm font-medium">Por favor, aguarde. Não feche esta janela.</p>
+            </div>
+          </section>
+        )}
+
+        {/* TELA INICIAL (BUSCA) */}
+        {!result && !isSimulating && (
           <>
             <section className="relative overflow-hidden bg-slate-900 py-16 sm:py-24 border-b border-slate-800">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent" />
@@ -170,7 +227,7 @@ export default function AuditDashboard() {
                         className="h-16 w-full rounded-2xl border-4 border-blue-500/30 bg-white text-slate-900 pl-6 pr-4 text-xl font-medium mb-4 shadow-[0_0_20px_rgba(59,130,246,0.15)] focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all placeholder:text-slate-400"
                       />
                       <Button disabled={isLoading} type="submit" className="h-16 w-full bg-orange-500 hover:bg-orange-600 text-white text-xl font-extrabold rounded-2xl shadow-[0_0_30px_rgba(249,115,22,0.3)] hover:scale-[1.02] transition-all">
-                        {isLoading ? "Buscando..." : "Analisar Meu Perfil Grátis"}
+                        {isLoading ? "Iniciando Varredura..." : "Analisar Meu Perfil Grátis"}
                       </Button>
                       
                       <p className="text-sm text-slate-400 mt-4 text-center font-medium">
@@ -253,13 +310,13 @@ export default function AuditDashboard() {
           </>
         )}
 
-        {!result && !isLoading && (
+        {!result && !isSimulating && !isLoading && (
           <div id="como-funciona">
             <HowItWorks />
           </div>
         )}
 
-        {errorMessage && (
+        {errorMessage && !isSimulating && (
           <div className="max-w-4xl mx-auto mt-8 px-4">
             <p className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 font-bold">
               {errorMessage}
@@ -267,7 +324,8 @@ export default function AuditDashboard() {
           </div>
         )}
         
-        {result && result.rating && (
+        {/* RESULTADO (TEXTOS PERSONALIZADOS) */}
+        {result && result.rating && !isSimulating && (
           <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
             <div className="mb-10 text-center">
               <h2 className="text-3xl font-extrabold text-slate-900 flex items-center justify-center gap-2 mb-2">
@@ -293,10 +351,12 @@ export default function AuditDashboard() {
                 
                 <h3 className="text-2xl sm:text-3xl font-black text-white mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
                   <AlertTriangle className="text-yellow-500 w-8 h-8 shrink-0" />
-                  <span>Sua empresa tirou a nota {healthScore}/100.</span>
+                  {/* TEXTO PERSONALIZADO AQUI */}
+                  <span>O perfil da {result.companyName} obteve a nota {healthScore}/100.</span>
                 </h3>
                 <p className="text-lg sm:text-xl text-slate-300 mt-4 font-medium max-w-2xl">
-                  Você está praticamente invisível para mais da metade dos clientes da sua região.
+                  {/* TEXTO PERSONALIZADO AQUI */}
+                  Nossa varredura detectou que a {result.companyName} está praticamente invisível para grande parte dos clientes buscando por seus serviços.
                 </p>
               </div>
 
@@ -309,7 +369,8 @@ export default function AuditDashboard() {
                     <span>Essas 3 empresas levam <strong>60% de todos os cliques e ligações da cidade</strong>.</span>
                   </p>
                 </div>
-                <p>Se a sua ficha apresenta a pontuação que você acabou de ver acima, <strong>você nunca será uma dessas 3 opções.</strong> Pior: você está entregando dinheiro de mão beijada para a concorrência todos os dias.</p>
+                {/* TEXTO PERSONALIZADO AQUI */}
+                <p>Se a ficha da {result.companyName} apresenta a pontuação que você acabou de ver acima, <strong>você nunca será uma dessas 3 opções.</strong> Pior: você está entregando dinheiro de mão beijada para a concorrência todos os dias.</p>
                 <h4 className="text-2xl font-black text-slate-900 pt-6">A Solução Rápida</h4>
                 <p>Nossa Inteligência Artificial cruzou os dados da sua ficha com as diretrizes oficiais do Google e encontrou exatamente o que está travando o seu perfil. Nós agrupamos as falhas e a solução em um <strong>Plano de Domínio Local (PDF)</strong> mastigado para você.</p>
                 <ul className="space-y-4 bg-slate-50 p-6 rounded-xl border border-slate-200 text-base">
@@ -321,7 +382,6 @@ export default function AuditDashboard() {
                 <p>Uma consultoria de SEO Local não sairia por menos de R$ 197,00 no mercado. Mas hoje, liberar o seu Relatório Executivo e o Plano de Ação completo custa <strong>apenas R$ 9,97</strong>.</p>
                 <p className="text-center font-bold text-slate-900 text-xl py-4">Menos de dez reais para destravar as vendas da sua empresa.</p>
 
-                {/* BOTÃO DE VENDAS (AQUI A FOTO ESTÁ SENDO PASSADA COM SEGURANÇA) */}
                 <ReportGenerator
                   companyName={result.companyName || ""}
                   address={result.address || ""}
@@ -337,42 +397,45 @@ export default function AuditDashboard() {
           </section>
         )}
 
-        <div className="mt-20 bg-blue-950 py-20 px-6 rounded-[3rem] shadow-2xl relative overflow-hidden max-w-7xl mx-auto">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-800/30 via-transparent to-transparent" />
-          <div className="relative z-10">
-            <h2 className="text-4xl font-extrabold text-center mb-16 text-white">Negócios que investiram R$ 9,97 e viraram o jogo:</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
-                <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">+412% de visualizações</div>
-                <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
-                <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Eu achava que o problema era preço, mas o diagnóstico me mostrou que eu estava invisível no mapa. Paguei R$ 9,97, apliquei o PDF e meu telefone não para de tocar."</p>
-                <div className="mt-8 flex items-center gap-4">
-                  <div className="h-14 w-14 rounded-full bg-orange-100 flex items-center justify-center border-2 border-orange-500 shadow-sm shrink-0">
-                    <Store className="text-orange-600 w-7 h-7" />
-                  </div>
-                  <div>
-                    <div className="font-extrabold text-lg text-slate-900">Maria Clara</div>
-                    <div className="text-sm font-medium text-slate-500">Doceria Doce Encanto, SP</div>
+        {/* PROVA SOCIAL MOSTRA APENAS APÓS RESULTADO OU NA HOME, NÃO NA SIMULAÇÃO */}
+        {!isSimulating && (
+          <div className="mt-20 bg-blue-950 py-20 px-6 rounded-[3rem] shadow-2xl relative overflow-hidden max-w-7xl mx-auto">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-800/30 via-transparent to-transparent" />
+            <div className="relative z-10">
+              <h2 className="text-4xl font-extrabold text-center mb-16 text-white">Negócios que investiram R$ 9,97 e viraram o jogo:</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
+                  <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">+412% de visualizações</div>
+                  <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
+                  <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Eu achava que o problema era preço, mas o diagnóstico me mostrou que eu estava invisível no mapa. Paguei R$ 9,97, apliquei o PDF e meu telefone não para de tocar."</p>
+                  <div className="mt-8 flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-full bg-orange-100 flex items-center justify-center border-2 border-orange-500 shadow-sm shrink-0">
+                      <Store className="text-orange-600 w-7 h-7" />
+                    </div>
+                    <div>
+                      <div className="font-extrabold text-lg text-slate-900">Maria Clara</div>
+                      <div className="text-sm font-medium text-slate-500">Doceria Doce Encanto, SP</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
-                <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">Top 3 em 1 semana</div>
-                <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
-                <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Por R$ 9,97 recebi um relatório prático que me disse exatamente o que fazer. Hoje os orçamentos chegam sozinhos no WhatsApp. Incrível."</p>
-                <div className="mt-8 flex items-center gap-4">
-                  <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center border-2 border-blue-500 shadow-sm shrink-0">
-                    <Wrench className="text-blue-600 w-7 h-7" />
-                  </div>
-                  <div>
-                    <div className="font-extrabold text-lg text-slate-900">Roberto M.</div>
-                    <div className="text-sm font-medium text-slate-500">Auto Center, RJ</div>
+                <div className="bg-white p-10 rounded-3xl shadow-xl relative transform transition hover:-translate-y-2">
+                  <div className="absolute -top-5 right-6 bg-green-500 text-white text-sm font-extrabold px-4 py-2 rounded-full shadow-lg">Top 3 em 1 semana</div>
+                  <div className="flex text-yellow-400 mb-6 text-xl">★★★★★</div>
+                  <p className="italic text-slate-700 text-lg leading-relaxed font-medium">"Por R$ 9,97 recebi um relatório prático que me disse exatamente o que fazer. Hoje os orçamentos chegam sozinhos no WhatsApp. Incrível."</p>
+                  <div className="mt-8 flex items-center gap-4">
+                    <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center border-2 border-blue-500 shadow-sm shrink-0">
+                      <Wrench className="text-blue-600 w-7 h-7" />
+                    </div>
+                    <div>
+                      <div className="font-extrabold text-lg text-slate-900">Roberto M.</div>
+                      <div className="text-sm font-medium text-slate-500">Auto Center, RJ</div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div id="faq" className="mt-20">
           <FaqSection />
