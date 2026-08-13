@@ -7,20 +7,24 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
 
-  // Função inteligente que detecta a página atual
+  // Função inteligente que detecta a página atual e o estado da pesquisa
   const handleNavigation = (targetId: string) => {
     if (pathname === "/") {
-      // Se já está na home, faz a rolagem suave
       if (targetId === "top") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // Força o recarregamento da Home para limpar a pesquisa ativa e resetar a tela
+        window.location.href = "/";
       } else {
         const element = document.getElementById(targetId);
         if (element) {
+          // Se o elemento existe na tela (nenhuma pesquisa ativa escondendo ele), faz a rolagem suave
           element.scrollIntoView({ behavior: "smooth" });
+        } else {
+          // Se o elemento NÃO existe (foi ocultado pelo relatório), recarrega a página indo direto para a seção
+          window.location.href = `/#${targetId}`;
         }
       }
     } else {
-      // Se está em outra página (como /termos), volta para a Home no ponto certo
+      // Comportamento para quando o usuário está em outras páginas (ex: /termos, /privacidade)
       if (targetId === "top") {
         router.push("/");
       } else {
@@ -58,7 +62,6 @@ export function Header() {
           >
             Como Funciona
           </button>
-          {/* Antigo botão de "Planos", agora "FAQ" */}
           <button 
             onClick={() => handleNavigation("faq")} 
             className="text-sm font-bold text-slate-300 hover:text-white px-3 py-2 rounded-lg transition-all"
