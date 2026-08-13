@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import dynamic from "next/dynamic";
@@ -150,7 +151,7 @@ export default function AuditDashboard() {
               <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid gap-12 lg:grid-cols-2 items-center">
                   
-                  {/* Lado Esquerdo: Headline + História + Busca */}
+                  {/* Lado Esquerdo: Headline + Busca Destacada */}
                   <div>
                     <div className="flex flex-wrap gap-3 mb-6">
                       <div className="inline-flex items-center gap-2 rounded-full bg-orange-500/10 px-3 py-1.5 text-sm font-bold text-orange-400 border border-orange-500/20">
@@ -161,30 +162,31 @@ export default function AuditDashboard() {
                     <h1 className="text-balance text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
                       Pare de perder clientes para o <span className="text-blue-400 block mt-2">concorrente da rua de trás.</span>
                     </h1>
-
-                    {/* História de Origem */}
-                    <div className="mt-8 p-6 bg-slate-800/50 rounded-2xl border border-slate-700">
-                      <p className="text-slate-300 italic font-medium leading-relaxed">
-                        "Gerencio o Google Meu Negócio de empresas há anos e cansei de ver negócios brilhantes fecharem as portas por erros de SEO que ninguém explicava. Criei o GMB Audit para que você não precise de uma agência cara para dominar o mapa da sua região." <span className="text-white font-bold not-italic">— Felipe Bially</span>
-                      </p>
-                    </div>
                     
-                    <form onSubmit={handleSubmit} className="mt-8 relative max-w-xl">
+                    <form onSubmit={handleSubmit} className="mt-10 relative max-w-xl">
+                      {/* Campo de busca com cor clara/branca para GRITAR na tela */}
                       <input
                         type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Digite o nome da empresa..."
-                        className="h-16 w-full rounded-2xl border-2 border-slate-700 bg-slate-800 text-white pl-6 pr-4 text-lg mb-3 shadow-sm focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20"
+                        placeholder="Digite o nome da sua empresa..."
+                        className="h-16 w-full rounded-2xl border-4 border-blue-500/30 bg-white text-slate-900 pl-6 pr-4 text-xl font-medium mb-4 shadow-[0_0_20px_rgba(59,130,246,0.15)] focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all placeholder:text-slate-400"
                       />
                       <Button disabled={isLoading} type="submit" className="h-16 w-full bg-orange-500 hover:bg-orange-600 text-white text-xl font-extrabold rounded-2xl shadow-[0_0_30px_rgba(249,115,22,0.3)] hover:scale-[1.02] transition-all">
                         {isLoading ? "Buscando..." : "Analisar Meu Perfil Grátis"}
                       </Button>
+                      
+                      {/* Microcopy de alívio de tensão */}
+                      <p className="text-sm text-slate-400 mt-4 text-center font-medium">
+                        ⚡ Receba sua nota de SEO Local gratuitamente em menos de 60 segundos.
+                      </p>
                     </form>
                   </div>
 
-                  {/* Lado Direito: Ilustração de dor (Ficha Fake do Google) */}
-                  <div className="hidden lg:block">
+                  {/* Lado Direito: Ficha Fake + História de Origem */}
+                  <div className="hidden lg:block space-y-6">
+                    
+                    {/* Ficha Fake do Google */}
                     <div className="relative rounded-2xl bg-white shadow-2xl overflow-hidden border border-slate-200">
                       
                       {/* Top Header estilo Google Maps */}
@@ -243,6 +245,14 @@ export default function AuditDashboard() {
                         </div>
                       </div>
                     </div>
+
+                    {/* História de Origem (Movida para baixo do card) */}
+                    <div className="p-6 bg-slate-800/60 rounded-2xl border border-slate-700 shadow-xl backdrop-blur-sm">
+                      <p className="text-slate-300 italic font-medium leading-relaxed text-sm">
+                        "Gerencio o Google Meu Negócio de empresas há anos e cansei de ver negócios brilhantes fecharem as portas por erros de SEO que ninguém explicava. Criei o GMB Audit para que você não precise de uma agência cara para dominar o mapa da sua região." <span className="text-white font-bold not-italic">— Felipe Bially</span>
+                      </p>
+                    </div>
+
                   </div>
 
                 </div>
