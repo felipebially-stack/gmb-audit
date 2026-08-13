@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Download, Star, MapPin, AlertTriangle, TrendingDown, TrendingUp, Zap, FileText, CheckSquare, Copy, Target, ShieldAlert, Award } from "lucide-react";
+import { CheckCircle2, Download, Star, MapPin, AlertTriangle, TrendingDown, TrendingUp, Zap, FileText, CheckSquare, Copy, Target, ShieldAlert, Award, Search } from "lucide-react";
 import Link from "next/link";
 
 export default function SucessoPage() {
@@ -117,7 +117,7 @@ export default function SucessoPage() {
   if (templateIndex === 0) {
     descricaoFinal = `Procurando por ${keywordFoco} em ${cidade}? A ${nomeConversacional} é o lugar certo! Nosso compromisso é entregar ${keywordSecundaria} com a agilidade e a confiança que você merece. Seja para tirar dúvidas ou solicitar um orçamento, nossa equipe está de prontidão. Venha nos visitar em ${cidade} ou chame no WhatsApp para garantir as melhores condições!`;
     post1 = `Você sabia que a ${nomeConversacional} é referência quando o assunto é ${keywordFoco}? 🎯 Estamos aqui em ${cidade} prontos para te entregar o melhor resultado. Clique no botão abaixo, fale com nossa equipe e descubra por que nossos clientes confiam em nós! 👇`;
-    post2 = `A qualidade que você procura está aqui. 🏆 Visite a ${nomeConversacional} hoje mesmo e aproveite nossas opções de ${keywordSecundaria}. Esperamos por você aqui em ${cidade}! ✨`;
+    post2 = `A quality que você procura está aqui. 🏆 Visite a ${nomeConversacional} hoje mesmo e aproveite nossas opções de ${keywordSecundaria}. Esperamos por você aqui em ${cidade}! ✨`;
     respostaAva = `Muito obrigado pela confiança! Nós da equipe ${nomeConversacional} ficamos extremamente felizes com seu feedback. Conte sempre com a gente quando precisar de ${keywordFoco} aqui em ${cidade}!`;
   } else if (templateIndex === 1) {
     descricaoFinal = `Bem-vindo à ${nomeConversacional}! Somos a escolha ideal quando o assunto é ${keywordFoco} na região de ${cidade}. Trabalhamos todos os dias para garantir ${keywordSecundaria} e a satisfação total dos nossos clientes. Entre em contato pelo nosso WhatsApp ou faça-nos uma visita para um atendimento 100% personalizado e soluções sob medida.`;
@@ -379,6 +379,59 @@ export default function SucessoPage() {
               </div>
             </div>
           </div>
+
+          {/* NOVA TABELA DE RANKING DE PALAVRAS-CHAVE PARA O PDF */}
+          <div className="mb-6 card-auditoria">
+            <h3 className="text-sm font-black text-slate-800 mb-3 border-b-2 border-slate-100 pb-2 uppercase tracking-wide flex items-center gap-2">
+              <Search className="w-4 h-4 text-blue-600" />
+              Auditoria de Termos de Busca (Rankings)
+            </h3>
+            <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 text-slate-600 border-b border-slate-200">
+                  <tr>
+                    <th className="px-5 py-3 font-bold uppercase tracking-wider text-xs">Termo de Pesquisa do Cliente</th>
+                    <th className="px-5 py-3 font-bold uppercase tracking-wider text-xs text-center">Sua Posição</th>
+                    <th className="px-5 py-3 font-bold uppercase tracking-wider text-xs text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {safeRankings && safeRankings.length > 0 ? (
+                    safeRankings.map((kw: any, i: number) => {
+                      const isInvisible = !kw.position || kw.position > 10;
+                      return (
+                        <tr key={i} className="hover:bg-slate-50/50">
+                          <td className="px-5 py-2.5 font-medium text-slate-700 capitalize">{kw.keyword}</td>
+                          <td className="px-5 py-2.5 text-center font-bold text-slate-900">
+                            {kw.position ? `${kw.position}º Lugar` : "> 20º Lugar"}
+                          </td>
+                          <td className="px-5 py-2.5 text-center">
+                            {isInvisible ? (
+                              <span className="bg-red-100 text-red-700 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider">Perdendo Vendas</span>
+                            ) : kw.position <= 3 ? (
+                              <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider">Dominando</span>
+                            ) : (
+                              <span className="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider">Risco Médio</span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="px-5 py-4 text-center text-slate-400 font-medium italic text-xs">
+                        Dados de termos de busca não capturados na última varredura.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-[10px] text-slate-500 mt-2 font-medium">
+              *Clientes que pesquisam estes termos não encontram o seu negócio se você estiver classificado abaixo da 3ª posição (Invisível).
+            </p>
+          </div>
+
           <div className="mt-auto bg-blue-900 text-white p-6 rounded-2xl flex items-center justify-between card-auditoria">
              <div>
                <h3 className="text-lg font-bold text-blue-300 flex items-center gap-2"><TrendingUp className="w-5 h-5"/> Previsão de Resultados</h3>
