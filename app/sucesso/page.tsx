@@ -286,7 +286,7 @@ export default function SucessoPage() {
             {/* FOTO REAL DA EMPRESA (Puxada do Google Places, se disponível) */}
             {dados.photoUrl ? (
               <div className="relative w-full h-56 rounded-2xl overflow-hidden border-2 border-slate-700 shadow-2xl mb-6">
-                <img src={dados.photoUrl} alt={nomeOriginal} className="w-full h-full object-cover" />
+                <img src={dados.photoUrl} alt={nomeOriginal} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent p-4 flex items-center justify-between">
                   <span className="text-xs font-bold text-white bg-blue-600/80 backdrop-blur-md px-3 py-1 rounded-lg">📸 Registro Oficial do Google Maps</span>
                   <span className="text-xs text-slate-300">{cidade}</span>
