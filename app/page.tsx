@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client"
 
 import dynamic from "next/dynamic";
@@ -6,7 +5,7 @@ import { Header } from "@/components/dashboard/header"
 import { HowItWorks } from "@/components/dashboard/how-it-works" 
 import { FaqSection } from "@/components/dashboard/faq-section" 
 import { ExitPopup } from "@/components/dashboard/exit-popup"
-import { AlertTriangle, MapPin, TrendingDown, XCircle, Store, Wrench } from "lucide-react"
+import { AlertTriangle, MapPin, TrendingDown, XCircle, Store, Wrench, Star, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useMemo, useState } from "react"
 
@@ -184,14 +183,64 @@ export default function AuditDashboard() {
                     </form>
                   </div>
 
-                  {/* Lado Direito: Ilustração de dor */}
+                  {/* Lado Direito: Ilustração de dor (Ficha Fake do Google) */}
                   <div className="hidden lg:block">
-                    <div className="rounded-2xl bg-white shadow-2xl p-8 border-4 border-orange-500">
-                      <h3 className="text-xl font-black text-slate-900 mb-6">Seu perfil está neste estado?</h3>
-                      <div className="space-y-4">
-                         <div className="flex items-center gap-3 text-red-600 font-bold"><XCircle className="w-6 h-6"/> Invisível no Local Pack</div>
-                         <div className="flex items-center gap-3 text-red-600 font-bold"><XCircle className="w-6 h-6"/> Fotos sem geotag</div>
-                         <div className="flex items-center gap-3 text-orange-600 font-bold"><AlertTriangle className="w-6 h-6"/> Sem palavras-chave locais</div>
+                    <div className="relative rounded-2xl bg-white shadow-2xl overflow-hidden border border-slate-200">
+                      
+                      {/* Top Header estilo Google Maps */}
+                      <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Store className="w-5 h-5 text-slate-400" />
+                          <span className="font-bold text-slate-600 text-sm">Ficha da Empresa</span>
+                        </div>
+                        <span className="text-[10px] font-black bg-red-100 text-red-600 px-2 py-1 rounded uppercase tracking-wide">Risco de Perda</span>
+                      </div>
+                      
+                      <div className="p-6 sm:p-8">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3 className="text-2xl font-black text-slate-900 leading-none">Sua Empresa</h3>
+                            <p className="text-slate-500 text-sm mt-2 flex items-center gap-1"><MapPin className="w-3 h-3"/> Sua Cidade, Região</p>
+                          </div>
+                          {/* Símbolo "G" para remeter ao Google sem usar imagens externas */}
+                          <div className="bg-slate-50 p-2 rounded-lg flex items-center justify-center w-10 h-10 border border-slate-200 shrink-0">
+                            <span className="font-black text-xl text-blue-600">G</span>
+                          </div>
+                        </div>
+
+                        {/* Avaliações Ruins (Gatilho de Autoridade) */}
+                        <div className="flex items-center gap-1 text-orange-500 mb-6">
+                          <span className="text-xl font-bold text-slate-700 mr-1">2.1</span>
+                          <Star className="w-5 h-5 fill-current" />
+                          <Star className="w-5 h-5 fill-current" />
+                          <Star className="w-5 h-5 text-slate-200" />
+                          <Star className="w-5 h-5 text-slate-200" />
+                          <Star className="w-5 h-5 text-slate-200" />
+                          <span className="text-sm text-slate-400 ml-2">(7)</span>
+                        </div>
+
+                        {/* Alerta de Visibilidade */}
+                        <div className="bg-red-50 border border-red-100 rounded-xl p-4 mb-6">
+                          <h4 className="text-red-700 font-bold flex items-center gap-2 mb-1">
+                            <EyeOff className="w-5 h-5" /> Invisível nas Buscas
+                          </h4>
+                          <p className="text-sm text-red-600/80 leading-relaxed font-medium">
+                            Seus clientes estão ligando para a concorrência porque você não aparece no mapa.
+                          </p>
+                        </div>
+
+                        {/* Checklist de erros */}
+                        <div className="space-y-3">
+                           <div className="flex items-center gap-3 text-sm text-slate-700 font-bold">
+                              <XCircle className="w-5 h-5 text-red-500 shrink-0"/> Fora do Top 3 (Local Pack)
+                           </div>
+                           <div className="flex items-center gap-3 text-sm text-slate-700 font-bold">
+                              <XCircle className="w-5 h-5 text-red-500 shrink-0"/> Fotos sem marcação de GPS
+                           </div>
+                           <div className="flex items-center gap-3 text-sm text-slate-700 font-bold">
+                              <AlertTriangle className="w-5 h-5 text-orange-500 shrink-0"/> Título sem palavras-chave
+                           </div>
+                        </div>
                       </div>
                     </div>
                   </div>
