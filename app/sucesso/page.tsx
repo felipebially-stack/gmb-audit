@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Download, Star, MapPin, TrendingDown, TrendingUp, Search, Clock, ShieldAlert, Image as ImageIcon, Link as LinkIcon, MessageSquare, Video, HelpCircle } from "lucide-react";
-import Link from "next/link";
+import { CheckCircle2, Download, Star, MapPin, Search, Clock, ShieldAlert, Image as ImageIcon, Link as LinkIcon, MessageSquare, Video, HelpCircle, Target } from "lucide-react";
 
 export default function SucessoPage() {
   const [dados, setDados] = useState<any>(null);
@@ -62,10 +61,8 @@ export default function SucessoPage() {
   }
 
   // ====================================================================
-  // HEALTH CHECK DETALHADO (NOVO FORMATO VISUAL)
+  // HEALTH CHECK DETALHADO (VISUAL)
   // ====================================================================
-  
-  // Lógica dinâmica para gerar os status baseados na nota geral e avaliações
   const checkStatus = (isGood: boolean, isFair: boolean) => {
     if (isGood) return { label: "Bom", percent: 100, color: "bg-green-500", textColor: "text-green-600" };
     if (isFair) return { label: "Razoável", percent: 50, color: "bg-yellow-500", textColor: "text-yellow-600" };
@@ -76,58 +73,89 @@ export default function SucessoPage() {
     {
       icone: <Star className="w-5 h-5 text-slate-700" />,
       titulo: "Média de Avaliações",
-      descricao: "Analisa se a pontuação média de avaliação está boa ou se pode ser melhorada. Uma pontuação adequada nas avaliações transmite segurança e conforto para o cliente.",
-      statusTexto: ratingNum >= 4.0 ? "A média de avaliações está normal." : "A média de avaliações está abaixo do padrão competitivo.",
+      descricao: "Analisa se a pontuação média de avaliação está competitiva. Uma pontuação adequada atrai cliques e transmite segurança.",
+      statusTexto: ratingNum >= 4.0 ? "A média de avaliações está excelente." : "A média de avaliações está abaixo do padrão competitivo local.",
       ...checkStatus(ratingNum >= 4.0, ratingNum >= 3.0)
     },
     {
       icone: <MessageSquare className="w-5 h-5 text-slate-700" />,
       titulo: "Quantidade de Avaliações",
-      descricao: "Analisa se possui uma quantidade mínima de avaliações em relação aos concorrentes da região.",
-      statusTexto: reviewsNum >= 15 ? "O negócio possui quantidade de avaliações suficiente." : "A quantidade de avaliações ainda é insuficiente para o algoritmo.",
+      descricao: "Mede a constância e o volume de avaliações, responsáveis por grande parte do peso do algoritmo.",
+      statusTexto: reviewsNum >= 15 ? "O negócio possui uma quantidade de avaliações sólida." : "A quantidade de avaliações ainda é insuficiente para o algoritmo gerar tração.",
       ...checkStatus(reviewsNum >= 15, reviewsNum >= 5)
     },
     {
       icone: <ShieldAlert className="w-5 h-5 text-slate-700" />,
-      titulo: "Nome do Negócio",
-      descricao: "O nome deve refletir o nome real do seu negócio, conforme é conhecido pelos clientes e apresentado na sua loja ou site. O uso de palavras-chave extras causa suspensão.",
-      statusTexto: nomeOriginal.length < 50 ? "O nome do negócio está definido com uma quantidade adequada de caracteres." : "O nome possui muitos caracteres, indicando possível excesso de palavras-chave (risco de bloqueio).",
+      titulo: "Nome do Negócio (Alerta de Suspensão)",
+      descricao: "O nome deve ser exatamente o da fachada. O uso de palavras-chave extras (keyword stuffing) é o motivo nº 1 de suspensão e banimento.",
+      statusTexto: nomeOriginal.length < 50 ? "O nome do negócio está dentro dos limites seguros." : "Alerta: O nome longo indica possível excesso de palavras-chave, gerando risco alto de banimento manual.",
       ...checkStatus(nomeOriginal.length < 50, nomeOriginal.length < 70)
     },
     {
       icone: <ImageIcon className="w-5 h-5 text-slate-700" />,
-      titulo: "Quantidade Total de Mídia pelo Proprietário",
-      descricao: "Fotos publicadas pelo proprietário revelam o compromisso que você tem com o seu negócio e demonstram como gostaria que este fosse apresentado.",
-      statusTexto: healthScore >= 60 ? "O negócio possui uma quantidade aceitável de mídia publicadas pelo proprietário." : "Faltam fotos de qualidade publicadas pelo proprietário.",
+      titulo: "Volume e Recência de Fotos",
+      descricao: "O algoritmo não lê GPS (geotagging) de forma prioritária, mas exige fotos com qualidade e recência (enviadas nos últimos meses) para comprovar atividade.",
+      statusTexto: healthScore >= 60 ? "O negócio possui uma presença visual aceitável." : "Faltam fotos de alta qualidade publicadas recentemente pelo proprietário.",
       ...checkStatus(healthScore >= 80, healthScore >= 50)
     },
     {
       icone: <Clock className="w-5 h-5 text-slate-700" />,
       titulo: "Data da Última Postagem",
-      descricao: "Criar e compartilhar novidades, falar sobre produtos ou serviços demonstra que o seu negócio é ativo no Google e isso ajuda a melhorar a sua visibilidade online.",
-      statusTexto: healthScore >= 70 ? "Postagens recentes detectadas ou dentro do limite." : "Já fazem muitos dias desde a última postagem. Quantidade máxima recomendada: 15 dias.",
+      descricao: "Posts mantêm o perfil 'quente'. Embora não sejam o fator número 1 de ranking, são excelentes para conversão e sinalização de atividade.",
+      statusTexto: healthScore >= 70 ? "Postagens recentes detectadas." : "Já fazem muitos dias desde a última atualização. O perfil está esfriando.",
       ...checkStatus(healthScore >= 80, healthScore >= 50)
     },
     {
       icone: <Video className="w-5 h-5 text-slate-700" />,
       titulo: "Mídia - Vídeos",
-      descricao: "Estudos mostram que os vídeos atraem e fidelizam clientes mais do que outras formas de marketing online no Maps.",
-      statusTexto: "Não existem vídeos detectados para o negócio. Quantidade mínima recomendada: 3.",
-      ...checkStatus(false, healthScore >= 90) // Geralmente a maioria não tem vídeos
+      descricao: "Vídeos curtos da fachada ou serviço aumentam drasticamente a retenção do usuário. São recomendados como fator extra de conversão.",
+      statusTexto: "Não existem vídeos detectados para o negócio. (Recomendação extra, não afeta ranking estrutural).",
+      ...checkStatus(false, true) // Sempre razoável se faltar, nunca 'fraco' para não ser injusto.
     },
     {
       icone: <HelpCircle className="w-5 h-5 text-slate-700" />,
-      titulo: "Perguntas Não Respondidas",
-      descricao: "Os clientes esperam que você assuma a liderança, respondendo e resolvendo as suas questões. Não deixe perguntas sem resposta na aba Q&A.",
-      statusTexto: healthScore >= 60 ? "Nenhuma pendência crítica de perguntas detectada." : "Ainda existem perguntas ou avaliações precisando de atenção.",
+      titulo: "Respostas e Q&A (Prova Social)",
+      descricao: "Avaliações e perguntas respondidas indicam ao Google que há um gestor ativo cuidando dos clientes.",
+      statusTexto: healthScore >= 60 ? "Boa manutenção de relacionamento e respostas." : "Existem pendências no relacionamento (perguntas ou reviews sem resposta).",
       ...checkStatus(healthScore >= 75, healthScore >= 40)
+    }
+  ];
+
+  // ====================================================================
+  // PLANO DE AÇÃO ESTRATÉGICO
+  // ====================================================================
+  const planoDeAcao = [
+    {
+      tipo: "urgente",
+      icone: <ShieldAlert className="w-5 h-5 text-red-600" />,
+      titulo: "Auditoria de Risco de Suspensão (Nome do Perfil)",
+      oque: `Garanta que o nome do seu perfil seja exatamente o nome real da sua fachada. Remova imediatamente qualquer palavra-chave solta (Ex: "Depilação em ${cidade}").`,
+      porque: "O uso de palavras-chave no nome oficial é considerado 'Spam' e é o principal motivo de suspensão de perfis. Cerca de 60% das denúncias de concorrentes resultam em banimento pelo Google.",
+      frequencia: "Ação Imediata. O Google pune edições drásticas repetidas, ajuste apenas se estiver irregular."
     },
     {
-      icone: <Search className="w-5 h-5 text-slate-700" />,
-      titulo: "Descrição da Empresa",
-      descricao: "Descrever o seu negócio é uma oportunidade de contar a potenciais clientes a sua história e inserir palavras-chave cruciais para o algoritmo.",
-      statusTexto: healthScore >= 50 ? "O negócio possui uma descrição configurada." : "A descrição está ausente ou muito curta. Mínimo recomendado: 50 caracteres.",
-      ...checkStatus(healthScore >= 70, healthScore >= 40)
+      tipo: "urgente",
+      icone: <Target className="w-5 h-5 text-red-600" />,
+      titulo: "Calibragem da Categoria Primária e Secundárias",
+      oque: "Acesse o painel e garanta que sua Categoria Primária seja a mais específica possível. Adicione exatamente de 2 a 3 categorias secundárias complementares.",
+      porque: "A categoria primária é o fator #1 absoluto de ranqueamento. Dados mostram que perfis com exatas 2 ou 3 categorias adicionais alcançam as melhores posições (posição média 2,5). O excesso dilui sua força.",
+      frequencia: "Revisão Imediata (Única)."
+    },
+    {
+      tipo: "otimizacao",
+      icone: <Star className="w-5 h-5 text-yellow-600" />,
+      titulo: "Escala Sustentável de Avaliações (Reviews)",
+      oque: "Crie um fluxo de captação orgânica (QR Code no balcão ou WhatsApp). O alvo inicial é manter um ritmo contínuo de novas avaliações por mês.",
+      porque: "A qualidade da ficha + avaliações representam 64% do peso do ranking. Mas atenção: o Google pune 'rajadas' de avaliações. Parar de receber novas reviews derruba seu ranking em 30 a 60 dias.",
+      frequencia: "Constante e Escalonada. Fuja de picos artificiais."
+    },
+    {
+      tipo: "otimizacao",
+      icone: <LinkIcon className="w-5 h-5 text-yellow-600" />,
+      titulo: "Sincronização de NAP (Nome, Endereço e Telefone)",
+      oque: "Garanta que o Nome, Endereço e Telefone (NAP) no seu site, Instagram e diretórios locais sejam milimetricamente iguais aos dados do Google Maps.",
+      porque: "Inconsistências (como 'R. XYZ' no site e 'Rua XYZ' no Google) confundem os robôs de busca. A consistência universal desses dados valida a autoridade externa do seu perfil.",
+      frequencia: "Revisão Semestral."
     }
   ];
 
@@ -140,6 +168,7 @@ export default function SucessoPage() {
           .card-auditoria { page-break-inside: avoid !important; break-inside: avoid !important; display: block !important; }
           .quebrar-antes { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
+          .forcar-fundo { background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; }
         }
       `}} />
 
@@ -274,12 +303,12 @@ export default function SucessoPage() {
           </div>
         </div>
 
-        {/* PÁGINA 3: HEALTH CHECK (NOVO ESTILO) */}
+        {/* PÁGINA 3: HEALTH CHECK (RAIO-X VISUAL) */}
         <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-slate-50">
           <div className="mb-10 border-b-2 border-slate-200 pb-6">
             <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Auditoria Detalhada</p>
             <h1 className="text-3xl font-black text-slate-900">Análise de Saúde da {nomeConversacional}</h1>
-            <p className="text-slate-500 mt-2 font-medium">Verificação profunda dos fatores de rankeamento e conversão.</p>
+            <p className="text-slate-500 mt-2 font-medium">Verificação profunda dos fatores vitais de ranqueamento e conversão.</p>
           </div>
 
           <div className="grid grid-cols-1 gap-6">
@@ -304,7 +333,6 @@ export default function SucessoPage() {
                 <div className="flex items-center gap-4">
                   <span className={`text-sm font-black w-20 ${item.textColor}`}>{item.label}</span>
                   <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden flex">
-                    {/* Barra visual simulando o velocímetro */}
                     <div className={`h-full ${item.color} transition-all duration-1000`} style={{ width: `${item.percent}%` }}></div>
                   </div>
                   <div className="w-32 flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
@@ -316,9 +344,58 @@ export default function SucessoPage() {
               </div>
             ))}
           </div>
+        </div>
 
-          <div className="mt-12 text-center">
-            <p className="text-xs text-slate-500 font-medium">As métricas acima guiam diretamente o algoritmo do Google Meu Negócio.</p>
+        {/* PÁGINA 4: PLANO DE AÇÃO ESTRATÉGICO */}
+        <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-white">
+          <div className="mb-10 border-b-2 border-slate-100 pb-6">
+            <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Implementação Prática</p>
+            <h1 className="text-3xl font-black text-slate-900">Plano de Ação Estratégico</h1>
+            <p className="text-slate-500 mt-2 font-medium">As diretrizes técnicas detalhadas para blindar e dominar o algoritmo local.</p>
+          </div>
+
+          <div className="space-y-6">
+            {planoDeAcao.map((acao, i) => (
+              <div key={i} className={`p-6 rounded-2xl border-l-4 card-auditoria forcar-fundo ${acao.tipo === 'urgente' ? 'border-l-red-500' : 'border-l-yellow-500'}`}>
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-xl shrink-0 ${acao.tipo === 'urgente' ? 'bg-red-100' : 'bg-yellow-100'}`}>
+                    {acao.icone}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-black text-slate-900 mb-3">{i + 1}. {acao.titulo}</h3>
+                    
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Ação Recomendada:</span>
+                        <p className="text-sm font-bold text-slate-700 leading-relaxed">{acao.oque}</p>
+                      </div>
+                      
+                      <div className="bg-white p-4 rounded-lg border border-slate-200">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 block mb-1">Impacto no Algoritmo (Por que fazer?)</span>
+                        <p className="text-sm text-slate-600 leading-relaxed font-medium">{acao.porque}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-1">
+                        <Clock className="w-4 h-4 text-slate-400" />
+                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Periodicidade:</span>
+                        <span className="text-xs font-bold text-slate-800">{acao.frequencia}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-auto border-t border-slate-200 pt-8 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-slate-500 font-bold uppercase tracking-widest mb-1">Desenvolvido por</p>
+              <p className="text-lg font-black text-slate-900">Método GMN Turbo © {new Date().getFullYear()}</p>
+            </div>
+            <div className="bg-slate-100 p-3 rounded-lg border border-slate-200 text-right">
+              <p className="text-xs font-bold text-slate-600">Dificuldade em aplicar?</p>
+              <p className="text-[10px] text-slate-500">Nossa agência executa este plano por você.</p>
+            </div>
           </div>
         </div>
 
