@@ -20,6 +20,7 @@ interface PlaceAuditData {
   userRatingsTotal: number | null
   address: string | null
   rankings: KeywordRanking[]
+  competitors?: any[] // ✅ ADICIONADO: Suporte aos concorrentes da API
   checklistData?: any
   serpStatus?: "ok" | "api_unavailable" | "not_configured"
   photoUrl?: string 
@@ -159,9 +160,6 @@ export default function AuditDashboard() {
     handleSearch(query);
   }
 
-  // ====================================================================
-  // MOTOR DE COPYWRITING DINÂMICO PARA A TELA DE VENDAS
-  // ====================================================================
   const getDynamicCopy = () => {
     if (!result) return { icon: null, title: "", subtitle: "", p1: "", p2: "" };
     
@@ -203,7 +201,6 @@ export default function AuditDashboard() {
       <Header />
       
       <main>
-        {/* TELA DE SIMULAÇÃO (SUSPENSE) */}
         {isSimulating && (
           <section className="relative overflow-hidden bg-slate-900 py-24 min-h-[70vh] flex items-center justify-center">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/40 via-transparent to-transparent animate-pulse" />
@@ -233,7 +230,6 @@ export default function AuditDashboard() {
           </section>
         )}
 
-        {/* TELA INICIAL (BUSCA) */}
         {!result && !isSimulating && (
           <>
             <section className="relative overflow-hidden bg-slate-900 py-16 sm:py-24 border-b border-slate-800">
@@ -358,7 +354,6 @@ export default function AuditDashboard() {
           </div>
         )}
         
-        {/* RESULTADO (TEXTOS PERSONALIZADOS E RANKING DE PALAVRAS-CHAVE) */}
         {result && result.rating && !isSimulating && (
           <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
             <div className="mb-10 text-center">
@@ -391,7 +386,7 @@ export default function AuditDashboard() {
                   {copy.subtitle}
                 </p>
 
-                {/* BLOCO: RANKING DE PALAVRAS-CHAVE NA TELA DE VENDAS */}
+                {/* BLOCO CORRIGIDO: RANKING DE PALAVRAS-CHAVE NA TELA DE VENDAS */}
                 <div className="w-full max-w-2xl mt-12 text-left bg-slate-800/50 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-inner">
                   <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                     <Search className="text-blue-400 w-6 h-6" />
@@ -405,8 +400,10 @@ export default function AuditDashboard() {
                           <div className="flex items-center shrink-0">
                             {kw.position && kw.position <= 3 ? (
                               <span className="bg-green-500/10 text-green-400 px-3 py-1.5 rounded-lg text-sm font-bold border border-green-500/20">Top {kw.position}</span>
-                            ) : kw.position && kw.position <= 10 ? (
-                              <span className="bg-yellow-500/10 text-yellow-400 px-3 py-1.5 rounded-lg text-sm font-bold border border-yellow-500/20">Posição {kw.position}</span>
+                            ) : kw.position ? (
+                              <span className="bg-yellow-500/10 text-yellow-400 px-3 py-1.5 rounded-lg text-sm font-bold border border-yellow-500/20">
+                                {kw.position}º Lugar
+                              </span>
                             ) : (
                               <span className="bg-red-500/10 text-red-400 px-3 py-1.5 rounded-lg text-sm font-bold border border-red-500/20 flex items-center gap-1.5">
                                 <XCircle className="w-4 h-4"/> Invisível
@@ -422,7 +419,6 @@ export default function AuditDashboard() {
                 </div>
               </div>
 
-              {/* A CARTA DE VENDAS DINÂMICA ABAIXO DO QUADRO ESCURO */}
               <div className="p-8 sm:p-14 space-y-8 text-lg text-slate-700 leading-relaxed font-medium">
                 <p>{copy.p1}</p>
                 <p>Pense no seu cliente ideal. Quando ele pega o celular precisando urgente do seu serviço, o Google mostra <strong>apenas 3 empresas no mapa</strong>.</p>
@@ -449,12 +445,14 @@ export default function AuditDashboard() {
                 <p>Uma consultoria de SEO Local não sairia por menos de R$ 197,00 no mercado. Mas hoje, liberar o seu Relatório Executivo e o Plano de Ação completo custa <strong>apenas R$ 9,97</strong>.</p>
                 <p className="text-center font-bold text-slate-900 text-xl py-4">Menos de dez reais para destravar os resultados da sua empresa.</p>
 
+                {/* PASSANDO OS CONCORRENTES PARA O GERADOR DE RELATÓRIO */}
                 <ReportGenerator
                   companyName={result.companyName || ""}
                   address={result.address || ""}
                   rating={result.rating}
                   userRatingsTotal={result.userRatingsTotal || 0}
                   rankings={keywordRankings || []}
+                  competitors={result.competitors || []} 
                   healthScore={healthScore}
                   checklistData={result.checklistData}
                   photoUrl={result.photoUrl} 
@@ -464,7 +462,6 @@ export default function AuditDashboard() {
           </section>
         )}
 
-        {/* PROVA SOCIAL MOSTRA APENAS APÓS RESULTADO OU NA HOME, NÃO NA SIMULAÇÃO */}
         {!isSimulating && (
           <div className="mt-20 bg-blue-950 py-20 px-6 rounded-[3rem] shadow-2xl relative overflow-hidden max-w-7xl mx-auto">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-800/30 via-transparent to-transparent" />
