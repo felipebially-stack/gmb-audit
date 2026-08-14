@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Download, Star, MapPin, AlertTriangle, TrendingDown, TrendingUp, Zap, CheckSquare, Target, Search, Clock, ShieldAlert } from "lucide-react";
+import { CheckCircle2, Download, Star, MapPin, AlertTriangle, TrendingDown, TrendingUp, Zap, CheckSquare, Target, Search, Clock, ShieldAlert, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import Link from "next/link";
 
 export default function SucessoPage() {
@@ -62,49 +62,49 @@ export default function SucessoPage() {
   }
 
   // ====================================================================
-  // CÉREBRO DE COPYWRITING AVANÇADO (O QUE, POR QUE, QUANDO)
+  // CÉREBRO DE COPYWRITING AVANÇADO (BASEADO NOS DADOS OFICIAIS DE RANKING)
   // ====================================================================
   
   const planoDeAcao = [
     {
       tipo: "urgente",
-      icone: <MapPin className="w-5 h-5 text-red-600" />,
-      titulo: "Injeção de Fotos com Geotagging (GPS)",
-      oque: `Ative a localização (GPS) do seu celular e faça o upload de 5 a 10 fotos novas da fachada, interior e equipe trabalhando diretamente de ${cidade}.`,
-      porque: "O algoritmo do Google extrai os metadados invisíveis (EXIF) das fotos. Ao ler as coordenadas exatas do seu endereço nas fotos, ele confirma que sua empresa é real e ativa, destravando seu alcance no mapa da região.",
-      frequencia: "Ação Imediata (Única). Depois, adicione 2 fotos novas a cada 15 dias."
+      icone: <ShieldAlert className="w-5 h-5 text-red-600" />,
+      titulo: "Auditoria de Risco de Suspensão (Nome do Perfil)",
+      oque: `Garanta que o nome do seu perfil seja exatamente o nome real da sua fachada ou CNPJ. Remova imediatamente qualquer palavra-chave solta (Ex: "Encanador em ${cidade}").`,
+      porque: "O uso de palavras-chave no nome oficial é considerado 'Spam' e é o principal motivo de suspensão de perfis hoje. Cerca de 60% das denúncias feitas por concorrentes resultam em punição e bloqueio da ficha pelo Google.",
+      frequencia: "Ação Imediata. O Google pune edições drásticas, ajuste apenas se estiver fora das regras."
     },
     {
       tipo: "urgente",
-      icone: <Search className="w-5 h-5 text-red-600" />,
-      titulo: "Otimização de Título e Descrição (SEO Local)",
-      oque: "Reescreva a descrição da sua empresa inserindo as palavras-chave principais que seus clientes buscam, junto com o nome dos bairros que você atende.",
-      porque: "O Google não 'adivinha' o que você vende. Ele varre os 750 caracteres da sua descrição em milissegundos para cruzar com a pesquisa do usuário. Sem as palavras corretas, você não participa do leilão de buscas.",
-      frequencia: "Ação Imediata. Revisão completa a cada 6 meses."
-    },
-    {
-      tipo: "otimizacao",
-      icone: <Target className="w-5 h-5 text-yellow-600" />,
-      titulo: "Expansão de Categorias Secundárias",
-      oque: "Acesse o painel, vá em 'Editar Perfil' e adicione até 4 categorias secundárias que representem sub-nichos do seu negócio.",
-      porque: "A categoria principal dita 70% do seu ranqueamento, mas as categorias secundárias abrem portas para pesquisas de 'cauda longa' (pesquisas mais específicas e com maior intenção de compra imediata).",
-      frequencia: "Revisão Imediata."
+      icone: <Target className="w-5 h-5 text-red-600" />,
+      titulo: "Calibragem da Categoria Primária e Secundárias",
+      oque: "Acesse o painel e garanta que sua Categoria Primária seja a mais específica possível. Em seguida, adicione exatamente de 2 a 3 categorias secundárias que sejam complementares ao seu serviço.",
+      porque: "A categoria primária é o fator #1 absoluto de ranqueamento local. Dados do algoritmo mostram que perfis com exatas 2 ou 3 categorias adicionais alcançam as melhores posições. O excesso de categorias irrelevantes dilui a força do seu perfil.",
+      frequencia: "Revisão Imediata (Única)."
     },
     {
       tipo: "otimizacao",
       icone: <Star className="w-5 h-5 text-yellow-600" />,
-      titulo: "Blindagem de Prova Social Responsiva",
-      oque: "Responda a todas as avaliações passadas e crie um processo para pedir avaliações aos clientes na hora do pagamento, utilizando palavras-chave na sua resposta.",
-      porque: "Perfis com avaliações respondidas ativam o gatilho de 'Frequência de Atualização' no algoritmo. Além disso, o Google lê os textos das avaliações para ranquear sua empresa para serviços específicos mencionados pelos clientes.",
-      frequencia: "Semanal. Responda novas avaliações em no máximo 48h."
+      titulo: "Escala Sustentável de Avaliações (Reviews)",
+      oque: "Crie um fluxo contínuo de captação de avaliações com seus clientes (Ex: QR Code no balcão ou link no WhatsApp). O alvo inicial é manter um ritmo de 1 a 2 novas avaliações por mês de forma orgânica.",
+      porque: "O algoritmo soma a qualidade da sua ficha com suas avaliações para dominar 64% do peso do ranking. Mas atenção: o Google pune 'rajadas' (muitas avaliações de uma vez e depois silêncio). Além disso, parar de receber avaliações derruba seu ranking em 30 a 60 dias.",
+      frequencia: "Manutenção Contínua e Escalonada."
     },
     {
       tipo: "otimizacao",
-      icone: <Clock className="w-5 h-5 text-yellow-600" />,
-      titulo: "Ativação do Catálogo de Produtos/Serviços",
-      oque: "Cadastre seus 10 principais produtos ou serviços na aba correspondente, incluindo fotos de alta qualidade, preço e uma breve descrição comercial.",
-      porque: "Isso cria um mini-site dentro da busca do Google. Reduz a fricção de compra do cliente e injeta um volume massivo de palavras-chave no seu perfil sem poluir a descrição principal.",
-      frequencia: "Manutenção Mensal (atualização de preços e ofertas)."
+      icone: <ImageIcon className="w-5 h-5 text-yellow-600" />,
+      titulo: "Atualização do Acervo Visual (Fator Recência)",
+      oque: "Faça upload de fotos reais e de alta resolução da sua fachada, interior e equipe. Esqueça ferramentas de banco de imagens ou fotos geradas por Inteligência Artificial.",
+      porque: "Não perca tempo tentando inserir localização de GPS falsa nas fotos (Geotagging), pois o Google não utiliza isso para ranking. O algoritmo prioriza estritamente a recência (fotos novas) e a qualidade (sem ruído) para atestar que o negócio está ativo.",
+      frequencia: "A cada 3 meses (Atualização de Acervo)."
+    },
+    {
+      tipo: "otimizacao",
+      icone: <LinkIcon className="w-5 h-5 text-yellow-600" />,
+      titulo: "Sincronização de NAP (Nome, Endereço e Telefone)",
+      oque: "Garanta que o Nome, Endereço e Telefone (NAP) escritos no seu site, redes sociais e diretórios de empresas sejam milimetricamente iguais aos dados do Google Maps.",
+      porque: "Inconsistências bobas (como escrever 'R. XYZ' no site e 'Rua XYZ' no Google) confundem os robôs de busca. A consistência universal desses dados é o principal fator de validação de autoridade externa do seu perfil.",
+      frequencia: "Revisão Semestral."
     }
   ];
 
@@ -252,12 +252,12 @@ export default function SucessoPage() {
           </div>
         </div>
 
-        {/* PÁGINA 3: PLANO DE AÇÃO ESTRATÉGICO (AGORA COMPLETO E DETALHADO) */}
+        {/* PÁGINA 3: PLANO DE AÇÃO ESTRATÉGICO */}
         <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-white">
           <div className="mb-10 border-b-2 border-slate-100 pb-6">
             <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Implementação Prática</p>
             <h1 className="text-3xl font-black text-slate-900">Plano de Ação Estratégico</h1>
-            <p className="text-slate-500 mt-2 font-medium">As diretrizes técnicas detalhadas para dominar o algoritmo local em {cidade}.</p>
+            <p className="text-slate-500 mt-2 font-medium">As diretrizes técnicas detalhadas para dominar o algoritmo local em {cidade}, baseadas nos 3 Pilares Oficiais de Ranqueamento.</p>
           </div>
 
           <div className="space-y-6">
@@ -272,12 +272,12 @@ export default function SucessoPage() {
                     
                     <div className="grid grid-cols-1 gap-4">
                       <div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">O Que Fazer:</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Ação Recomendada:</span>
                         <p className="text-sm font-bold text-slate-700 leading-relaxed">{acao.oque}</p>
                       </div>
                       
                       <div className="bg-white p-4 rounded-lg border border-slate-200">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 block mb-1">Por que o Google exige isso?</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 block mb-1">Impacto no Algoritmo (Por que fazer?)</span>
                         <p className="text-sm text-slate-600 leading-relaxed font-medium">{acao.porque}</p>
                       </div>
 
