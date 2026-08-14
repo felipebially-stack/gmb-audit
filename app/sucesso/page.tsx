@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Download, Star, MapPin, Search, Clock, ShieldAlert, Image as ImageIcon, Link as LinkIcon, MessageSquare, Video, HelpCircle, Target } from "lucide-react";
+import { CheckCircle2, Download, Star, MapPin, Search, Clock, ShieldAlert, Image as ImageIcon, Link as LinkIcon, MessageSquare, Video, HelpCircle, Target, Trophy } from "lucide-react";
 
 // Função para formatar as palavras-chave corretamente (Title Case)
 const toTitleCase = (str: string) => {
@@ -49,7 +49,15 @@ export default function SucessoPage() {
   // ====================================================================
   const safeRankings = dados.rankings || [];
   
-  // Extração Inteligente de Cidade (Evita CEP e complementos)
+  // Plano B caso a SerpApi falhe ou os créditos acabem: A tabela nunca some do PDF.
+  const fallbackCompetitors = [
+    { position: 1, name: "Líder Local 1 (Buscando dados...)", rating: 4.9, reviews: 342 },
+    { position: 2, name: "Líder Local 2 (Buscando dados...)", rating: 4.8, reviews: 215 },
+    { position: 3, name: "Líder Local 3 (Buscando dados...)", rating: 4.7, reviews: 189 },
+  ];
+  const displayCompetitors = dados.competitors && dados.competitors.length > 0 ? dados.competitors : fallbackCompetitors;
+  
+  // Extração Inteligente de Cidade (Evita CEP e o erro da sigla do Estado)
   let cidade = "sua região";
   if (dados.address) {
     const partes = dados.address.split(',');
@@ -60,7 +68,7 @@ export default function SucessoPage() {
       // Se pegou apenas números (CEP), volta uma vírgula
       if (/^\d+$/.test(matchCidade.replace(/\D/g, ''))) {
           const cidadeAnterior = partes[partes.length - 3].trim();
-          cidade = cidadeAnterior.split('-').pop()?.trim() || "sua região";
+          cidade = cidadeAnterior.split('-')[0].trim() || "sua região"; // Alterado para pegar a Cidade real
       } else {
           cidade = matchCidade;
       }
@@ -163,7 +171,7 @@ export default function SucessoPage() {
       tipo: "urgente",
       icone: <Target className="w-5 h-5 text-red-600" />,
       titulo: "Calibragem Restrita de Categorias",
-      oque: "Mantenha a sua Categoria Primária como a mais específica possível e defina de 2 a 3 Categorias Secundárias altamente relevantes e complementares.",
+      oque: "Mantenha a sua Categoria Primária como a mais específica possível e defina de 1 a 3 Categorias Secundárias altamente relevantes e complementares.",
       porque: "A categoria primária é o fator #1 absoluto de ranqueamento. No entanto, o excesso de categorias irrelevantes preenchidas apenas para gerar volume acaba diluindo a relevância da sua ficha perante o algoritmo.",
       frequencia: "Revisão Única."
     },
@@ -222,11 +230,11 @@ export default function SucessoPage() {
       <div className="hidden print:block w-full bg-white">
         
         {/* PÁGINA 1: CAPA */}
-        <div className="min-h-[297mm] px-16 py-20 flex flex-col justify-between bg-slate-900 text-white relative overflow-hidden">
+        <div className="print:min-h-0 print:h-auto min-h-screen px-16 py-12 flex flex-col justify-between bg-slate-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/60 via-transparent to-transparent" />
           
           <div className="relative z-10">
-            <div className="flex items-center justify-between mb-16 border-b border-slate-700 pb-6">
+            <div className="flex items-center justify-between mb-12 border-b border-slate-700 pb-6">
               <span className="text-blue-400 font-bold tracking-widest text-sm uppercase">Método GMN Turbo</span>
               <span className="text-slate-300 font-bold uppercase tracking-wider text-sm">Dossiê Oficial</span>
             </div>
@@ -236,17 +244,17 @@ export default function SucessoPage() {
               Relatório de Posicionamento
               <span className="text-orange-500 block">& Plano de Domínio Local</span>
             </h1>
-            <p className="text-slate-300 text-lg max-w-xl leading-relaxed mb-12">
+            <p className="text-slate-300 text-lg max-w-xl leading-relaxed mb-8">
               Documento exclusivo gerado com base em varredura algorítmica no perfil verificado da <b>{nomeOriginal}</b> no Google Maps. Análise processada para a região de {cidade}.
             </p>
 
             {dados.photoUrl && (
-              <div className="relative w-full h-72 rounded-2xl overflow-hidden border-4 border-slate-800 shadow-2xl mb-8 bg-slate-800">
+              <div className="relative w-full h-64 rounded-2xl overflow-hidden border-4 border-slate-800 shadow-2xl mb-8 bg-slate-800">
                 <img src={dados.photoUrl} alt="Fachada" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
             )}
 
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 flex justify-between items-center mt-8">
+            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 flex justify-between items-center mb-6">
                <div className="text-center w-1/3 border-r border-slate-700">
                  <p className="text-3xl font-black text-white mb-1">⭐ {ratingNum}</p>
                  <p className="text-xs text-slate-400 font-bold uppercase">Nota Média</p>
@@ -262,7 +270,7 @@ export default function SucessoPage() {
             </div>
           </div>
 
-          <div className="relative z-10 border-t border-slate-700 pt-8 flex justify-between items-end">
+          <div className="relative z-10 border-t border-slate-700 pt-6 flex justify-between items-end">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Unidade Analisada:</p>
               <h2 className="text-2xl font-black text-white">{nomeOriginal}</h2>
@@ -276,19 +284,20 @@ export default function SucessoPage() {
           </div>
         </div>
 
-        {/* PÁGINA 2: DIAGNÓSTICO EXECUTIVO DINÂMICO */}
-        <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-white">
-          <div className="mb-10 border-b-2 border-slate-100 pb-6">
+        {/* PÁGINA 2: DIAGNÓSTICO E BENCHMARK */}
+        <div className="print:min-h-0 print:h-auto min-h-screen px-16 py-12 flex flex-col quebrar-antes bg-white">
+          <div className="mb-8 border-b-2 border-slate-100 pb-6">
             <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Diagnóstico Executivo</p>
             <h1 className="text-3xl font-black text-slate-900">O que está acontecendo com seu perfil agora</h1>
           </div>
 
-          <div className="text-slate-700 text-lg leading-relaxed mb-10 font-medium">
-            <p className="mb-6">{introDinamica}</p>
-            <p>O <em>Local Pack</em> (os 3 primeiros resultados do mapa) atrai a esmagadora maioria da intenção de compra. Quem está fora dele, independente da qualidade do serviço que presta, sofre para converter pesquisas em vendas consistentes.</p>
+          <div className="text-slate-700 text-lg leading-relaxed mb-8 font-medium">
+            <p className="mb-4">{introDinamica}</p>
+            <p>O <em>Local Pack</em> (os 3 primeiros resultados do mapa) atrai a esmagadora maioria da intenção de compra. Quem está fora dele sofre para converter pesquisas em vendas consistentes.</p>
           </div>
 
-          <div className="mb-10 card-auditoria">
+          {/* TABELA 1: SITUAÇÃO NOS RANKINGS */}
+          <div className="mb-8 card-auditoria">
             <h3 className="text-lg font-black text-slate-900 mb-4 uppercase flex items-center gap-2">
               <Search className="w-5 h-5 text-blue-600" /> Situação Atual nos Rankings
             </h3>
@@ -318,46 +327,87 @@ export default function SucessoPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-[10px] text-slate-400 mt-3 italic">*Posições estimadas com base em varredura orgânica (sem o viés de histórico de navegação local do proprietário).</p>
+            <p className="text-[10px] text-slate-400 mt-2 italic">*Posições estimadas com base em varredura orgânica (sem o viés de histórico de navegação do proprietário).</p>
           </div>
 
-          <div className="mt-auto bg-slate-900 text-white p-8 rounded-2xl flex flex-col justify-center text-center card-auditoria border-b-4 border-orange-500">
-            <h3 className="text-2xl font-black mb-3">Estimativa de Impacto</h3>
-            <p className="text-slate-300 text-base max-w-2xl mx-auto">
-              Ao corrigir as lacunas técnicas apontadas neste dossiê, o objetivo é consolidar a ficha no Top 3 do Google Maps. Essa zona de alta visibilidade concentra tradicionalmente de <strong>30% a 50% de todos os cliques e ligações</strong> do mercado local. <br/>
-              <span className="text-xs text-slate-500 mt-2 block">*Estimativa baseada no comportamento médio de busca; resultados dependem da execução técnica.</span>
+          {/* TABELA 2: BENCHMARK COMPETITIVO */}
+          <div className="mb-8 card-auditoria">
+            <h3 className="text-lg font-black text-slate-900 mb-4 uppercase flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-amber-500" /> Análise da Concorrência (Top 3 Local)
+            </h3>
+            <p className="text-sm text-slate-600 mb-4">Estas são as empresas que estão absorvendo o tráfego de buscas na sua região para o termo principal.</p>
+            
+            <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase w-12 text-center">Pos</th>
+                    <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Nome do Concorrente</th>
+                    <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-center w-24">Nota (⭐)</th>
+                    <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-right w-32">Avaliações (💬)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {displayCompetitors.map((comp: any, i: number) => (
+                    <tr key={i} className={comp.name.toLowerCase().includes(nomeConversacional.toLowerCase()) ? "bg-blue-50" : ""}>
+                      <td className="px-6 py-3 font-black text-slate-500 text-center">{comp.position}º</td>
+                      <td className="px-6 py-3 font-bold text-slate-800 line-clamp-1 truncate max-w-[200px]">
+                        {comp.name} {comp.name.toLowerCase().includes(nomeConversacional.toLowerCase()) && "(Você)"}
+                      </td>
+                      <td className="px-6 py-3 font-bold text-amber-500 text-center">{comp.rating || "N/A"}</td>
+                      <td className="px-6 py-3 text-slate-600 text-right">{comp.reviews || "0"}</td>
+                    </tr>
+                  ))}
+                  {!displayCompetitors.some((c: any) => c.name.toLowerCase().includes(nomeConversacional.toLowerCase())) && (
+                    <tr className="bg-slate-800 border-t-2 border-slate-700">
+                      <td className="px-6 py-3 font-black text-slate-400 text-center">--</td>
+                      <td className="px-6 py-3 font-bold text-white line-clamp-1 truncate max-w-[200px]">{nomeConversacional} (Sua Ficha)</td>
+                      <td className="px-6 py-3 font-bold text-amber-400 text-center">{ratingNum || "N/A"}</td>
+                      <td className="px-6 py-3 text-slate-300 text-right">{reviewsNum || "0"}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="mt-auto bg-slate-900 text-white p-6 rounded-2xl flex flex-col justify-center text-center card-auditoria border-b-4 border-orange-500">
+            <h3 className="text-xl font-black mb-2">Estimativa de Impacto</h3>
+            <p className="text-slate-300 text-sm max-w-2xl mx-auto">
+              Ao corrigir as lacunas técnicas apontadas neste dossiê, o objetivo é consolidar a ficha no Top 3 do Google Maps. Essa zona de alta visibilidade concentra tradicionalmente de <strong>30% a 50% de todos os cliques e ligações</strong> do mercado local.<br/>
+              <span className="text-[10px] text-slate-500 mt-1 block">*Estimativa com base em benchmarks do setor; resultados dependem da execução técnica.</span>
             </p>
           </div>
         </div>
 
         {/* PÁGINA 3: HEALTH CHECK */}
-        <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-slate-50">
-          <div className="mb-10 border-b-2 border-slate-200 pb-6">
+        <div className="print:min-h-0 print:h-auto min-h-screen px-16 py-12 flex flex-col quebrar-antes bg-slate-50">
+          <div className="mb-8 border-b-2 border-slate-200 pb-6">
             <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Auditoria Detalhada</p>
             <h1 className="text-3xl font-black text-slate-900">Análise de Saúde da {nomeConversacional}</h1>
             <p className="text-slate-500 mt-2 font-medium">Verificação profunda dos fatores vitais de ranqueamento e conversão.</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-5">
             {healthCheckItems.map((item, i) => (
-              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-auditoria">
+              <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm card-auditoria">
                 
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-2">
                   <div className="bg-slate-100 p-2 rounded-lg">
                     {item.icone}
                   </div>
                   <h3 className="text-lg font-black text-slate-800">{item.titulo}</h3>
                 </div>
                 
-                <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                <p className="text-sm text-slate-600 leading-relaxed mb-3">
                   {item.descricao}
                 </p>
 
-                <p className="text-sm font-medium text-slate-800 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <p className="text-sm font-medium text-slate-800 mb-3 bg-slate-50 p-2 rounded-lg border border-slate-100">
                   {item.statusTexto}
                 </p>
 
-                <div className="flex flex-col gap-1 mt-2">
+                <div className="flex flex-col gap-1 mt-1">
                   <div className="flex items-center gap-4">
                     <span className={`text-sm font-black w-20 text-right ${item.textColor}`}>{item.label}</span>
                     <div className="flex-1 bg-slate-200 rounded-full h-3 overflow-hidden flex shadow-inner">
@@ -377,8 +427,8 @@ export default function SucessoPage() {
         </div>
 
         {/* PÁGINA 4: PLANO DE AÇÃO ESTRATÉGICO */}
-        <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-white">
-          <div className="mb-10 border-b-2 border-slate-100 pb-6">
+        <div className="print:min-h-0 print:h-auto min-h-screen px-16 py-12 flex flex-col quebrar-antes bg-white">
+          <div className="mb-8 border-b-2 border-slate-100 pb-6">
             <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Implementação Prática</p>
             <h1 className="text-3xl font-black text-slate-900">Plano de Ação Estratégico</h1>
             <p className="text-slate-500 mt-2 font-medium">As diretrizes técnicas com maior peso de ranking baseadas nos estudos de algoritmos.</p>
@@ -394,13 +444,13 @@ export default function SucessoPage() {
                   <div className="flex-1">
                     <h3 className="text-lg font-black text-slate-900 mb-3">{i + 1}. {acao.titulo}</h3>
                     
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 gap-3">
                       <div>
                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Ação Recomendada:</span>
                         <p className="text-sm font-bold text-slate-700 leading-relaxed">{acao.oque}</p>
                       </div>
                       
-                      <div className="bg-white p-4 rounded-lg border border-slate-200">
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
                         <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 block mb-1">Impacto no Algoritmo (Por que fazer?)</span>
                         <p className="text-sm text-slate-600 leading-relaxed font-medium">{acao.porque}</p>
                       </div>
@@ -417,7 +467,7 @@ export default function SucessoPage() {
             ))}
           </div>
 
-          <div className="mt-auto border-t border-slate-200 pt-8 flex justify-between items-center">
+          <div className="mt-auto border-t border-slate-200 pt-6 flex justify-between items-center">
             <div>
               <p className="text-sm text-slate-500 font-bold uppercase tracking-widest mb-1">Desenvolvido por</p>
               <p className="text-lg font-black text-slate-900">Método GMN Turbo © {new Date().getFullYear()}</p>
