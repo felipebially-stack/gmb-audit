@@ -6,9 +6,9 @@ import { Header } from "@/components/dashboard/header"
 import { HowItWorks } from "@/components/dashboard/how-it-works" 
 import { FaqSection } from "@/components/dashboard/faq-section" 
 import { ExitPopup } from "@/components/dashboard/exit-popup"
-import { AlertTriangle, MapPin, TrendingDown, XCircle, Store, Wrench, Star, EyeOff, Search } from "lucide-react"
+import { AlertTriangle, MapPin, TrendingDown, XCircle, Store, Wrench, Star, EyeOff, Search, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useMemo, useState, useEffect } from "react"
+import { useMemo, useState } from "react"
 
 const ReportGenerator = dynamic(() => import("@/components/dashboard/ReportGenerator"), {
   ssr: false,
@@ -133,7 +133,6 @@ export default function AuditDashboard() {
         return
       }
       
-      // Simulação de Auditoria (Ilusão do Trabalho)
       let currentStep = 0;
       const interval = setInterval(() => {
         currentStep++;
@@ -145,7 +144,7 @@ export default function AuditDashboard() {
         } else {
           setSimulationStep(currentStep);
         }
-      }, 1600); // 1.6 segundos por cada passo (Totalizando 8s de suspense)
+      }, 1600); 
 
     } catch {
       setResult(null)
@@ -159,6 +158,41 @@ export default function AuditDashboard() {
     e.preventDefault(); 
     handleSearch(query);
   }
+
+  // ====================================================================
+  // MOTOR DE COPYWRITING DINÂMICO PARA A TELA DE VENDAS
+  // ====================================================================
+  const getDynamicCopy = () => {
+    if (!result) return { icon: null, title: "", subtitle: "", p1: "", p2: "" };
+    
+    if (healthScore >= 75) {
+      return {
+        icon: <CheckCircle2 className="text-green-500 w-8 h-8 shrink-0" />,
+        title: `A ${result.companyName} tem uma base forte: nota ${healthScore}/100.`,
+        subtitle: `Sua empresa tem autoridade, mas nossa varredura detectou lacunas técnicas. Ajustar isso vai colocar a ${result.companyName} no domínio absoluto das buscas locais.`,
+        p1: `Você já construiu algo que a maioria dos concorrentes não tem: uma boa reputação e clientes fiéis. Mas sabe por que a sua empresa ainda não recebe o dobro de contatos que poderia? Não é culpa do seu serviço. É porque o algoritmo do Google exige otimizações técnicas contínuas para manter você no topo.`,
+        p2: `Mesmo com uma nota forte, pequenas falhas na ficha estão impedindo a ${result.companyName} de monopolizar as buscas da região. Você está deixando dinheiro na mesa para concorrentes muito menores que entenderam como o algoritmo funciona.`,
+      }
+    } else if (healthScore >= 50) {
+      return {
+        icon: <AlertTriangle className="text-yellow-500 w-8 h-8 shrink-0" />,
+        title: `Atenção: A ${result.companyName} obteve a nota ${healthScore}/100.`,
+        subtitle: `Sua empresa tem grande potencial, mas falhas técnicas na ficha estão fazendo a ${result.companyName} perder clientes valiosos para a concorrência.`,
+        p1: `O seu negócio tem potencial, mas sabe por que o telefone não toca tanto quanto deveria? Não é culpa do seu preço. É porque o algoritmo do Google mudou, e os seus concorrentes aprenderam a jogar o jogo.`,
+        p2: `Com a nota de ${healthScore}/100, a ${result.companyName} não tem força algorítmica para segurar o topo. Pior: você está entregando clientes de mão beijada para a concorrência todos os dias simplesmente por falta de ajustes técnicos.`,
+      }
+    } else {
+      return {
+        icon: <TrendingDown className="text-red-500 w-8 h-8 shrink-0" />,
+        title: `Risco de Vendas: A ${result.companyName} tirou nota ${healthScore}/100.`,
+        subtitle: `Nossa varredura detectou que a ${result.companyName} está praticamente invisível no Google Maps. Seus clientes estão ligando para o seu concorrente.`,
+        p1: `Sabe por que o seu telefone parou de tocar e as vendas caíram? Não é culpa da economia ou do seu preço. É porque você está quase invisível no Google Maps, e os seus concorrentes tomaram o seu lugar.`,
+        p2: `Se a ficha da ${result.companyName} apresenta a pontuação que você acabou de ver acima, você nunca será uma dessas 3 opções. Seus clientes estão fechando com a concorrência simplesmente porque não encontram o seu negócio.`,
+      }
+    }
+  };
+
+  const copy = getDynamicCopy();
 
   return (
     <div className="min-h-screen bg-slate-50 relative">
@@ -324,7 +358,7 @@ export default function AuditDashboard() {
           </div>
         )}
         
-        {/* RESULTADO (TEXTOS PERSONALIZADOS) */}
+        {/* RESULTADO (TEXTOS PERSONALIZADOS E RANKING DE PALAVRAS-CHAVE) */}
         {result && result.rating && !isSimulating && (
           <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
             <div className="mb-10 text-center">
@@ -349,38 +383,71 @@ export default function AuditDashboard() {
                   </div>
                 </div>
                 
-                <h3 className="text-2xl sm:text-3xl font-black text-white mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <AlertTriangle className="text-yellow-500 w-8 h-8 shrink-0" />
-                  {/* TEXTO PERSONALIZADO AQUI */}
-                  <span>O perfil da {result.companyName} obteve a nota {healthScore}/100.</span>
+                <h3 className="text-2xl sm:text-3xl font-black text-white mt-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
+                  {copy.icon}
+                  <span>{copy.title}</span>
                 </h3>
                 <p className="text-lg sm:text-xl text-slate-300 mt-4 font-medium max-w-2xl">
-                  {/* TEXTO PERSONALIZADO AQUI */}
-                  Nossa varredura detectou que a {result.companyName} está praticamente invisível para grande parte dos clientes buscando por seus serviços.
+                  {copy.subtitle}
                 </p>
+
+                {/* BLOCO: RANKING DE PALAVRAS-CHAVE NA TELA DE VENDAS */}
+                <div className="w-full max-w-2xl mt-12 text-left bg-slate-800/50 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-inner">
+                  <h4 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <Search className="text-blue-400 w-6 h-6" />
+                    Como os clientes te veem hoje:
+                  </h4>
+                  <div className="space-y-3">
+                    {keywordRankings && keywordRankings.length > 0 ? (
+                      keywordRankings.map((kw, i) => (
+                        <div key={i} className="flex items-center justify-between bg-slate-900 p-4 rounded-xl border border-slate-700">
+                          <span className="text-slate-300 font-medium capitalize truncate pr-4">{kw.keyword}</span>
+                          <div className="flex items-center shrink-0">
+                            {kw.position && kw.position <= 3 ? (
+                              <span className="bg-green-500/10 text-green-400 px-3 py-1.5 rounded-lg text-sm font-bold border border-green-500/20">Top {kw.position}</span>
+                            ) : kw.position && kw.position <= 10 ? (
+                              <span className="bg-yellow-500/10 text-yellow-400 px-3 py-1.5 rounded-lg text-sm font-bold border border-yellow-500/20">Posição {kw.position}</span>
+                            ) : (
+                              <span className="bg-red-500/10 text-red-400 px-3 py-1.5 rounded-lg text-sm font-bold border border-red-500/20 flex items-center gap-1.5">
+                                <XCircle className="w-4 h-4"/> Invisível
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-slate-400 text-sm">Realizando varredura de termos...</p>
+                    )}
+                  </div>
+                </div>
               </div>
 
+              {/* A CARTA DE VENDAS DINÂMICA ABAIXO DO QUADRO ESCURO */}
               <div className="p-8 sm:p-14 space-y-8 text-lg text-slate-700 leading-relaxed font-medium">
-                <p>Sabe por que o seu telefone parou de tocar? <strong className="text-slate-900">Não é culpa da economia ou do seu preço.</strong> É porque o algoritmo do Google Meu Negócio mudou, e os seus concorrentes aprenderam a jogar o jogo.</p>
+                <p>{copy.p1}</p>
                 <p>Pense no seu cliente ideal. Quando ele pega o celular precisando urgente do seu serviço, o Google mostra <strong>apenas 3 empresas no mapa</strong>.</p>
+                
                 <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl">
                   <p className="flex items-start gap-3 text-red-900">
                     <TrendingDown className="w-6 h-6 shrink-0 mt-1" />
                     <span>Essas 3 empresas levam <strong>60% de todos os cliques e ligações da cidade</strong>.</span>
                   </p>
                 </div>
-                {/* TEXTO PERSONALIZADO AQUI */}
-                <p>Se a ficha da {result.companyName} apresenta a pontuação que você acabou de ver acima, <strong>você nunca será uma dessas 3 opções.</strong> Pior: você está entregando dinheiro de mão beijada para a concorrência todos os dias.</p>
+                
+                <p>{copy.p2}</p>
+                
                 <h4 className="text-2xl font-black text-slate-900 pt-6">A Solução Rápida</h4>
                 <p>Nossa Inteligência Artificial cruzou os dados da sua ficha com as diretrizes oficiais do Google e encontrou exatamente o que está travando o seu perfil. Nós agrupamos as falhas e a solução em um <strong>Plano de Domínio Local (PDF)</strong> mastigado para você.</p>
+                
                 <ul className="space-y-4 bg-slate-50 p-6 rounded-xl border border-slate-200 text-base">
                   <li className="flex gap-3"><span className="text-green-500 font-black">✓</span> <strong>A Auditoria:</strong> Descubra para quais palavras-chave você simplesmente não existe.</li>
                   <li className="flex gap-3"><span className="text-green-500 font-black">✓</span> <strong>O Kit Copie e Cole:</strong> A IA já escreveu a sua nova descrição e o roteiro das suas postagens. É só copiar.</li>
                   <li className="flex gap-3"><span className="text-green-500 font-black">✓</span> <strong>O Checklist de 7 Dias:</strong> As tarefas urgentes para fazer o algoritmo devolver as suas ligações em 72 horas.</li>
                 </ul>
-                <p className="pt-4">Você pode tentar adivinhar o que está errado e perder semanas testando, ou pode receber o plano exato do que alterar hoje para o telefone voltar a tocar.</p>
+                
+                <p className="pt-4">Você pode tentar adivinhar o que está errado e perder semanas testando, ou pode receber o plano exato do que alterar hoje para dominar a sua região.</p>
                 <p>Uma consultoria de SEO Local não sairia por menos de R$ 197,00 no mercado. Mas hoje, liberar o seu Relatório Executivo e o Plano de Ação completo custa <strong>apenas R$ 9,97</strong>.</p>
-                <p className="text-center font-bold text-slate-900 text-xl py-4">Menos de dez reais para destravar as vendas da sua empresa.</p>
+                <p className="text-center font-bold text-slate-900 text-xl py-4">Menos de dez reais para destravar os resultados da sua empresa.</p>
 
                 <ReportGenerator
                   companyName={result.companyName || ""}
