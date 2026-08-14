@@ -3,6 +3,15 @@
 import { useEffect, useState } from "react";
 import { CheckCircle2, Download, Star, MapPin, Search, Clock, ShieldAlert, Image as ImageIcon, Link as LinkIcon, MessageSquare, Video, HelpCircle, Target } from "lucide-react";
 
+// Função para formatar as palavras-chave corretamente (Title Case)
+const toTitleCase = (str: string) => {
+  const minorWords = ['de', 'da', 'do', 'das', 'dos', 'e', 'em', 'na', 'no', 'nas', 'nos', 'a', 'o', 'as', 'os', 'por', 'para', 'com'];
+  return str.toLowerCase().split(' ').map((word, index) => {
+    if (index > 0 && minorWords.includes(word)) return word;
+    return word.charAt(0).toUpperCase() + word.substring(1);
+  }).join(' ');
+};
+
 export default function SucessoPage() {
   const [dados, setDados] = useState<any>(null);
 
@@ -40,15 +49,21 @@ export default function SucessoPage() {
   // ====================================================================
   const safeRankings = dados.rankings || [];
   
-  // Extração inteligente de cidade (evita puxar "Lj b" ou "Sala 3")
+  // Extração Inteligente de Cidade (Evita CEP e complementos)
   let cidade = "sua região";
   if (dados.address) {
-    const match = dados.address.match(/-\s*([^,-]+),\s*[A-Z]{2}\b/);
-    if (match && match[1]) {
-      cidade = match[1].trim();
-    } else {
-      const partes = dados.address.split('-');
-      if (partes.length > 1) cidade = partes[partes.length - 1].split(',')[0].trim();
+    const partes = dados.address.split(',');
+    if (partes.length >= 3) {
+      const possivelCidadeEstado = partes[partes.length - 2].trim();
+      const matchCidade = possivelCidadeEstado.split('-')[0].trim();
+      
+      // Se pegou apenas números (CEP), volta uma vírgula
+      if (/^\d+$/.test(matchCidade.replace(/\D/g, ''))) {
+          const cidadeAnterior = partes[partes.length - 3].trim();
+          cidade = cidadeAnterior.split('-').pop()?.trim() || "sua região";
+      } else {
+          cidade = matchCidade;
+      }
     }
   }
 
@@ -60,8 +75,7 @@ export default function SucessoPage() {
   let nomeConversacional = nomeOriginal.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').split(/[-|]/)[0].trim();
   if (nomeConversacional.split(' ').length > 4) nomeConversacional = nomeConversacional.split(' ').slice(0, 3).join(' ');
 
-  // Termo dinâmico para evitar o bug de template clonado no plano de ação
-  const termoExemplo = safeRankings.length > 0 ? safeRankings[0].keyword : `Melhores serviços em ${cidade}`;
+  const termoExemplo = safeRankings.length > 0 ? toTitleCase(safeRankings[0].keyword) : `Melhores serviços em ${cidade}`;
 
   let introDinamica = "";
   if (reviewsNum > 500) {
@@ -73,7 +87,7 @@ export default function SucessoPage() {
   }
 
   // ====================================================================
-  // HEALTH CHECK DETALHADO (ESCALA CORRIGIDA)
+  // HEALTH CHECK DETALHADO
   // ====================================================================
   const checkStatus = (isGood: boolean, isFair: boolean) => {
     if (isGood) return { label: "Bom", percent: 100, color: "bg-green-500", textColor: "text-green-600" };
@@ -85,56 +99,56 @@ export default function SucessoPage() {
     {
       icone: <Star className="w-5 h-5 text-slate-700" />,
       titulo: "Média de Avaliações",
-      descricao: "Analisa se a pontuação média está competitiva em relação aos concorrentes do Local Pack. Uma pontuação adequada atrai cliques e transmite segurança.",
+      descricao: "Analisa se a pontuação média está competitiva em relação aos concorrentes do Local Pack.",
       statusTexto: ratingNum >= 4.5 ? "Sua nota é excelente e altamente competitiva." : (ratingNum >= 4.0 ? "Nota aceitável, mas requer atenção frente à média do Top 3 local." : "A média de avaliações está abaixo do padrão competitivo local."),
       ...checkStatus(ratingNum >= 4.5, ratingNum >= 4.0)
     },
     {
       icone: <MessageSquare className="w-5 h-5 text-slate-700" />,
       titulo: "Quantidade de Avaliações",
-      descricao: "Mede a constância e o volume de avaliações, responsáveis por grande parte do peso de autoridade do algoritmo.",
+      descricao: "Mede a constância e o volume de avaliações, responsáveis por grande parte do peso de autoridade.",
       statusTexto: reviewsNum >= 50 ? "O negócio possui uma quantidade de avaliações sólida." : "A quantidade de avaliações precisa ser escalonada para o algoritmo gerar tração.",
       ...checkStatus(reviewsNum >= 50, reviewsNum >= 15)
     },
     {
       icone: <ShieldAlert className="w-5 h-5 text-slate-700" />,
       titulo: "Nome do Negócio (Alerta de Suspensão)",
-      descricao: "O nome deve ser exatamente o da fachada. O uso de palavras-chave extras (keyword stuffing) é um dos principais motivos de suspensão por denúncia.",
-      statusTexto: nomeOriginal.length < 50 ? "O nome do negócio está dentro dos limites de segurança primários." : "Alerta: O nome longo indica possível excesso de palavras-chave, gerando risco alto de banimento manual.",
+      descricao: "O nome deve ser exatamente o da fachada. O uso de palavras-chave extras (keyword stuffing) é motivo de suspensão.",
+      statusTexto: nomeOriginal.length < 50 ? "O nome do negócio está dentro dos limites de segurança primários." : "Alerta: O nome longo indica possível excesso de palavras-chave (risco de banimento).",
       ...checkStatus(nomeOriginal.length < 50, nomeOriginal.length < 70)
     },
     {
       icone: <ImageIcon className="w-5 h-5 text-slate-700" />,
       titulo: "Volume e Recência de Fotos",
-      descricao: "O algoritmo não prioriza GPS (geotagging) nas fotos, mas exige estritamente qualidade e recência para atestar atividade contínua.",
+      descricao: "O algoritmo exige qualidade e recência nas fotos publicadas para atestar atividade contínua.",
       statusTexto: healthScore >= 60 ? "O negócio possui uma presença visual aceitável." : "Faltam fotos de alta qualidade publicadas recentemente pelo proprietário.",
       ...checkStatus(healthScore >= 80, healthScore >= 50)
     },
     {
       icone: <Clock className="w-5 h-5 text-slate-700" />,
       titulo: "Atividade de Postagens (Updates)",
-      descricao: "Posts mantêm o perfil ativo. Embora não alterem diretamente o ranqueamento orgânico, são excelentes para conversão e sinalização ao usuário.",
+      descricao: "Posts mantêm o perfil ativo e são excelentes para conversão e sinalização ao usuário.",
       statusTexto: healthScore >= 70 ? "Postagens recentes detectadas." : "Já fazem dias desde a última atualização. O perfil tende a esfriar.",
       ...checkStatus(healthScore >= 80, healthScore >= 50)
     },
     {
       icone: <Video className="w-5 h-5 text-slate-700" />,
       titulo: "Mídia - Vídeos",
-      descricao: "Vídeos curtos aumentam drasticamente a retenção do usuário. São recomendados como fator extra de conversão (não afetam ranking estrutural).",
+      descricao: "Vídeos curtos aumentam drasticamente a retenção do usuário. (Não afetam ranking estrutural diretamente).",
       statusTexto: "Ausência de vídeos recentes detectada. (Oportunidade extra de engajamento).",
       ...checkStatus(false, true)
     },
     {
       icone: <HelpCircle className="w-5 h-5 text-slate-700" />,
-      titulo: "Respostas a Clientes",
-      descricao: "Responder a todas as avaliações indica ao Google que há um gestor ativo. Os consumidores preferem negócios altamente responsivos.",
+      titulo: "Respostas e Q&A",
+      descricao: "Responder a todas as avaliações e perguntas indica ao Google que há um gestor ativo cuidando da ficha.",
       statusTexto: healthScore >= 60 ? "Boa manutenção de relacionamento (respostas ativas)." : "Existem pendências no relacionamento (avaliações sem resposta recente).",
       ...checkStatus(healthScore >= 75, healthScore >= 40)
     }
   ];
 
   // ====================================================================
-  // PLANO DE AÇÃO ESTRATÉGICO (BLINDADO LEGALMENTE)
+  // PLANO DE AÇÃO ESTRATÉGICO
   // ====================================================================
   const planoDeAcao = [
     {
@@ -149,8 +163,8 @@ export default function SucessoPage() {
       tipo: "urgente",
       icone: <Target className="w-5 h-5 text-red-600" />,
       titulo: "Calibragem Restrita de Categorias",
-      oque: "Mantenha a sua Categoria Primária como a mais específica possível e defina, de preferência, apenas 1 Categoria Secundária altamente relevante.",
-      porque: "A categoria primária é o fator #1 absoluto de ranqueamento. O estudo da BrightLocal indica que empresas com apenas 1 categoria adicional tendem a obter a melhor média de posicionamento. Excesso de categorias dilui sua relevância.",
+      oque: "Mantenha a sua Categoria Primária como a mais específica possível e defina de 2 a 3 Categorias Secundárias altamente relevantes e complementares.",
+      porque: "A categoria primária é o fator #1 absoluto de ranqueamento. No entanto, o excesso de categorias irrelevantes preenchidas apenas para gerar volume acaba diluindo a relevância da sua ficha perante o algoritmo.",
       frequencia: "Revisão Única."
     },
     {
@@ -158,14 +172,14 @@ export default function SucessoPage() {
       icone: <Star className="w-5 h-5 text-yellow-600" />,
       titulo: "Crescimento Sustentado de Reviews",
       oque: "Crie um fluxo de captação orgânica contínua (ex: automação no WhatsApp após o serviço). O segredo não é a quantidade abrupta, mas a constância.",
-      porque: "O peso somado da sua ficha com as avaliações dita quase metade (~48%) da sua força de ranking (Whitespark). O Google pune envios em massa (rajadas). Além disso, estagnar sem novas avaliações pode derrubar suas posições num período de 90 a 180 dias.",
+      porque: "A sua ficha somada às avaliações dita quase metade (~48%) da sua força de ranking (Whitespark). O Google pune envios em massa (rajadas), e estagnar sem novas avaliações pode derrubar suas posições num período de 30 a 60 dias.",
       frequencia: "Constante e Escalonada. Fuja de picos artificiais."
     },
     {
       tipo: "otimizacao",
       icone: <LinkIcon className="w-5 h-5 text-yellow-600" />,
       titulo: "Sincronização de Dados (NAP)",
-      oque: "Assegure-se de que o Nome, Endereço e Telefone (NAP) no seu site e nas redes sociais sejam idênticos aos dados do Google Maps.",
+      oque: "Assegure-se de que o Nome, Endereço e Telefone (NAP) no seu site, redes sociais e diretórios locais sejam idênticos aos dados do Google Maps.",
       porque: "Inconsistências (como usar 'R.' no site e 'Rua' no Google) confundem os rastreadores. O alinhamento perfeito dessas citações externas é vital para confirmar a sua autoridade local perante o algoritmo.",
       frequencia: "Revisão Semestral."
     }
@@ -289,7 +303,7 @@ export default function SucessoPage() {
                 <tbody className="divide-y divide-slate-100">
                   {safeRankings.length > 0 ? safeRankings.map((kw: any, i: number) => (
                     <tr key={i}>
-                      <td className="px-6 py-4 font-bold text-slate-800 capitalize">{kw.keyword}</td>
+                      <td className="px-6 py-4 font-bold text-slate-800">{toTitleCase(kw.keyword)}</td>
                       <td className="px-6 py-4 text-right">
                         {kw.position && kw.position <= 3 ? (
                           <span className="text-green-600 font-black bg-green-50 px-3 py-1 rounded-md">{kw.position}º Lugar</span>
@@ -316,7 +330,7 @@ export default function SucessoPage() {
           </div>
         </div>
 
-        {/* PÁGINA 3: HEALTH CHECK (RAIO-X VISUAL CORRIGIDO) */}
+        {/* PÁGINA 3: HEALTH CHECK */}
         <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-slate-50">
           <div className="mb-10 border-b-2 border-slate-200 pb-6">
             <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Auditoria Detalhada</p>
@@ -345,13 +359,12 @@ export default function SucessoPage() {
 
                 <div className="flex flex-col gap-1 mt-2">
                   <div className="flex items-center gap-4">
-                    <span className={`text-sm font-black w-20 ${item.textColor}`}>{item.label}</span>
+                    <span className={`text-sm font-black w-20 text-right ${item.textColor}`}>{item.label}</span>
                     <div className="flex-1 bg-slate-200 rounded-full h-3 overflow-hidden flex shadow-inner">
                       <div className={`h-full ${item.color} transition-all duration-1000`} style={{ width: `${item.percent}%` }}></div>
                     </div>
                   </div>
-                  {/* Escala Corrigida (Fraco -> Razoável -> Bom) */}
-                  <div className="flex justify-between pl-24 pr-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                  <div className="flex justify-between pl-28 pr-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                     <span>Fraco</span>
                     <span>Razoável</span>
                     <span>Bom</span>
@@ -363,7 +376,7 @@ export default function SucessoPage() {
           </div>
         </div>
 
-        {/* PÁGINA 4: PLANO DE AÇÃO ESTRATÉGICO (BLINDADO) */}
+        {/* PÁGINA 4: PLANO DE AÇÃO ESTRATÉGICO */}
         <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-white">
           <div className="mb-10 border-b-2 border-slate-100 pb-6">
             <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Implementação Prática</p>
