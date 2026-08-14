@@ -449,7 +449,7 @@ export async function POST(request: Request) {
 
     const companyName = place.displayName?.text ?? resolvedInput.searchText
     const city = extractCity(place)
-    const serpApiKey = process.env.SERPAPI_API_KEY || null
+    const serpApiKey = "5c29a972723c8b32ceefe8e45907c56ae9223d7d45025878fd641dc8ce7fc764";
     const dynamicSeeds = buildDynamicSerpKeywords(place, city)
 
     let photoUrl: string | null = null
