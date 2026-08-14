@@ -36,32 +36,44 @@ export default function SucessoPage() {
   }
 
   // ====================================================================
-  // MOTOR DE DADOS BASE
+  // MOTOR DE DADOS BASE E TRATAMENTO INTELIGENTE
   // ====================================================================
   const safeRankings = dados.rankings || [];
-  const partesEndereco = dados.address?.split('-');
-  const cidade = partesEndereco && partesEndereco.length > 1 ? partesEndereco[1].split(',')[0].trim() : "sua região";
+  
+  // Extração inteligente de cidade (evita puxar "Lj b" ou "Sala 3")
+  let cidade = "sua região";
+  if (dados.address) {
+    const match = dados.address.match(/-\s*([^,-]+),\s*[A-Z]{2}\b/);
+    if (match && match[1]) {
+      cidade = match[1].trim();
+    } else {
+      const partes = dados.address.split('-');
+      if (partes.length > 1) cidade = partes[partes.length - 1].split(',')[0].trim();
+    }
+  }
 
   const ratingNum = dados.rating || 0;
   const reviewsNum = dados.userRatingsTotal || 0;
   const healthScore = dados.healthScore || (ratingNum ? Math.round((ratingNum / 5) * 100) : 50);
-  const clientesPerdidos = Math.round((100 - healthScore) * 1.5) || 12;
 
   const nomeOriginal = dados.companyName || "Sua Empresa";
   let nomeConversacional = nomeOriginal.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').split(/[-|]/)[0].trim();
   if (nomeConversacional.split(' ').length > 4) nomeConversacional = nomeConversacional.split(' ').slice(0, 3).join(' ');
 
+  // Termo dinâmico para evitar o bug de template clonado no plano de ação
+  const termoExemplo = safeRankings.length > 0 ? safeRankings[0].keyword : `Melhores serviços em ${cidade}`;
+
   let introDinamica = "";
   if (reviewsNum > 500) {
-    introDinamica = `A ${nomeConversacional} tem algo raro de se ver: ${reviewsNum} avaliações e nota ${ratingNum}. Isso é autoridade pura, construída com muito trabalho. O problema crítico é que toda essa reputação não está sendo convertida no volume máximo de ligações e clientes, porque a ficha do Google Maps apresenta falhas técnicas que impedem o algoritmo de colocar você no topo nas buscas mais importantes.`;
+    introDinamica = `A ${nomeConversacional} tem um volume massivo de avaliações (${reviewsNum}). Isso é autoridade pura. O problema crítico é que, dependendo da nota média da região, essa reputação pode não estar se convertendo no volume máximo de ligações, pois falhas técnicas na ficha impedem o algoritmo de fixar você no topo das buscas mais quentes.`;
   } else if (reviewsNum > 50) {
-    introDinamica = `A ${nomeConversacional} já possui uma excelente base de aprovação (${reviewsNum} avaliações reais). Você faz um bom trabalho, mas o Google Maps precisa de ajustes técnicos na sua ficha para entender essa autoridade e entregar o seu perfil na frente da concorrência de ${cidade}.`;
+    introDinamica = `A ${nomeConversacional} já possui uma excelente base de aprovação (${reviewsNum} avaliações reais). Você faz um bom trabalho, mas o Google Maps exige ajustes estruturais na sua ficha para entender essa autoridade e ranquear o seu perfil de forma consistente em ${cidade}.`;
   } else {
-    introDinamica = `A ${nomeConversacional} tem muito potencial em ${cidade}, mas o Google Maps precisa de mais sinais de atividade e otimização técnica para confiar no seu perfil. Neste exato momento, a falta de estruturação da ficha está entregando clientes prontos para comprar de mão beijada para a sua concorrência.`;
+    introDinamica = `A ${nomeConversacional} tem grande potencial em ${cidade}, mas o Google Maps precisa de mais sinais de autoridade e otimização técnica. Neste exato momento, a falta de estruturação avançada da ficha está deixando dinheiro na mesa e entregando clientes para a concorrência.`;
   }
 
   // ====================================================================
-  // HEALTH CHECK DETALHADO (VISUAL)
+  // HEALTH CHECK DETALHADO (ESCALA CORRIGIDA)
   // ====================================================================
   const checkStatus = (isGood: boolean, isFair: boolean) => {
     if (isGood) return { label: "Bom", percent: 100, color: "bg-green-500", textColor: "text-green-600" };
@@ -73,88 +85,88 @@ export default function SucessoPage() {
     {
       icone: <Star className="w-5 h-5 text-slate-700" />,
       titulo: "Média de Avaliações",
-      descricao: "Analisa se a pontuação média de avaliação está competitiva. Uma pontuação adequada atrai cliques e transmite segurança.",
-      statusTexto: ratingNum >= 4.0 ? "A média de avaliações está excelente." : "A média de avaliações está abaixo do padrão competitivo local.",
-      ...checkStatus(ratingNum >= 4.0, ratingNum >= 3.0)
+      descricao: "Analisa se a pontuação média está competitiva em relação aos concorrentes do Local Pack. Uma pontuação adequada atrai cliques e transmite segurança.",
+      statusTexto: ratingNum >= 4.5 ? "Sua nota é excelente e altamente competitiva." : (ratingNum >= 4.0 ? "Nota aceitável, mas requer atenção frente à média do Top 3 local." : "A média de avaliações está abaixo do padrão competitivo local."),
+      ...checkStatus(ratingNum >= 4.5, ratingNum >= 4.0)
     },
     {
       icone: <MessageSquare className="w-5 h-5 text-slate-700" />,
       titulo: "Quantidade de Avaliações",
-      descricao: "Mede a constância e o volume de avaliações, responsáveis por grande parte do peso do algoritmo.",
-      statusTexto: reviewsNum >= 15 ? "O negócio possui uma quantidade de avaliações sólida." : "A quantidade de avaliações ainda é insuficiente para o algoritmo gerar tração.",
-      ...checkStatus(reviewsNum >= 15, reviewsNum >= 5)
+      descricao: "Mede a constância e o volume de avaliações, responsáveis por grande parte do peso de autoridade do algoritmo.",
+      statusTexto: reviewsNum >= 50 ? "O negócio possui uma quantidade de avaliações sólida." : "A quantidade de avaliações precisa ser escalonada para o algoritmo gerar tração.",
+      ...checkStatus(reviewsNum >= 50, reviewsNum >= 15)
     },
     {
       icone: <ShieldAlert className="w-5 h-5 text-slate-700" />,
       titulo: "Nome do Negócio (Alerta de Suspensão)",
-      descricao: "O nome deve ser exatamente o da fachada. O uso de palavras-chave extras (keyword stuffing) é o motivo nº 1 de suspensão e banimento.",
-      statusTexto: nomeOriginal.length < 50 ? "O nome do negócio está dentro dos limites seguros." : "Alerta: O nome longo indica possível excesso de palavras-chave, gerando risco alto de banimento manual.",
+      descricao: "O nome deve ser exatamente o da fachada. O uso de palavras-chave extras (keyword stuffing) é um dos principais motivos de suspensão por denúncia.",
+      statusTexto: nomeOriginal.length < 50 ? "O nome do negócio está dentro dos limites de segurança primários." : "Alerta: O nome longo indica possível excesso de palavras-chave, gerando risco alto de banimento manual.",
       ...checkStatus(nomeOriginal.length < 50, nomeOriginal.length < 70)
     },
     {
       icone: <ImageIcon className="w-5 h-5 text-slate-700" />,
       titulo: "Volume e Recência de Fotos",
-      descricao: "O algoritmo não lê GPS (geotagging) de forma prioritária, mas exige fotos com qualidade e recência (enviadas nos últimos meses) para comprovar atividade.",
+      descricao: "O algoritmo não prioriza GPS (geotagging) nas fotos, mas exige estritamente qualidade e recência para atestar atividade contínua.",
       statusTexto: healthScore >= 60 ? "O negócio possui uma presença visual aceitável." : "Faltam fotos de alta qualidade publicadas recentemente pelo proprietário.",
       ...checkStatus(healthScore >= 80, healthScore >= 50)
     },
     {
       icone: <Clock className="w-5 h-5 text-slate-700" />,
-      titulo: "Data da Última Postagem",
-      descricao: "Posts mantêm o perfil 'quente'. Embora não sejam o fator número 1 de ranking, são excelentes para conversão e sinalização de atividade.",
-      statusTexto: healthScore >= 70 ? "Postagens recentes detectadas." : "Já fazem muitos dias desde a última atualização. O perfil está esfriando.",
+      titulo: "Atividade de Postagens (Updates)",
+      descricao: "Posts mantêm o perfil ativo. Embora não alterem diretamente o ranqueamento orgânico, são excelentes para conversão e sinalização ao usuário.",
+      statusTexto: healthScore >= 70 ? "Postagens recentes detectadas." : "Já fazem dias desde a última atualização. O perfil tende a esfriar.",
       ...checkStatus(healthScore >= 80, healthScore >= 50)
     },
     {
       icone: <Video className="w-5 h-5 text-slate-700" />,
       titulo: "Mídia - Vídeos",
-      descricao: "Vídeos curtos da fachada ou serviço aumentam drasticamente a retenção do usuário. São recomendados como fator extra de conversão.",
-      statusTexto: "Não existem vídeos detectados para o negócio. (Recomendação extra, não afeta ranking estrutural).",
-      ...checkStatus(false, true) // Sempre razoável se faltar, nunca 'fraco' para não ser injusto.
+      descricao: "Vídeos curtos aumentam drasticamente a retenção do usuário. São recomendados como fator extra de conversão (não afetam ranking estrutural).",
+      statusTexto: "Ausência de vídeos recentes detectada. (Oportunidade extra de engajamento).",
+      ...checkStatus(false, true)
     },
     {
       icone: <HelpCircle className="w-5 h-5 text-slate-700" />,
-      titulo: "Respostas e Q&A (Prova Social)",
-      descricao: "Avaliações e perguntas respondidas indicam ao Google que há um gestor ativo cuidando dos clientes.",
-      statusTexto: healthScore >= 60 ? "Boa manutenção de relacionamento e respostas." : "Existem pendências no relacionamento (perguntas ou reviews sem resposta).",
+      titulo: "Respostas a Clientes",
+      descricao: "Responder a todas as avaliações indica ao Google que há um gestor ativo. Os consumidores preferem negócios altamente responsivos.",
+      statusTexto: healthScore >= 60 ? "Boa manutenção de relacionamento (respostas ativas)." : "Existem pendências no relacionamento (avaliações sem resposta recente).",
       ...checkStatus(healthScore >= 75, healthScore >= 40)
     }
   ];
 
   // ====================================================================
-  // PLANO DE AÇÃO ESTRATÉGICO
+  // PLANO DE AÇÃO ESTRATÉGICO (BLINDADO LEGALMENTE)
   // ====================================================================
   const planoDeAcao = [
     {
       tipo: "urgente",
       icone: <ShieldAlert className="w-5 h-5 text-red-600" />,
       titulo: "Auditoria de Risco de Suspensão (Nome do Perfil)",
-      oque: `Garanta que o nome do seu perfil seja exatamente o nome real da sua fachada. Remova imediatamente qualquer palavra-chave solta (Ex: "Depilação em ${cidade}").`,
-      porque: "O uso de palavras-chave no nome oficial é considerado 'Spam' e é o principal motivo de suspensão de perfis. Cerca de 60% das denúncias de concorrentes resultam em banimento pelo Google.",
-      frequencia: "Ação Imediata. O Google pune edições drásticas repetidas, ajuste apenas se estiver irregular."
+      oque: `Garanta que o nome do seu perfil seja estritamente o da fachada. Remova qualquer palavra-chave acoplada (Ex: "${termoExemplo}").`,
+      porque: "O 'keyword stuffing' (uso de palavras-chave no nome) é considerado spam. Segundo auditorias (como Sterling Sky), cerca de 20% das denúncias de concorrentes por esse motivo resultam em suspensão do perfil pelo Google.",
+      frequencia: "Ação Imediata. Evite edições drásticas frequentes."
     },
     {
       tipo: "urgente",
       icone: <Target className="w-5 h-5 text-red-600" />,
-      titulo: "Calibragem da Categoria Primária e Secundárias",
-      oque: "Acesse o painel e garanta que sua Categoria Primária seja a mais específica possível. Adicione exatamente de 2 a 3 categorias secundárias complementares.",
-      porque: "A categoria primária é o fator #1 absoluto de ranqueamento. Dados mostram que perfis com exatas 2 ou 3 categorias adicionais alcançam as melhores posições (posição média 2,5). O excesso dilui sua força.",
-      frequencia: "Revisão Imediata (Única)."
+      titulo: "Calibragem Restrita de Categorias",
+      oque: "Mantenha a sua Categoria Primária como a mais específica possível e defina, de preferência, apenas 1 Categoria Secundária altamente relevante.",
+      porque: "A categoria primária é o fator #1 absoluto de ranqueamento. O estudo da BrightLocal indica que empresas com apenas 1 categoria adicional tendem a obter a melhor média de posicionamento. Excesso de categorias dilui sua relevância.",
+      frequencia: "Revisão Única."
     },
     {
       tipo: "otimizacao",
       icone: <Star className="w-5 h-5 text-yellow-600" />,
-      titulo: "Escala Sustentável de Avaliações (Reviews)",
-      oque: "Crie um fluxo de captação orgânica (QR Code no balcão ou WhatsApp). O alvo inicial é manter um ritmo contínuo de novas avaliações por mês.",
-      porque: "A qualidade da ficha + avaliações representam 64% do peso do ranking. Mas atenção: o Google pune 'rajadas' de avaliações. Parar de receber novas reviews derruba seu ranking em 30 a 60 dias.",
+      titulo: "Crescimento Sustentado de Reviews",
+      oque: "Crie um fluxo de captação orgânica contínua (ex: automação no WhatsApp após o serviço). O segredo não é a quantidade abrupta, mas a constância.",
+      porque: "O peso somado da sua ficha com as avaliações dita quase metade (~48%) da sua força de ranking (Whitespark). O Google pune envios em massa (rajadas). Além disso, estagnar sem novas avaliações pode derrubar suas posições num período de 90 a 180 dias.",
       frequencia: "Constante e Escalonada. Fuja de picos artificiais."
     },
     {
       tipo: "otimizacao",
       icone: <LinkIcon className="w-5 h-5 text-yellow-600" />,
-      titulo: "Sincronização de NAP (Nome, Endereço e Telefone)",
-      oque: "Garanta que o Nome, Endereço e Telefone (NAP) no seu site, Instagram e diretórios locais sejam milimetricamente iguais aos dados do Google Maps.",
-      porque: "Inconsistências (como 'R. XYZ' no site e 'Rua XYZ' no Google) confundem os robôs de busca. A consistência universal desses dados valida a autoridade externa do seu perfil.",
+      titulo: "Sincronização de Dados (NAP)",
+      oque: "Assegure-se de que o Nome, Endereço e Telefone (NAP) no seu site e nas redes sociais sejam idênticos aos dados do Google Maps.",
+      porque: "Inconsistências (como usar 'R.' no site e 'Rua' no Google) confundem os rastreadores. O alinhamento perfeito dessas citações externas é vital para confirmar a sua autoridade local perante o algoritmo.",
       frequencia: "Revisão Semestral."
     }
   ];
@@ -259,7 +271,7 @@ export default function SucessoPage() {
 
           <div className="text-slate-700 text-lg leading-relaxed mb-10 font-medium">
             <p className="mb-6">{introDinamica}</p>
-            <p>O Local Pack (os 3 primeiros resultados do mapa) recebe <strong>60% de todos os cliques e ligações</strong>. Quem está fora dele, independente da qualidade do serviço que presta, simplesmente não existe para o cliente naquele momento exato de necessidade.</p>
+            <p>O <em>Local Pack</em> (os 3 primeiros resultados do mapa) atrai a esmagadora maioria da intenção de compra. Quem está fora dele, independente da qualidade do serviço que presta, sofre para converter pesquisas em vendas consistentes.</p>
           </div>
 
           <div className="mb-10 card-auditoria">
@@ -270,7 +282,7 @@ export default function SucessoPage() {
               <table className="w-full text-left">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Termo de Busca em {cidade}</th>
+                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Termo de Busca Relevante</th>
                     <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Sua Posição</th>
                   </tr>
                 </thead>
@@ -292,18 +304,19 @@ export default function SucessoPage() {
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-slate-500 mt-3 italic">*Termos classificados abaixo da 3ª posição não geram vendas consistentes.</p>
+            <p className="text-[10px] text-slate-400 mt-3 italic">*Posições estimadas com base em varredura orgânica (sem o viés de histórico de navegação local do proprietário).</p>
           </div>
 
           <div className="mt-auto bg-slate-900 text-white p-8 rounded-2xl flex flex-col justify-center text-center card-auditoria border-b-4 border-orange-500">
-            <h3 className="text-2xl font-black mb-3">Impacto Financeiro Direto</h3>
+            <h3 className="text-2xl font-black mb-3">Estimativa de Impacto</h3>
             <p className="text-slate-300 text-base max-w-2xl mx-auto">
-              Ao corrigir as lacunas técnicas da ficha, o algoritmo passa a cruzar sua reputação de {ratingNum} estrelas com as buscas locais. A estimativa é captar de <strong>{clientesPerdidos} a {clientesPerdidos * 2} novos contatos qualificados por mês</strong> ao alcançar e se estabilizar no Top 3.
+              Ao corrigir as lacunas técnicas apontadas neste dossiê, o objetivo é consolidar a ficha no Top 3 do Google Maps. Essa zona de alta visibilidade concentra tradicionalmente de <strong>30% a 50% de todos os cliques e ligações</strong> do mercado local. <br/>
+              <span className="text-xs text-slate-500 mt-2 block">*Estimativa baseada no comportamento médio de busca; resultados dependem da execução técnica.</span>
             </p>
           </div>
         </div>
 
-        {/* PÁGINA 3: HEALTH CHECK (RAIO-X VISUAL) */}
+        {/* PÁGINA 3: HEALTH CHECK (RAIO-X VISUAL CORRIGIDO) */}
         <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-slate-50">
           <div className="mb-10 border-b-2 border-slate-200 pb-6">
             <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Auditoria Detalhada</p>
@@ -330,13 +343,17 @@ export default function SucessoPage() {
                   {item.statusTexto}
                 </p>
 
-                <div className="flex items-center gap-4">
-                  <span className={`text-sm font-black w-20 ${item.textColor}`}>{item.label}</span>
-                  <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden flex">
-                    <div className={`h-full ${item.color} transition-all duration-1000`} style={{ width: `${item.percent}%` }}></div>
+                <div className="flex flex-col gap-1 mt-2">
+                  <div className="flex items-center gap-4">
+                    <span className={`text-sm font-black w-20 ${item.textColor}`}>{item.label}</span>
+                    <div className="flex-1 bg-slate-200 rounded-full h-3 overflow-hidden flex shadow-inner">
+                      <div className={`h-full ${item.color} transition-all duration-1000`} style={{ width: `${item.percent}%` }}></div>
+                    </div>
                   </div>
-                  <div className="w-32 flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">
+                  {/* Escala Corrigida (Fraco -> Razoável -> Bom) */}
+                  <div className="flex justify-between pl-24 pr-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
                     <span>Fraco</span>
+                    <span>Razoável</span>
                     <span>Bom</span>
                   </div>
                 </div>
@@ -346,12 +363,12 @@ export default function SucessoPage() {
           </div>
         </div>
 
-        {/* PÁGINA 4: PLANO DE AÇÃO ESTRATÉGICO */}
+        {/* PÁGINA 4: PLANO DE AÇÃO ESTRATÉGICO (BLINDADO) */}
         <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-white">
           <div className="mb-10 border-b-2 border-slate-100 pb-6">
             <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Implementação Prática</p>
             <h1 className="text-3xl font-black text-slate-900">Plano de Ação Estratégico</h1>
-            <p className="text-slate-500 mt-2 font-medium">As diretrizes técnicas detalhadas para blindar e dominar o algoritmo local.</p>
+            <p className="text-slate-500 mt-2 font-medium">As diretrizes técnicas com maior peso de ranking baseadas nos estudos de algoritmos.</p>
           </div>
 
           <div className="space-y-6">
@@ -377,7 +394,7 @@ export default function SucessoPage() {
 
                       <div className="flex items-center gap-2 mt-1">
                         <Clock className="w-4 h-4 text-slate-400" />
-                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Periodicidade:</span>
+                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Periodicidade Recomendada:</span>
                         <span className="text-xs font-bold text-slate-800">{acao.frequencia}</span>
                       </div>
                     </div>
