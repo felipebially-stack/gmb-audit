@@ -50,7 +50,7 @@ export default function ReportGenerator({
     // LINK OFICIAL DA KIWIFY
     // ==========================================
     // Substitua o link abaixo pelo seu link de checkout da Kiwify:
-    const KIWIFY_CHECKOUT_URL = "https://pay.kiwify.com.br/SEU_LINK_AQUI";
+    const KIWIFY_CHECKOUT_URL = "https://pay.kiwify.com.br/yM2aUy9";
 
     // Opcional: passa o nome da empresa na URL para rastreio
     const checkoutUrl = new URL(KIWIFY_CHECKOUT_URL);
