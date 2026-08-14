@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Beaker } from "lucide-react";
+import { ArrowRight, FileText, ShieldCheck } from "lucide-react";
 
 interface ReportProps {
   companyName: string;
@@ -9,7 +9,7 @@ interface ReportProps {
   userRatingsTotal: number | null;
   address: string;
   rankings: any[];
-  competitors?: any[]; // ✅ Conectado para receber os concorrentes
+  competitors?: any[];
   healthScore?: number;
   checklistData?: any;
   photoUrl?: string;
@@ -31,14 +31,14 @@ export default function ReportGenerator({
   const irParaPagamento = () => {
     setIsRedirecting(true);
 
-    // Salva todos os dados na memória do navegador para gerar o PDF
+    // Salva todos os dados na memória do navegador para a página de sucesso puxar após o pagamento
     const dadosRelatorio = {
       companyName,
       rating,
       userRatingsTotal,
       address,
       rankings,
-      competitors, // ✅ Salva os concorrentes na memória
+      competitors,
       healthScore,
       checklistData,
       photoUrl
@@ -46,10 +46,18 @@ export default function ReportGenerator({
 
     localStorage.setItem("ultimo_relatorio", JSON.stringify(dadosRelatorio));
 
-    // 🚧 MODO TESTE ATIVO: Vai direto para o PDF sem cobrar nada
-    setTimeout(() => {
-      window.location.href = "/sucesso";
-    }, 800);
+    // ==========================================
+    // LINK OFICIAL DA KIWIFY
+    // ==========================================
+    // Substitua o link abaixo pelo seu link de checkout da Kiwify:
+    const KIWIFY_CHECKOUT_URL = "https://pay.kiwify.com.br/SEU_LINK_AQUI";
+
+    // Opcional: passa o nome da empresa na URL para rastreio
+    const checkoutUrl = new URL(KIWIFY_CHECKOUT_URL);
+    checkoutUrl.searchParams.set("src", encodeURIComponent(companyName));
+
+    // Redireciona o cliente para o checkout oficial
+    window.location.href = checkoutUrl.toString();
   };
 
   return (
@@ -57,19 +65,25 @@ export default function ReportGenerator({
       <button
         onClick={irParaPagamento}
         disabled={isRedirecting || !rating}
-        className="w-full max-w-xl bg-green-600 hover:bg-green-700 text-white font-black py-5 px-8 rounded-2xl shadow-[0_0_30px_rgba(22,163,74,0.3)] transition-all hover:scale-[1.02] disabled:opacity-50 text-xl flex justify-center items-center gap-3 uppercase tracking-wide"
+        className="w-full max-w-xl bg-orange-500 hover:bg-orange-600 text-white font-black py-5 px-8 rounded-2xl shadow-[0_0_40px_rgba(249,115,22,0.4)] transition-all hover:scale-[1.02] disabled:opacity-50 text-xl flex justify-center items-center gap-3 uppercase tracking-wide"
       >
-        {isRedirecting ? "Gerando PDF..." : (
+        {isRedirecting ? (
+          <span className="flex items-center gap-2">
+            <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin" />
+            Redirecionando...
+          </span>
+        ) : (
           <>
-            <Beaker className="w-6 h-6" />
-            [MODO TESTE] GERAR PDF GRÁTIS
+            <FileText className="w-6 h-6" />
+            Liberar Plano de Domínio Local (R$ 9,97)
             <ArrowRight className="w-6 h-6" />
           </>
         )}
       </button>
-      <p className="text-sm text-green-600 mt-4 font-bold flex items-center gap-2">
-        🚧 Bypass Ativado: O checkout está desativado para análises de teste.
-      </p>
+      <div className="flex items-center gap-2 mt-4 text-sm font-bold text-slate-400">
+        <ShieldCheck className="w-5 h-5 text-green-500" />
+        Pagamento 100% Seguro via PIX ou Cartão
+      </div>
     </div>
   );
 }
