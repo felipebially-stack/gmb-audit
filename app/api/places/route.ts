@@ -226,16 +226,16 @@ function extractCity(place: GooglePlace) {
   return null
 }
 
-// DICIONÁRIO DE TRADUÇÃO EXPANDIDO
+// DICIONÁRIO DE TRADUÇÃO EXPANDIDO COM FOCO EM ESTÉTICA E DEPILAÇÃO
 const PLACE_TYPE_PT: Record<string, string> = {
-  medical_clinic: "clínica médica",
-  health: "clínica de saúde",
   laser_hair_removal_service: "clínica de depilação a laser",
   hair_removal_service: "clínica de depilação",
   skin_care_clinic: "clínica de estética",
   beauty_salon: "salão de beleza",
-  hair_care: "cabeleireiro",
   spa: "clínica de estética e spa",
+  medical_clinic: "clínica médica",
+  health: "clínica de saúde",
+  hair_care: "cabeleireiro",
   dentist: "clínica odontológica",
   dental_clinic: "clínica odontológica",
   doctor: "consultório médico",
@@ -324,9 +324,18 @@ interface SerpKeywordSeed {
   searchVolume: string
 }
 
-function buildDynamicSerpKeywords(place: GooglePlace, city: string | null): SerpKeywordSeed[] {
+function buildDynamicSerpKeywords(place: GooglePlace, city: string | null, companyName: string): SerpKeywordSeed[] {
   const rawType = pickPrimaryGoogleType(place)
-  const ptLabel = rawType ? translatePlaceTypeToPt(rawType) : "comércio local"
+  let ptLabel = rawType ? translatePlaceTypeToPt(rawType) : "comércio local"
+
+  // EXCEÇÃO INTELIGENTE POR NOME PARA EVITAR "CLÍNICA MÉDICA" INDEVIDA
+  const nomeLower = companyName.toLowerCase()
+  if (nomeLower.includes("depilação") || nomeLower.includes("depilacao") || nomeLower.includes("laser")) {
+    ptLabel = "clínica de depilação a laser"
+  } else if (nomeLower.includes("estética") || nomeLower.includes("estetica")) {
+    ptLabel = "clínica de estética"
+  }
+
   const cityTrim = city?.trim() ?? ""
   const vol = "—"
   const candidates: SerpKeywordSeed[] = []
@@ -449,8 +458,8 @@ export async function POST(request: Request) {
 
     const companyName = place.displayName?.text ?? resolvedInput.searchText
     const city = extractCity(place)
-    const serpApiKey = "5c29a972723c8b32ceefe8e45907c56ae9223d7d45025878fd641dc8ce7fc764";
-    const dynamicSeeds = buildDynamicSerpKeywords(place, city)
+    const serpApiKey = "5c29a972723c8b32ceefe8e45907c56ae9223d7d45025878fd641dc8ce7fc764"
+    const dynamicSeeds = buildDynamicSerpKeywords(place, city, companyName)
 
     let photoUrl: string | null = null
     if (place.photos && place.photos.length > 0) {
@@ -470,7 +479,6 @@ export async function POST(request: Request) {
       serpStatus = successCount > 0 ? "ok" : "api_unavailable"
       rankings = serpResults.map(({ requestOk: _requestOk, topCompetitors: _top, ...ranking }) => ranking)
       
-      // Pega o benchmark competitivo da primeira palavra-chave que deu certo
       const firstValidResult = serpResults.find(r => r.requestOk && r.topCompetitors && r.topCompetitors.length > 0)
       if (firstValidResult && firstValidResult.topCompetitors) {
           competitors = firstValidResult.topCompetitors
@@ -483,7 +491,7 @@ export async function POST(request: Request) {
       userRatingsTotal: place.userRatingCount ?? null,
       address: place.formattedAddress ?? "Endereço não disponível",
       rankings,
-      competitors, // DADO NOVO ENVIADO AO FRONT
+      competitors,
       serpStatus,
       photoUrl,
     })
