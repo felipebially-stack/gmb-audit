@@ -570,7 +570,7 @@ export async function POST(request: Request) {
 
     const companyName = place.displayName?.text ?? resolvedInput.searchText
     const city = extractCity(place)
-    const serpApiKey = process.env.SERPAPI_API_KEY
+    const serpApiKey = null; // process.env.SERPAPI_API_KEY
     const dynamicSeeds = buildDynamicSerpKeywords(place, city)
 
   // CRIANDO A URL DA FOTO PARA MANDAR PARA O FRONT

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, Download, Star, MapPin, AlertTriangle, TrendingDown, TrendingUp, Zap, FileText, CheckSquare, Copy, Target, ShieldAlert, Award, Search } from "lucide-react";
+import { CheckCircle2, Download, Star, MapPin, AlertTriangle, TrendingDown, TrendingUp, Zap, CheckSquare, Target, Search, Clock, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
 export default function SucessoPage() {
@@ -21,29 +21,8 @@ export default function SucessoPage() {
           }
         }, 500);
 
-        if (typeof window !== 'undefined' && (window as any).fbq) {
-          (window as any).fbq('track', 'Purchase', {
-            value: 9.97,
-            currency: 'BRL',
-            content_name: `Consultoria - ${parsedData.companyName || 'Empresa'}`,
-            content_type: 'product'
-          });
-        }
       } catch (e) {
         console.error("Erro ao ler dados do relatório", e);
-      }
-    } else {
-      const backup = localStorage.getItem("@gmbAudit:reportData");
-      if (backup) {
-         try {
-           const parsedBackup = JSON.parse(backup);
-           const fallbackData = parsedBackup.result ? {
-             ...parsedBackup.result,
-             healthScore: parsedBackup.healthScore,
-             rankings: parsedBackup.keywordRankings || parsedBackup.result?.rankings
-           } : parsedBackup;
-           setDados(fallbackData);
-         } catch(e) {}
       }
     }
   }, []);
@@ -61,12 +40,6 @@ export default function SucessoPage() {
   // MOTOR DE DADOS BASE
   // ====================================================================
   const safeRankings = dados.rankings || [];
-  const pioresRankings = safeRankings.filter((r: any) => r.position === null || r.position > 10);
-  const melhorRanking = safeRankings.find((r: any) => r.position !== null && r.position <= 5);
-  
-  const termoRuim = pioresRankings.length > 0 ? pioresRankings[0].keyword : "seus serviços";
-  const termoBom = melhorRanking ? melhorRanking.keyword : "sua especialidade";
-  
   const partesEndereco = dados.address?.split('-');
   const cidade = partesEndereco && partesEndereco.length > 1 ? partesEndereco[1].split(',')[0].trim() : "sua região";
 
@@ -74,15 +47,11 @@ export default function SucessoPage() {
   const reviewsNum = dados.userRatingsTotal || 0;
   const healthScore = dados.healthScore || (ratingNum ? Math.round((ratingNum / 5) * 100) : 50);
   const clientesPerdidos = Math.round((100 - healthScore) * 1.5) || 12;
-  const potencialAumento = Math.round((100 - healthScore) * 0.8) || 25;
 
   const nomeOriginal = dados.companyName || "Sua Empresa";
   let nomeConversacional = nomeOriginal.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '').split(/[-|]/)[0].trim();
   if (nomeConversacional.split(' ').length > 4) nomeConversacional = nomeConversacional.split(' ').slice(0, 3).join(' ');
 
-  // ====================================================================
-  // CÉREBRO DE COPYWRITING (Inspirado no seu script Python)
-  // ====================================================================
   let introDinamica = "";
   if (reviewsNum > 500) {
     introDinamica = `A ${nomeConversacional} tem algo raro de se ver: ${reviewsNum} avaliações e nota ${ratingNum}. Isso é autoridade pura, construída com muito trabalho. O problema crítico é que toda essa reputação não está sendo convertida no volume máximo de ligações e clientes, porque a ficha do Google Maps apresenta falhas técnicas que impedem o algoritmo de colocar você no topo nas buscas mais importantes.`;
@@ -92,40 +61,63 @@ export default function SucessoPage() {
     introDinamica = `A ${nomeConversacional} tem muito potencial em ${cidade}, mas o Google Maps precisa de mais sinais de atividade e otimização técnica para confiar no seu perfil. Neste exato momento, a falta de estruturação da ficha está entregando clientes prontos para comprar de mão beijada para a sua concorrência.`;
   }
 
-  // Restante da lógica (Checklist, 10 pilares, Textos prontos) mantém a robustez
-  const api = dados.checklistData || {};
-  const statusVerificado = typeof api.perfilVerificado === "boolean" ? (api.perfilVerificado ? "Bom" : "Fraco") : (reviewsNum > 0 ? "Bom" : "Fraco");
-  const statusFotos = typeof api.fotosRecentes === "boolean" ? (api.fotosRecentes ? "Bom" : "Fraco") : (healthScore >= 95 ? "Bom" : (healthScore >= 70 ? "Razoável" : "Fraco"));
-  // ... (Simplificando a checagem visual para manter o código limpo)
-  const acoesCriticas: any[] = [];
-  const acoesMedias: any[] = [];
+  // ====================================================================
+  // CÉREBRO DE COPYWRITING AVANÇADO (O QUE, POR QUE, QUANDO)
+  // ====================================================================
   
-  if (statusVerificado !== "Bom") acoesCriticas.push({ t: "Verificação Oficial", d: "Acesse o painel do Google e conclua a verificação de propriedade."});
-  if (statusFotos !== "Bom") acoesCriticas.push({ t: "Fotos c/ GPS", d: `Ative a localização do celular e tire 5 fotos da fachada em ${cidade}.`});
-  if (acoesCriticas.length === 0) acoesCriticas.push({ t: "Manutenção Visual", d: `Tire mais 3 fotos da equipe em ${cidade} e poste esta semana.`});
-  
-  acoesMedias.push({ t: "Adicionar Categorias", d: "Adicione 3 novas categorias secundárias estratégicas."});
-  acoesMedias.push({ t: "Otimizar Produtos", d: `Cadastre seus principais produtos/serviços com foto e preço.`});
+  const planoDeAcao = [
+    {
+      tipo: "urgente",
+      icone: <MapPin className="w-5 h-5 text-red-600" />,
+      titulo: "Injeção de Fotos com Geotagging (GPS)",
+      oque: `Ative a localização (GPS) do seu celular e faça o upload de 5 a 10 fotos novas da fachada, interior e equipe trabalhando diretamente de ${cidade}.`,
+      porque: "O algoritmo do Google extrai os metadados invisíveis (EXIF) das fotos. Ao ler as coordenadas exatas do seu endereço nas fotos, ele confirma que sua empresa é real e ativa, destravando seu alcance no mapa da região.",
+      frequencia: "Ação Imediata (Única). Depois, adicione 2 fotos novas a cada 15 dias."
+    },
+    {
+      tipo: "urgente",
+      icone: <Search className="w-5 h-5 text-red-600" />,
+      titulo: "Otimização de Título e Descrição (SEO Local)",
+      oque: "Reescreva a descrição da sua empresa inserindo as palavras-chave principais que seus clientes buscam, junto com o nome dos bairros que você atende.",
+      porque: "O Google não 'adivinha' o que você vende. Ele varre os 750 caracteres da sua descrição em milissegundos para cruzar com a pesquisa do usuário. Sem as palavras corretas, você não participa do leilão de buscas.",
+      frequencia: "Ação Imediata. Revisão completa a cada 6 meses."
+    },
+    {
+      tipo: "otimizacao",
+      icone: <Target className="w-5 h-5 text-yellow-600" />,
+      titulo: "Expansão de Categorias Secundárias",
+      oque: "Acesse o painel, vá em 'Editar Perfil' e adicione até 4 categorias secundárias que representem sub-nichos do seu negócio.",
+      porque: "A categoria principal dita 70% do seu ranqueamento, mas as categorias secundárias abrem portas para pesquisas de 'cauda longa' (pesquisas mais específicas e com maior intenção de compra imediata).",
+      frequencia: "Revisão Imediata."
+    },
+    {
+      tipo: "otimizacao",
+      icone: <Star className="w-5 h-5 text-yellow-600" />,
+      titulo: "Blindagem de Prova Social Responsiva",
+      oque: "Responda a todas as avaliações passadas e crie um processo para pedir avaliações aos clientes na hora do pagamento, utilizando palavras-chave na sua resposta.",
+      porque: "Perfis com avaliações respondidas ativam o gatilho de 'Frequência de Atualização' no algoritmo. Além disso, o Google lê os textos das avaliações para ranquear sua empresa para serviços específicos mencionados pelos clientes.",
+      frequencia: "Semanal. Responda novas avaliações em no máximo 48h."
+    },
+    {
+      tipo: "otimizacao",
+      icone: <Clock className="w-5 h-5 text-yellow-600" />,
+      titulo: "Ativação do Catálogo de Produtos/Serviços",
+      oque: "Cadastre seus 10 principais produtos ou serviços na aba correspondente, incluindo fotos de alta qualidade, preço e uma breve descrição comercial.",
+      porque: "Isso cria um mini-site dentro da busca do Google. Reduz a fricção de compra do cliente e injeta um volume massivo de palavras-chave no seu perfil sem poluir a descrição principal.",
+      frequencia: "Manutenção Mensal (atualização de preços e ofertas)."
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-slate-900 font-sans print:bg-white text-slate-900">
-      {/* 
-        O SEGREDO DO DESIGN DO PDF ESTÁ AQUI:
-        Esse bloco de CSS ajusta as cores para não sumirem na impressão,
-        remove margens padrão do navegador e força as quebras de página.
-      */}
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
           @page { margin: 0; size: A4; }
-          body { 
-            -webkit-print-color-adjust: exact !important; 
-            print-color-adjust: exact !important; 
-            background-color: white !important; 
-          }
+          body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background-color: white !important; }
           .card-auditoria { page-break-inside: avoid !important; break-inside: avoid !important; display: block !important; }
           .quebrar-antes { page-break-before: always !important; break-before: page !important; }
           .print\\:hidden { display: none !important; }
-          .print-dark-text { color: #0f172a !important; }
+          .forcar-fundo { background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; }
         }
       `}} />
 
@@ -138,7 +130,6 @@ export default function SucessoPage() {
           <h1 className="text-3xl font-black text-slate-900 mb-2">Avaliação Gerada!</h1>
           <p className="text-slate-600 mb-8 text-lg">O dossiê inteligente da <strong>{nomeOriginal}</strong> foi processado e está pronto.</p>
           
-          {/* BOTÃO QUE GERA O PDF NA HORA */}
           <button 
             onClick={() => window.print()} 
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-xl flex justify-center items-center gap-3 mb-4 transition-transform hover:scale-[1.02] uppercase tracking-wider text-lg"
@@ -149,11 +140,11 @@ export default function SucessoPage() {
       </div>
 
       {/* ========================================================================= */}
-      {/* INÍCIO DO DOCUMENTO PDF (Fica invisível na web, só aparece na impressão) */}
+      {/* INÍCIO DO DOCUMENTO PDF */}
       {/* ========================================================================= */}
       <div className="hidden print:block w-full bg-white">
         
-        {/* PÁGINA 1: CAPA (Estilo Relatório Executivo Python) */}
+        {/* PÁGINA 1: CAPA */}
         <div className="min-h-[297mm] px-16 py-20 flex flex-col justify-between bg-slate-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/60 via-transparent to-transparent" />
           
@@ -172,14 +163,12 @@ export default function SucessoPage() {
               Documento exclusivo gerado com base em varredura algorítmica no perfil verificado da <b>{nomeOriginal}</b> no Google Maps. Análise processada para a região de {cidade}.
             </p>
 
-            {/* FOTO RENDENRIZADA COM PERFEIÇÃO NA CAPA */}
             {dados.photoUrl && (
               <div className="relative w-full h-72 rounded-2xl overflow-hidden border-4 border-slate-800 shadow-2xl mb-8 bg-slate-800">
                 <img src={dados.photoUrl} alt="Fachada" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
             )}
 
-            {/* TARJA DE NÚMEROS (Estilo do seu script) */}
             <div className="bg-slate-800 border border-slate-700 rounded-2xl p-6 flex justify-between items-center mt-8">
                <div className="text-center w-1/3 border-r border-slate-700">
                  <p className="text-3xl font-black text-white mb-1">⭐ {ratingNum}</p>
@@ -217,13 +206,11 @@ export default function SucessoPage() {
             <h1 className="text-3xl font-black text-slate-900">O que está acontecendo com seu perfil agora</h1>
           </div>
 
-          {/* O Texto Inteligente que criamos no React entra aqui */}
           <div className="text-slate-700 text-lg leading-relaxed mb-10 font-medium">
             <p className="mb-6">{introDinamica}</p>
             <p>O Local Pack (os 3 primeiros resultados do mapa) recebe <strong>60% de todos os cliques e ligações</strong>. Quem está fora dele, independente da qualidade do serviço que presta, simplesmente não existe para o cliente naquele momento exato de necessidade.</p>
           </div>
 
-          {/* Tabela de Rankings com visual limpo e corporativo */}
           <div className="mb-10 card-auditoria">
             <h3 className="text-lg font-black text-slate-900 mb-4 uppercase flex items-center gap-2">
               <Search className="w-5 h-5 text-blue-600" /> Situação Atual nos Rankings
@@ -257,50 +244,64 @@ export default function SucessoPage() {
             <p className="text-xs text-slate-500 mt-3 italic">*Termos classificados abaixo da 3ª posição não geram vendas consistentes.</p>
           </div>
 
-          {/* Banner Escuro de Impacto Financeiro */}
           <div className="mt-auto bg-slate-900 text-white p-8 rounded-2xl flex flex-col justify-center text-center card-auditoria border-b-4 border-orange-500">
             <h3 className="text-2xl font-black mb-3">Impacto Financeiro Direto</h3>
             <p className="text-slate-300 text-base max-w-2xl mx-auto">
-              Ao corrigir as lacunas técnicas da ficha, o algoritmo passa a cruzar sua reputação de {ratingNum} estrelas com as buscas locais. A estimativa é captar de <strong>{clientesPerdidos} a {clientesPerdidos * 2} novos contatos por mês</strong> ao alcançar o Top 3.
+              Ao corrigir as lacunas técnicas da ficha, o algoritmo passa a cruzar sua reputação de {ratingNum} estrelas com as buscas locais. A estimativa é captar de <strong>{clientesPerdidos} a {clientesPerdidos * 2} novos contatos qualificados por mês</strong> ao alcançar e se estabilizar no Top 3.
             </p>
           </div>
         </div>
 
-        {/* PÁGINA 3: PLANO DE AÇÃO */}
+        {/* PÁGINA 3: PLANO DE AÇÃO ESTRATÉGICO (AGORA COMPLETO E DETALHADO) */}
         <div className="min-h-[297mm] px-16 py-20 flex flex-col quebrar-antes bg-white">
-          <div className="mb-12 border-b-2 border-slate-100 pb-6">
-            <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Implementação</p>
+          <div className="mb-10 border-b-2 border-slate-100 pb-6">
+            <p className="text-blue-600 font-black tracking-widest uppercase text-xs mb-2">Implementação Prática</p>
             <h1 className="text-3xl font-black text-slate-900">Plano de Ação Estratégico</h1>
+            <p className="text-slate-500 mt-2 font-medium">As diretrizes técnicas detalhadas para dominar o algoritmo local em {cidade}.</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 mb-12">
-            <div className="border border-red-200 bg-red-50/50 p-8 rounded-2xl card-auditoria">
-              <h3 className="text-xl font-black text-red-700 mb-6 flex items-center gap-2"><AlertTriangle className="w-6 h-6"/> Tarefas Urgentes (Hoje)</h3>
-              <div className="space-y-6">
-                {acoesCriticas.map((a, i) => (
-                  <div key={i}>
-                    <p className="font-bold text-slate-900 mb-1">{i+1}. {a.t}</p>
-                    <p className="text-sm text-slate-700 leading-relaxed">{a.d}</p>
+          <div className="space-y-6">
+            {planoDeAcao.map((acao, i) => (
+              <div key={i} className={`p-6 rounded-2xl border-l-4 card-auditoria forcar-fundo ${acao.tipo === 'urgente' ? 'border-l-red-500' : 'border-l-yellow-500'}`}>
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-xl shrink-0 ${acao.tipo === 'urgente' ? 'bg-red-100' : 'bg-yellow-100'}`}>
+                    {acao.icone}
                   </div>
-                ))}
-              </div>
-            </div>
-            <div className="border border-yellow-200 bg-yellow-50/50 p-8 rounded-2xl card-auditoria">
-              <h3 className="text-xl font-black text-yellow-700 mb-6 flex items-center gap-2"><Zap className="w-6 h-6"/> Otimizações (7 Dias)</h3>
-              <div className="space-y-6">
-                {acoesMedias.map((a, i) => (
-                  <div key={i}>
-                    <p className="font-bold text-slate-900 mb-1">{i+3}. {a.t}</p>
-                    <p className="text-sm text-slate-700 leading-relaxed">{a.d}</p>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-black text-slate-900 mb-3">{i + 1}. {acao.titulo}</h3>
+                    
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">O Que Fazer:</span>
+                        <p className="text-sm font-bold text-slate-700 leading-relaxed">{acao.oque}</p>
+                      </div>
+                      
+                      <div className="bg-white p-4 rounded-lg border border-slate-200">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-blue-500 block mb-1">Por que o Google exige isso?</span>
+                        <p className="text-sm text-slate-600 leading-relaxed font-medium">{acao.porque}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 mt-1">
+                        <Clock className="w-4 h-4 text-slate-400" />
+                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">Periodicidade:</span>
+                        <span className="text-xs font-bold text-slate-800">{acao.frequencia}</span>
+                      </div>
+                    </div>
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
 
-          <div className="mt-auto border-t border-slate-200 pt-8 text-center">
-            <p className="text-sm text-slate-500 font-bold uppercase tracking-widest mb-2">Desenvolvido por</p>
-            <p className="text-lg font-black text-slate-900">Método GMN Turbo © {new Date().getFullYear()}</p>
+          <div className="mt-auto border-t border-slate-200 pt-8 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-slate-500 font-bold uppercase tracking-widest mb-1">Desenvolvido por</p>
+              <p className="text-lg font-black text-slate-900">Método GMN Turbo © {new Date().getFullYear()}</p>
+            </div>
+            <div className="bg-slate-100 p-3 rounded-lg border border-slate-200 text-right">
+              <p className="text-xs font-bold text-slate-600">Dificuldade em aplicar?</p>
+              <p className="text-[10px] text-slate-500">Nossa agência executa este plano por você.</p>
+            </div>
           </div>
         </div>
 
