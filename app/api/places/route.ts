@@ -4,7 +4,6 @@ const GOOGLE_PLACES_ENDPOINT = "https://places.googleapis.com/v1/places:searchTe
 const GOOGLE_PLACE_DETAILS_ENDPOINT = "https://places.googleapis.com/v1"
 const SERPAPI_ENDPOINT = "https://serpapi.com/search.json"
 
-/** Tipos genéricos do Google que não descrevem o nicho do negócio */
 const GENERIC_GOOGLE_PLACE_TYPES = new Set([
   "establishment",
   "point_of_interest",
@@ -25,7 +24,6 @@ interface GooglePlace {
     shortText?: string
     types?: string[]
   }>
-  // ADICIONADO AQUI: Suporte para pegar a foto do Google
   photos?: Array<{
     name: string
   }>
@@ -51,10 +49,18 @@ interface KeywordRanking {
   searchVolume: string
 }
 
+interface Competitor {
+  name: string
+  rating: number | null
+  reviews: number | null
+  position: number
+}
+
 type SerpStatus = "ok" | "api_unavailable" | "not_configured"
 
 interface SerpRankingResult extends KeywordRanking {
   requestOk: boolean
+  topCompetitors?: Competitor[]
 }
 
 function normalizeText(value: string) {
@@ -69,26 +75,19 @@ function decodePlaceSlug(raw: string): string {
   if (!raw) return ""
   let s = raw.trim()
   s = s.replace(/\+/g, " ")
-  try {
-    s = decodeURIComponent(s)
-  } catch {
-  }
+  try { s = decodeURIComponent(s) } catch {}
   try {
     if (/%[0-9A-Fa-f]{2}/.test(s)) {
       const again = decodeURIComponent(s)
       if (again !== s) s = again
     }
-  } catch {
-  }
+  } catch {}
   return s.replace(/\s+/g, " ").trim()
 }
 
 function tryExtractNameFromUrlPath(input: URL): string | null {
   const pathAndQuery = `${input.pathname}${input.search ?? ""}`
-  const placePatterns: RegExp[] = [
-    /\/maps\/place\/([^/?#]+)/i,
-    /\/place\/([^/?#]+)/i,
-  ]
+  const placePatterns: RegExp[] = [/\/maps\/place\/([^/?#]+)/i, /\/place\/([^/?#]+)/i]
   for (const re of placePatterns) {
     const m = pathAndQuery.match(re)
     if (!m?.[1]) continue
@@ -107,9 +106,7 @@ function tryExtractQueryFromSearchParams(input: URL): string | null {
   const candidates = ["q", "query", "ftid"]
   for (const key of candidates) {
     const v = input.searchParams.get(key)
-    if (v?.trim()) {
-      return decodePlaceSlug(v)
-    }
+    if (v?.trim()) return decodePlaceSlug(v)
   }
   return null
 }
@@ -118,24 +115,17 @@ function tryUnwrapGoogleRedirectUrl(url: URL): URL {
   try {
     if (url.pathname.includes("/url") && url.searchParams.has("q")) {
       const inner = url.searchParams.get("q")
-      if (inner?.startsWith("http")) {
-        return new URL(inner)
-      }
+      if (inner?.startsWith("http")) return new URL(inner)
     }
-  } catch {
-  }
+  } catch {}
   return url
 }
 
 function tryExtractCoordinatesFromUrl(input: URL) {
   const atMatch = input.pathname.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/)
-  if (atMatch?.[1] && atMatch?.[2]) {
-    return `${atMatch[1]},${atMatch[2]}`
-  }
+  if (atMatch?.[1] && atMatch?.[2]) return `${atMatch[1]},${atMatch[2]}`
   const q = input.searchParams.get("q")
-  if (q && /^-?\d+\.\d+,-?\d+\.\d+$/.test(q)) {
-    return q
-  }
+  if (q && /^-?\d+\.\d+,-?\d+\.\d+$/.test(q)) return q
   return null
 }
 
@@ -147,30 +137,19 @@ function tryExtractPlaceId(content: string) {
 function isUnusableListingHtmlTitle(title: string): boolean {
   const t = title.trim().toLowerCase()
   if (!t) return true
-  const unusable = [
-    "google search",
-    "google",
-    "search",
-    "before you continue",
-    "redirecting",
-  ]
+  const unusable = ["google search", "google", "search", "before you continue", "redirecting"]
   return unusable.some((u) => t === u || t.startsWith(`${u} `))
 }
 
 function tryExtractNameFromHtml(content: string) {
-  const ogMatch = content.match(
-    /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i,
-  )
+  const ogMatch = content.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
   if (ogMatch?.[1]) {
     const cleaned = ogMatch[1].replace(/\s*-\s*Google(?:\s+Maps)?\s*$/i, "").trim()
     if (cleaned && !isUnusableListingHtmlTitle(cleaned)) return cleaned
   }
   const titleMatch = content.match(/<title>([\s\S]*?)<\/title>/i)
   if (!titleMatch?.[1]) return null
-  const cleanedTitle = titleMatch[1]
-    .replace(/\s*-\s*Google(?:\s+Maps)?\s*$/i, "")
-    .replace(/\s*\|\s*Google\s*Maps\s*$/i, "")
-    .trim()
+  const cleanedTitle = titleMatch[1].replace(/\s*-\s*Google(?:\s+Maps)?\s*$/i, "").replace(/\s*\|\s*Google\s*Maps\s*$/i, "").trim()
   if (!cleanedTitle || isUnusableListingHtmlTitle(cleanedTitle)) return null
   return cleanedTitle
 }
@@ -186,104 +165,69 @@ function tryExtractFirstGoogleMapsPlaceUrl(html: string): string | null {
   for (const re of patterns) {
     const m = html.match(re)
     if (m?.[0]) {
-      try {
-        return new URL(m[0]).toString()
-      } catch {
-      }
+      try { return new URL(m[0]).toString() } catch {}
     }
   }
   return null
 }
 
 async function resolveSearchInput(rawQuery: string, redirectDepth = 0): Promise<ResolvedSearchInput> {
-  if (!rawQuery.toLowerCase().startsWith("http")) {
-    return { searchText: rawQuery }
-  }
-  if (redirectDepth > 5) {
-    return { searchText: rawQuery }
-  }
+  if (!rawQuery.toLowerCase().startsWith("http")) return { searchText: rawQuery }
+  if (redirectDepth > 5) return { searchText: rawQuery }
   try {
     const firstUrl = new URL(rawQuery)
     const response = await fetch(firstUrl.toString(), {
-      method: "GET",
-      cache: "no-store",
-      redirect: "follow",
-      headers: {
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-      },
+      method: "GET", cache: "no-store", redirect: "follow",
+      headers: { Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7" },
     })
     let finalUrl = new URL(response.url || firstUrl.toString())
     finalUrl = tryUnwrapGoogleRedirectUrl(finalUrl)
     const pathFromFinal = tryExtractNameFromUrlPath(finalUrl)
     const pathFromFirst = tryExtractNameFromUrlPath(firstUrl)
-    const queryFromParams =
-      tryExtractQueryFromSearchParams(finalUrl) ?? tryExtractQueryFromSearchParams(firstUrl)
+    const queryFromParams = tryExtractQueryFromSearchParams(finalUrl) ?? tryExtractQueryFromSearchParams(firstUrl)
     const coordinates = tryExtractCoordinatesFromUrl(finalUrl) ?? tryExtractCoordinatesFromUrl(firstUrl)
     if (!response.ok) {
-      const extractedQuery = pathFromFinal ?? pathFromFirst ?? queryFromParams ?? coordinates ?? rawQuery
-      return { searchText: extractedQuery }
+      return { searchText: pathFromFinal ?? pathFromFirst ?? queryFromParams ?? coordinates ?? rawQuery }
     }
     const html = await response.text()
     const extractedPlaceId = tryExtractPlaceId(html)
     const extractedName = tryExtractNameFromHtml(html)
-    let extractedQuery =
-      pathFromFinal ??
-      pathFromFirst ??
-      queryFromParams ??
-      extractedName ??
-      coordinates ??
-      null
+    let extractedQuery = pathFromFinal ?? pathFromFirst ?? queryFromParams ?? extractedName ?? coordinates ?? null
     if (!extractedQuery) {
       const embeddedMaps = tryExtractFirstGoogleMapsPlaceUrl(html)
-      if (embeddedMaps) {
-        return resolveSearchInput(embeddedMaps, redirectDepth + 1)
-      }
+      if (embeddedMaps) return resolveSearchInput(embeddedMaps, redirectDepth + 1)
     }
-    const finalQuery = extractedQuery ?? rawQuery
-    return {
-      searchText: finalQuery,
-      placeId: extractedPlaceId ?? undefined,
-    }
-  } catch {
-    return { searchText: rawQuery }
-  }
+    return { searchText: extractedQuery ?? rawQuery, placeId: extractedPlaceId ?? undefined }
+  } catch { return { searchText: rawQuery } }
 }
 
 async function fetchPlaceById(placeId: string, apiKey: string) {
-  const response = await fetch(`${GOOGLE_PLACE_DETAILS_ENDPOINT}/places/${placeId}`, {
+  return await fetch(`${GOOGLE_PLACE_DETAILS_ENDPOINT}/places/${placeId}`, {
     method: "GET",
     headers: {
       "X-Goog-Api-Key": apiKey,
-      // ADICIONADO 'photos' AQUI
-      "X-Goog-FieldMask":
-        "displayName,formattedAddress,rating,userRatingCount,addressComponents,primaryType,types,photos",
+      "X-Goog-FieldMask": "displayName,formattedAddress,rating,userRatingCount,addressComponents,primaryType,types,photos",
     },
     cache: "no-store",
   })
-  return response
 }
 
 function extractCity(place: GooglePlace) {
   const byComponent = place.addressComponents?.find(
-    (component) =>
-      component.types?.includes("locality") ||
-      component.types?.includes("administrative_area_level_2"),
+    (c) => c.types?.includes("locality") || c.types?.includes("administrative_area_level_2"),
   )
   if (byComponent?.longText) return byComponent.longText
   if (!place.formattedAddress) return null
   const parts = place.formattedAddress.split(",").map((item) => item.trim())
   if (parts.length >= 2) {
     const cityState = parts[parts.length - 2]
-    const city = cityState.split("-")[0]?.trim()
-    return city || null
+    return cityState.split("-")[0]?.trim() || null
   }
   return null
 }
 
+// DICIONÁRIO DE TRADUÇÃO EXPANDIDO
 const PLACE_TYPE_PT: Record<string, string> = {
-  // Nicho de Estética, Beleza e Saúde (Foco da LivreLaser)
   medical_clinic: "clínica médica",
   health: "clínica de saúde",
   laser_hair_removal_service: "clínica de depilação a laser",
@@ -300,8 +244,6 @@ const PLACE_TYPE_PT: Record<string, string> = {
   veterinary_care: "clínica veterinária",
   physiotherapist: "clínica de fisioterapia",
   chiropractor: "quiroprata",
-
-  // Nicho de Varejo e Comércio (Foco Balaroti, Decore, etc)
   florist: "floricultura",
   flower_shop: "floricultura",
   building_materials_store: "loja de materiais de construção",
@@ -320,8 +262,6 @@ const PLACE_TYPE_PT: Record<string, string> = {
   book_store: "livraria",
   liquor_store: "adega",
   auto_parts_store: "loja de autopeças",
-
-  // Nicho de Alimentação
   restaurant: "restaurante",
   cafe: "café",
   coffee_shop: "cafeteria",
@@ -333,8 +273,6 @@ const PLACE_TYPE_PT: Record<string, string> = {
   pizza_restaurant: "pizzaria",
   hamburger_restaurant: "hamburgueria",
   steak_house: "churrascaria",
-
-  // Nicho de Serviços Locais
   plumber: "encanador",
   electrician: "eletricista",
   locksmith: "chaveiro",
@@ -347,8 +285,6 @@ const PLACE_TYPE_PT: Record<string, string> = {
   car_dealer: "concessionária",
   car_repair: "oficina mecânica",
   gas_station: "posto de gasolina",
-
-  // Nicho Corporativo e Viagens
   lawyer: "escritório de advocacia",
   accounting: "escritório de contabilidade",
   real_estate_agency: "imobiliária",
@@ -360,25 +296,19 @@ const PLACE_TYPE_PT: Record<string, string> = {
   gym: "academia",
   school: "escola",
   university: "universidade",
-};
+}
 
 function prettifyPlaceTypeSnake(type: string): string {
-  return type
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (ch) => ch.toUpperCase())
-    .trim()
+  return type.replace(/_/g, " ").replace(/\b\w/g, (ch) => ch.toUpperCase()).trim()
 }
 
 function translatePlaceTypeToPt(googleType: string): string {
   const key = googleType.trim().toLowerCase()
-  if (PLACE_TYPE_PT[key]) return PLACE_TYPE_PT[key]
-  return prettifyPlaceTypeSnake(key)
+  return PLACE_TYPE_PT[key] || prettifyPlaceTypeSnake(key)
 }
 
 function pickPrimaryGoogleType(place: GooglePlace): string | null {
-  if (place.primaryType?.trim()) {
-    return place.primaryType.trim().toLowerCase()
-  }
+  if (place.primaryType?.trim()) return place.primaryType.trim().toLowerCase()
   for (const t of place.types ?? []) {
     const low = (t ?? "").toLowerCase()
     if (low && !GENERIC_GOOGLE_PLACE_TYPES.has(low)) return low
@@ -406,15 +336,14 @@ function buildDynamicSerpKeywords(place: GooglePlace, city: string | null): Serp
       { keyword: `${ptLabel} ${cityTrim}`, searchVolume: vol },
       { keyword: `melhor ${ptLabel} ${cityTrim}`, searchVolume: vol },
       { keyword: `onde encontrar ${ptLabel} ${cityTrim}`, searchVolume: vol },
-      { keyword: `${ptLabel} perto de mim`, searchVolume: vol },
-      { keyword: `melhores ${ptLabel} ${cityTrim}`, searchVolume: vol },
+      { keyword: `${ptLabel} perto de mim`, searchVolume: vol }
     )
   } else {
     candidates.push(
       { keyword: ptLabel, searchVolume: vol },
       { keyword: `melhor ${ptLabel}`, searchVolume: vol },
       { keyword: `${ptLabel} perto de mim`, searchVolume: vol },
-      { keyword: `onde encontrar ${ptLabel}`, searchVolume: vol },
+      { keyword: `onde encontrar ${ptLabel}`, searchVolume: vol }
     )
   }
 
@@ -427,98 +356,60 @@ function buildDynamicSerpKeywords(place: GooglePlace, city: string | null): Serp
     unique.push({ ...item, keyword: item.keyword.replace(/\s+/g, " ").trim() })
   }
 
-  const min = 3
-  const max = 5
-  if (unique.length >= min) return unique.slice(0, max)
-
-  const pad1 = cityTrim ? `${ptLabel} em ${cityTrim}` : `serviços de ${ptLabel}`
-  const k1 = pad1.toLowerCase()
-  if (!seen.has(k1)) {
-    seen.add(k1)
-    unique.push({ keyword: pad1.replace(/\s+/g, " ").trim(), searchVolume: vol })
-  }
-
-  if (unique.length < min) {
-    const pad2 = cityTrim ? `${ptLabel} centro ${cityTrim}` : `${ptLabel} na região`
-    const k2 = pad2.toLowerCase()
-    if (!seen.has(k2)) {
-      unique.push({ keyword: pad2.replace(/\s+/g, " ").trim(), searchVolume: vol })
-    }
-  }
-
-  return unique.slice(0, max)
+  // LIMITANDO A EXATAMENTE 4 PALAVRAS
+  return unique.slice(0, 4)
 }
 
-function findBusinessPosition(
-  localResults: Array<{ position?: number; title?: string }>,
-  companyName: string,
-) {
-  const normalizedCompany = normalizeText(companyName);
-  
-  // Pegamos a primeira palavra do nome da empresa para ser mais flexível
-  const firstWord = normalizedCompany.split(" ")[0];
+function findBusinessPosition(localResults: Array<{ position?: number; title?: string }>, companyName: string) {
+  const normalizedCompany = normalizeText(companyName)
+  const firstWord = normalizedCompany.split(" ")[0]
 
   const match = localResults.find((result) => {
-    const title = normalizeText(result.title ?? "");
-    // Agora ele verifica se o título tem o nome inteiro OU pelo menos a primeira palavra principal
+    const title = normalizeText(result.title ?? "")
     return (
       title.includes(normalizedCompany) || 
       normalizedCompany.includes(title) ||
       (firstWord.length > 3 && title.includes(firstWord))
-    );
-  });
-  
-  return match?.position ?? null;
+    )
+  })
+  return match?.position ?? null
 }
 
-async function fetchSerpRanking(
-  keyword: string,
-  searchVolume: string,
-  companyName: string,
-  serpApiKey: string,
-): Promise<SerpRankingResult> {
+async function fetchSerpRanking(keyword: string, searchVolume: string, companyName: string, serpApiKey: string): Promise<SerpRankingResult> {
   try {
-    const query = keyword.trim()
     const url = new URL(SERPAPI_ENDPOINT)
     url.searchParams.set("engine", "google_local")
-    url.searchParams.set("q", query)
+    url.searchParams.set("q", keyword.trim())
     url.searchParams.set("api_key", serpApiKey)
     const response = await fetch(url.toString(), { cache: "no-store" })
     const bodyText = await response.text()
-    if (!response.ok) {
-      return { keyword, searchVolume, position: null, previousPosition: null, requestOk: false }
-    }
-    let data: {
-      error?: string
-      local_results?: Array<{ position?: number; title?: string; name?: string }>
-    }
-    try {
-      data = JSON.parse(bodyText) as typeof data
-    } catch {
-      return { keyword, searchVolume, position: null, previousPosition: null, requestOk: false }
-    }
-    if (data.error) {
-      return { keyword, searchVolume, position: null, previousPosition: null, requestOk: false }
-    }
+    if (!response.ok) return { keyword, searchVolume, position: null, previousPosition: null, requestOk: false }
+    
+    let data: any
+    try { data = JSON.parse(bodyText) } catch { return { keyword, searchVolume, position: null, previousPosition: null, requestOk: false } }
+    if (data.error) return { keyword, searchVolume, position: null, previousPosition: null, requestOk: false }
+    
     const localResults = data.local_results ?? []
-    const normalizedResults = localResults.map((r) => {
-      const raw = r.position
-      const pos =
-        typeof raw === "number"
-          ? raw
-          : raw !== undefined && raw !== null
-            ? Number(raw)
-            : NaN
-      return {
-        position: Number.isFinite(pos) ? pos : undefined,
-        title: r.title ?? r.name ?? "",
-      }
-    })
+    const normalizedResults = localResults.map((r: any) => ({
+      position: Number(r.position) || undefined,
+      title: r.title ?? r.name ?? "",
+      rating: r.rating ? Number(r.rating) : null,
+      reviews: r.reviews ? Number(r.reviews) : null
+    }))
+    
     const position = findBusinessPosition(normalizedResults, companyName)
-    const previousPosition =
-      position !== null && position !== undefined ? position + 1 : null
-    return { keyword, searchVolume, position, previousPosition, requestOk: true }
-  } catch (err) {
+    const previousPosition = position !== null && position !== undefined ? position + 1 : null
+
+    // Capturando o Top 3 para o Benchmark
+    const topCompetitors = normalizedResults.slice(0, 3).map((r: any) => ({
+      name: r.title,
+      rating: r.rating,
+      reviews: r.reviews,
+      position: r.position ?? 0
+    }))
+
+    return { keyword, searchVolume, position, previousPosition, requestOk: true, topCompetitors }
+  } catch {
     return { keyword, searchVolume, position: null, previousPosition: null, requestOk: false }
   }
 }
@@ -527,16 +418,10 @@ export async function POST(request: Request) {
   try {
     const { query } = (await request.json()) as { query?: string }
     const rawInput = query?.trim()
-    if (!rawInput) {
-      return NextResponse.json({ error: "Nome da empresa é obrigatório." }, { status: 400 })
-    }
+    if (!rawInput) return NextResponse.json({ error: "Nome da empresa é obrigatório." }, { status: 400 })
+    
     const apiKey = process.env.GOOGLE_PLACES_API_KEY
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "GOOGLE_PLACES_API_KEY não configurada no servidor." },
-        { status: 500 },
-      )
-    }
+    if (!apiKey) return NextResponse.json({ error: "GOOGLE_PLACES_API_KEY não configurada." }, { status: 500 })
 
     const resolvedInput = await resolveSearchInput(rawInput)
     let response: Response
@@ -549,74 +434,47 @@ export async function POST(request: Request) {
         headers: {
           "Content-Type": "application/json",
           "X-Goog-Api-Key": apiKey,
-          // ADICIONADO 'places.photos' AQUI PARA BUSCAS POR TEXTO
-          "X-Goog-FieldMask":
-            "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.addressComponents,places.primaryType,places.types,places.photos",
+          "X-Goog-FieldMask": "places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.addressComponents,places.primaryType,places.types,places.photos",
         },
-        body: JSON.stringify({
-          textQuery: resolvedInput.searchText,
-          maxResultCount: 1,
-        }),
+        body: JSON.stringify({ textQuery: resolvedInput.searchText, maxResultCount: 1 }),
         cache: "no-store",
       })
     }
 
-    if (!response.ok) {
-      let detailedError = "Não foi possível consultar o Google Places."
-      try {
-        const errorData = (await response.json()) as GoogleApiErrorResponse
-        if (errorData.error?.message) {
-          detailedError = `Google Places: ${errorData.error.message}`
-        }
-      } catch {}
-      return NextResponse.json(
-        { error: detailedError },
-        { status: response.status },
-      )
-    }
+    if (!response.ok) return NextResponse.json({ error: "Erro ao consultar Google Places." }, { status: response.status })
 
-    const data = (await response.json()) as { places?: GooglePlace[] } & GooglePlace
+    const data = (await response.json()) as any
     const place = resolvedInput.placeId ? data : data.places?.[0]
-
-    if (!place) {
-      return NextResponse.json({ error: "Empresa não encontrada." }, { status: 404 })
-    }
+    if (!place) return NextResponse.json({ error: "Empresa não encontrada." }, { status: 404 })
 
     const companyName = place.displayName?.text ?? resolvedInput.searchText
     const city = extractCity(place)
-    const serpApiKey = null; // process.env.SERPAPI_API_KEY
+    const serpApiKey = process.env.SERPAPI_API_KEY || null
     const dynamicSeeds = buildDynamicSerpKeywords(place, city)
 
-  // CRIANDO A URL DA FOTO PARA MANDAR PARA O FRONT
-  let photoUrl: string | null = null;
-    
-  if (place.photos && place.photos.length > 0) {
-     // Tentativa 1: Foto real de dentro/fachada via Google Places
-     const photoName = place.photos[0].name;
-     photoUrl = `https://places.googleapis.com/v1/${photoName}/media?maxHeightPx=800&maxWidthPx=1200&key=${apiKey}`;
-  } else {
-     // Tentativa 2 (O Fallback Imbatível): Se o Places falhar, pegamos a foto da rua (Street View) pelo endereço!
-     const queryParaFoto = place.formattedAddress ? place.formattedAddress : `${companyName} ${city || ""}`;
-     photoUrl = `https://maps.googleapis.com/maps/api/streetview?size=800x400&location=${encodeURIComponent(queryParaFoto)}&key=${apiKey}`;
-  }
+    let photoUrl: string | null = null
+    if (place.photos && place.photos.length > 0) {
+      photoUrl = `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxHeightPx=800&maxWidthPx=1200&key=${apiKey}`
+    } else {
+      const queryParaFoto = place.formattedAddress ? place.formattedAddress : `${companyName} ${city || ""}`
+      photoUrl = `https://maps.googleapis.com/maps/api/streetview?size=800x400&location=${encodeURIComponent(queryParaFoto)}&key=${apiKey}`
+    }
 
     let serpStatus: SerpStatus = "not_configured"
-    let rankings: KeywordRanking[] = dynamicSeeds.map((item) => ({
-      keyword: item.keyword,
-      searchVolume: item.searchVolume,
-      position: null,
-      previousPosition: null,
-    }))
+    let rankings: KeywordRanking[] = dynamicSeeds.map((item) => ({ keyword: item.keyword, searchVolume: item.searchVolume, position: null, previousPosition: null }))
+    let competitors: Competitor[] = []
 
     if (serpApiKey) {
-      const serpResults = await Promise.all(
-        dynamicSeeds.map((item) =>
-          fetchSerpRanking(item.keyword, item.searchVolume, companyName, serpApiKey),
-        ),
-      )
+      const serpResults = await Promise.all(dynamicSeeds.map((item) => fetchSerpRanking(item.keyword, item.searchVolume, companyName, serpApiKey)))
       const successCount = serpResults.filter((result) => result.requestOk).length
       serpStatus = successCount > 0 ? "ok" : "api_unavailable"
-      rankings = serpResults.map(({ requestOk: _requestOk, ...ranking }) => ranking)
+      rankings = serpResults.map(({ requestOk: _requestOk, topCompetitors: _top, ...ranking }) => ranking)
+      
+      // Pega o benchmark competitivo da primeira palavra-chave que deu certo
+      const firstValidResult = serpResults.find(r => r.requestOk && r.topCompetitors && r.topCompetitors.length > 0)
+      if (firstValidResult && firstValidResult.topCompetitors) {
+          competitors = firstValidResult.topCompetitors
+      }
     }
 
     return NextResponse.json({
@@ -625,8 +483,9 @@ export async function POST(request: Request) {
       userRatingsTotal: place.userRatingCount ?? null,
       address: place.formattedAddress ?? "Endereço não disponível",
       rankings,
+      competitors, // DADO NOVO ENVIADO AO FRONT
       serpStatus,
-      photoUrl, // ✅ FOTO SENDO ENVIADA COM SUCESSO
+      photoUrl,
     })
   } catch {
     return NextResponse.json({ error: "Erro interno ao buscar dados." }, { status: 500 })
