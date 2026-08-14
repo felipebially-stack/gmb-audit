@@ -439,12 +439,22 @@ function findBusinessPosition(
   localResults: Array<{ position?: number; title?: string }>,
   companyName: string,
 ) {
-  const normalizedCompany = normalizeText(companyName)
+  const normalizedCompany = normalizeText(companyName);
+  
+  // Pegamos a primeira palavra do nome da empresa para ser mais flexível
+  const firstWord = normalizedCompany.split(" ")[0];
+
   const match = localResults.find((result) => {
-    const title = normalizeText(result.title ?? "")
-    return title.includes(normalizedCompany) || normalizedCompany.includes(title)
-  })
-  return match?.position ?? null
+    const title = normalizeText(result.title ?? "");
+    // Agora ele verifica se o título tem o nome inteiro OU pelo menos a primeira palavra principal
+    return (
+      title.includes(normalizedCompany) || 
+      normalizedCompany.includes(title) ||
+      (firstWord.length > 3 && title.includes(firstWord))
+    );
+  });
+  
+  return match?.position ?? null;
 }
 
 async function fetchSerpRanking(
